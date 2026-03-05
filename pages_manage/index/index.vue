@@ -16,8 +16,8 @@
 			<uni-list-item title="商品分类" showArrow to="/pages_manage/category/category"></uni-list-item>
 			<uni-list-item title="所有推荐" showArrow to="/pages_manage/banner/list"></uni-list-item>
 			<uni-list-item title="新增推荐" showArrow to="/pages_manage/banner/add"></uni-list-item>
-			<uni-list-item title="所有知识库" showArrow to="/pages_manage/knowledge/list"></uni-list-item>
-			<uni-list-item title="更新知识库" showArrow to="/pages_manage/knowledge/add"></uni-list-item>
+			<uni-list-item title="查看知识库" showArrow to="/pages_manage/knowledge/list"></uni-list-item>
+			<uni-list-item title="知识库新增" showArrow to="/pages_manage/knowledge/add"></uni-list-item>
 			<uni-list-item title="商家信息" showArrow to="/pages_manage/brand/brand"></uni-list-item>
 		</uni-list>
 	</view>

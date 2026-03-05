@@ -275,7 +275,7 @@
 	}
 	.skuList{
 		.item{
-			@include flex-box-set(start)
+			@include flex-box-set(start);
 			padding: 30rpx;
 			background: $page-bg-color;
 			margin: 15rpx 0;
@@ -320,7 +320,7 @@
 					padding: 10rpx 0 30rpx;
 					flex-wrap: wrap;           //自动换行
 					.button{
-						@include flex-box-set()
+						@include flex-box-set();
 						padding: 0 25rpx;
 						height: 60rpx;
 						border: 1rpx solid $border-color-light;

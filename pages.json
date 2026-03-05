@@ -1,5 +1,5 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/index/index",
 			"style": {
@@ -59,194 +59,206 @@
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F7F7F7"
 	},
-	// 小程序分包配置
-	"subPackages": [{
-		"root": "pages_manage",
-		"pages": [{
-				"path": "index/index",
-				"style": {
-					"navigationBarTitleText": "后台管理",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path": "category/category",
-				"style": {
-					"navigationBarTitleText": "分类管理",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path": "goods/list",
-				"style": {
-					"navigationBarTitleText": "商品列表",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path": "goods/add",
-				"style": {
-					"navigationBarTitleText": "新增商品",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path": "brand/brand",
-				"style": {
-					"navigationBarTitleText": "商家信息",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path" : "order/order",
-				"style" : 
+	"subPackages": [
+		{
+			"root": "pages_manage",
+			"pages": [
 				{
-					"navigationBarTitleText" : "所有订单",
-					"enablePullDownRefresh": false
-				}
-			}
-		]
-	},{
-		"root": "uni_modules/uni-pay/pages",
-		"pages": [
-			{
-				"path": "success/success",
-				"style": {
-					"backgroundColor": "#F8F8F8",
-					"navigationBarTitleText": "支付成功",
-					"navigationStyle": "custom"
-				}
-			}, {
-				"path": "ad-interactive-webview/ad-interactive-webview",
-				"style": {
-					"backgroundColor": "#F8F8F8",
-					"navigationBarTitleText": "ad"
-				}
-			}, {
-				"path": "pay-desk/pay-desk",
-				"style": {
-					"backgroundColor": "#F8F8F8",
-					"navigationBarTitleText": "收银台"
-				}
-			}
-		]
-	},{
-		"root": "uni_modules/uni-id-pages/pages",
-		"pages": [{
-				"path": "register/register",
-				"style": {
-					"navigationBarTitleText": "注册",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path": "login/login-withoutpwd",
-				"style": {
-					"navigationBarTitleText": "登录",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path": "login/login-withpwd",
-				"style": {
-					"navigationBarTitleText": "账号密码登录",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path": "login/login-smscode",
-				"style": {
-					"navigationBarTitleText": "手机验证码登录",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path": "userinfo/bind-mobile/bind-mobile",
-				"style": {
-					"navigationBarTitleText": "绑定手机号码",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path" : "userinfo/cropImage/cropImage",
-				"style" : 
+					"path": "index/index",
+					"style": {
+						"navigationBarTitleText": "后台管理",
+						"enablePullDownRefresh": false
+					}
+				},
 				{
-					"navigationBarTitleText" : "",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path" : "register/register-by-email",
-				"style" : 
+					"path": "category/category",
+					"style": {
+						"navigationBarTitleText": "分类管理",
+						"enablePullDownRefresh": false
+					}
+				},
 				{
-					"navigationBarTitleText" : "邮箱验证码注册",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path" : "retrieve/retrieve",
-				"style" : 
+					"path": "goods/list",
+					"style": {
+						"navigationBarTitleText": "商品列表",
+						"enablePullDownRefresh": false
+					}
+				},
 				{
-					"navigationBarTitleText" : "重置密码",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path" : "retrieve/retrieve-by-email",
-				"style" : 
+					"path": "goods/add",
+					"style": {
+						"navigationBarTitleText": "新增商品",
+						"enablePullDownRefresh": false
+					}
+				},
 				{
-					"navigationBarTitleText" : "通过邮箱重置密码",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path" : "common/webview/webview",
-				"style" : 
+					"path": "order/order",
+					"style": {
+						"navigationBarTitleText": "所有订单",
+						"enablePullDownRefresh": false
+					}
+				},
 				{
-					"navigationBarTitleText" : "",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path" : "userinfo/change_pwd/change_pwd",
-				"style" : 
+					"path": "knowledge/list",
+					"style": {
+						"navigationBarTitleText": "查看知识库",
+						"enablePullDownRefresh": false
+					}
+				},
 				{
-					"navigationBarTitleText" : "修改密码",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path" : "register/register-admin",
-				"style" : 
+					"path": "knowledge/add",
+					"style": {
+						"navigationBarTitleText": "知识库新增",
+						"enablePullDownRefresh": false
+					}
+				},
 				{
-					"navigationBarTitleText" : "注册管理员账号",
-					"enablePullDownRefresh": false
+					"path": "brand/brand",
+					"style": {
+						"navigationBarTitleText": "商家信息",
+						"enablePullDownRefresh": false
+					}
 				}
-			},
-			{
-				"path" : "userinfo/set-pwd/set-pwd",
-				"style" : 
+			]
+		},
+		{
+			"root": "uni_modules/uni-pay/pages",
+			"pages": [
 				{
-					"navigationBarTitleText" : "设置密码",
-					"enablePullDownRefresh": false
+					"path": "success/success",
+					"style": {
+						"backgroundColor": "#F8F8F8",
+						"navigationBarTitleText": "支付成功",
+						"navigationStyle": "custom"
+					}
+				},
+				{
+					"path": "ad-interactive-webview/ad-interactive-webview",
+					"style": {
+						"backgroundColor": "#F8F8F8",
+						"navigationBarTitleText": "ad"
+					}
+				},
+				{
+					"path": "pay-desk/pay-desk",
+					"style": {
+						"backgroundColor": "#F8F8F8",
+						"navigationBarTitleText": "收银台"
+					}
 				}
-			},
-			{
-				"path": "userinfo/deactivate/deactivate",
-				"style": {
-					"navigationBarTitleText": "注销账号",
-					"enablePullDownRefresh": false
+			]
+		},
+		{
+			"root": "uni_modules/uni-id-pages/pages",
+			"pages": [
+				{
+					"path": "register/register",
+					"style": {
+						"navigationBarTitleText": "注册",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "login/login-withoutpwd",
+					"style": {
+						"navigationBarTitleText": "登录",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "login/login-withpwd",
+					"style": {
+						"navigationBarTitleText": "账号密码登录",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "login/login-smscode",
+					"style": {
+						"navigationBarTitleText": "手机验证码登录",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "userinfo/bind-mobile/bind-mobile",
+					"style": {
+						"navigationBarTitleText": "绑定手机号码",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "userinfo/cropImage/cropImage",
+					"style": {
+						"navigationBarTitleText": "",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "register/register-by-email",
+					"style": {
+						"navigationBarTitleText": "邮箱验证码注册",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "retrieve/retrieve",
+					"style": {
+						"navigationBarTitleText": "重置密码",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "retrieve/retrieve-by-email",
+					"style": {
+						"navigationBarTitleText": "通过邮箱重置密码",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "common/webview/webview",
+					"style": {
+						"navigationBarTitleText": "",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "userinfo/change_pwd/change_pwd",
+					"style": {
+						"navigationBarTitleText": "修改密码",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "register/register-admin",
+					"style": {
+						"navigationBarTitleText": "注册管理员账号",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "userinfo/set-pwd/set-pwd",
+					"style": {
+						"navigationBarTitleText": "设置密码",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "userinfo/deactivate/deactivate",
+					"style": {
+						"navigationBarTitleText": "注销账号",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "userinfo/realname-verify/realname-verify",
+					"style": {
+						"navigationBarTitleText": "实名认证",
+						"enablePullDownRefresh": false
+					}
 				}
-			}, 
-			{
-				"path": "userinfo/realname-verify/realname-verify",
-				"style": {
-					"navigationBarTitleText": "实名认证",
-					"enablePullDownRefresh": false
-				}
-			}
-		]
-	}],
+			]
+		}
+	],
 	"uniIdRouter": {
 		"loginPage": "uni_modules/uni-id-pages/pages/login/login-withpwd",
 		"needLogin": [

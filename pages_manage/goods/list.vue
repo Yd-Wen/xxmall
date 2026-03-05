@@ -99,9 +99,6 @@
 				font-size: 34rpx;
 			}
 		}
-		.category{
-			
-		}
 		.goodsRow{
 			padding: 0 30rpx;
 			.goods{

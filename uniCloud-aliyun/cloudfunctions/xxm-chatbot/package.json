@@ -1,0 +1,7 @@
+{
+  "name": "xxm-chatbot",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}

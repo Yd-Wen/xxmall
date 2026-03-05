@@ -2,16 +2,16 @@ const cloudUtils = require("xxm-cloud-utils")
 const baseURL = "http://localhost:8000/v1/chat/stream"
 
 module.exports = {
-    _before: function () { // 通用预处理器
+    _before: async function () { // 通用预处理器
         this.userInfo = await cloudUtils.getUserInfo(this)
         if (!this.userInfo.uid) throw this.userInfo
         this.params = this.getParams()[0]
     },
-    
-    async chat(prompt:str, sessionId:str) {
+
+    async chat(prompt, sessionId) {
         return new Promise((resolve, reject) => {
             let fullResponse = ""; // 存储完整响应
-            
+
             uni.request({
                 url: baseURL,
                 method: 'POST',
@@ -27,7 +27,7 @@ module.exports = {
                     // 解析SSE格式的数据
                     const lines = rawData.split('\n');
                     let chunks = [];
-                    
+
                     lines.forEach(line => {
                         if (line.startsWith('data: ')) {
                             const data = line.substring(6);
@@ -60,7 +60,7 @@ module.exports = {
             });
         });
     },
-    
+
     // 可选：设置实时更新回调
     setOnChunkReceived(callback) {
         this.onChunkReceived = callback;

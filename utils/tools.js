@@ -1,15 +1,15 @@
 // 价格转换
-export function priceFormat(num){
-	return (num/100).toFixed(2)
+export function priceFormat(num) {
+	return (num / 100).toFixed(2)
 }
 // 计算折扣
-export function discount(num1, num2){
-	let res = parseInt((num1/num2)*100)
-	return res+'折'
+export function discount(num1, num2) {
+	let res = parseInt((num1 / num2) * 100)
+	return res + '折'
 }
 
 // 日期格式化
-export function timeFormat(timestamp, fmt="yyyy-MM-dd hh:mm:ss", targetTimezone=0){
+export function timeFormat(timestamp, fmt = "yyyy-MM-dd hh:mm:ss", targetTimezone = 0) {
 	const validTimestamp = String(timestamp).length === 10 ? timestamp * 1000 : timestamp;
 	const date = new Date(validTimestamp);
 	if (isNaN(date.getTime())) {
@@ -27,18 +27,81 @@ export function timeFormat(timestamp, fmt="yyyy-MM-dd hh:mm:ss", targetTimezone=
 }
 
 // 后台访问权限
-export function isManage(){
+export function isManage() {
 	let userInfo = uniCloud.getCurrentUserInfo()
-	if(!userInfo.uid || !userInfo.role.includes('manage')){
+	if (!userInfo.uid || !userInfo.role.includes('manage')) {
 		uni.showToast({
-			title:"无访问权限",
-			icon:"error",
-			mask:true
+			title: "无访问权限",
+			icon: "error",
+			mask: true
 		})
-		setTimeout(()=>{
+		setTimeout(() => {
 			uni.reLaunch({
-				url:"/pages/index/index"
+				url: "/pages/index/index"
 			})
 		}, 1000)
 	}
 }
+
+// export function http(options, loading = true) {
+// 	console.log('%c请求拦截：', ' background:orange', options);
+// 	if (loading) {
+// 		uni.showLoading({
+// 			title: "加载中...",
+// 			mask: true
+// 		});
+// 	};
+
+// 	return new Promise((resolve, reject) => {
+// 		uni.request({
+// 			header: {
+// 				token:uni.getStorageSync("userToken")||''
+// 			},
+// 			url: baseUrl + options.url,
+// 			method: options.method || 'GET',
+// 			data: options.data || {},
+// 			async success(res) {
+// 				uni.hideLoading();
+// 				resolve(res.data);
+// 				console.log('响应拦截：', options, res.data);
+// 				if(res.data.code == 900){
+// 					uni.removeStorageSync("token");
+// 					uni.showModal({
+// 						title:'登录过期提示',
+// 						content:'登录已过期，请重新登录',
+// 						showCancel:false,
+// 						success:()=>{
+// 							uni.reLaunch({
+// 								url:"/pages/login/login",
+// 							})
+// 						}
+// 					})
+// 				}else{
+// 					uni.showToast({
+// 						title: res.data.msg,
+// 						icon: res.data.code == 1?"success":"error"
+// 					})
+// 				}
+// 			},
+// 			fail(err) {
+// 				uni.hideLoading();
+// 				console.log('请求失败：', err);
+// 				uni.showToast({
+// 					icon: "error",
+// 					title: err.data.msg
+// 				})
+// 				reject(err);
+// 			},
+// 			complete() {
+// 				// uni.hideLoading();    // 在showToast之前执行会受影响
+// 			}
+// 		});
+// 	});
+// };
+
+// 上传文件到知识库
+// export function uploadFile(options, loading = true) {
+
+// }
+
+

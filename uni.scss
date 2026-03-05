@@ -1,0 +1,58 @@
+/* uni.scss */
+@import '@/uni_modules/uview-ui/theme.scss';
+
+// 自定义颜色
+$xxm-theme-color: #ec544f;         //品牌主体颜色
+$xxm-theme-color-aux: #576b95;     //品牌辅助颜色
+$page-bg-color: #f7f7f7;           //页面背景颜色
+$border-color: #e0e0e0;            //边框颜色
+$border-color-light: #efefef;      //边框亮色
+
+$text-font-color-1: #000;          //文字主体颜色 
+$text-font-color-2: #676767;       //副标题颜色
+$text-font-color-3: #a7a7a7;       //文字浅色
+
+@mixin flex-box {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+@mixin flex-box-set($jc:center, $ai:center) {
+	@include flex-box();
+	@if $jc==center {
+		justify-content: center;
+	}
+	@if $jc==start {
+		justify-content: flex-start;
+	}
+	@if $jc==end {
+		justify-content: flex-end;
+	}
+	@if $jc==between {
+		justify-content: space-between;
+	}
+	@if $ai==center {
+		align-items: center;
+	}
+	@if $ai==start {
+		align-items: flex-start;
+	}
+	@if $ai==end {
+		align-items: flex-end;
+	}
+	@if $ai==stretch {
+		align-items: stretch;
+	}
+}
+
+@mixin ellipse($row:1) {
+	text-overflow: -o-ellipsis-lastline;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: $row;
+	line-clamp: $row;
+	-webkit-box-orient: vertical;
+}
+

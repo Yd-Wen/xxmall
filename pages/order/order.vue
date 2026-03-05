@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<uni-nav-bar title="我的订单" style="{font-size: 32px; font-weight: bold;}" 
+		<uni-nav-bar title="我的订单" :style="{fontSize: '32px', fontWeight: 'bold'}" 
 		:border="false" backgroundColor="#fff" color="#000" leftIcon="left" @clickLeft="onBack" statusBar></uni-nav-bar>
 		<view class="order" v-if="orderList.length">
 			<view class="row" @click="onDetail(item.order_no)" v-for="(item,index) in orderList" :key="item._id">

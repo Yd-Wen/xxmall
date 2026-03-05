@@ -1,0 +1,7 @@
+{
+  "name": "xxm-knowledge",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}

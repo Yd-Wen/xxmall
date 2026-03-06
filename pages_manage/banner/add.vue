@@ -2,7 +2,7 @@
 	<view class="bannerView">
 		<uni-forms ref="bannerForm" :model="bannerData" :rules="bannerRules" :label-width="60" label-align="right">
 			<uni-forms-item label="图片" required name="thumb">
-				<uni-file-picker v-model="bannerData.thumb" file-mediatype="image" mode="grid" :limit="1" dir="banner/"></uni-file-picker>
+				<uni-file-picker v-model="bannerData.thumb" file-mediatype="image" mode="grid" :limit="1" dir="banner" ></uni-file-picker>
 			</uni-forms-item>
 			<uni-forms-item label="标题" required name="name">
 				<uni-easyinput type="text" v-model="bannerData.name" placeholder="请输入标题" trim="both"></uni-easyinput>
@@ -26,25 +26,46 @@
 		data() {
 			return {
 				bannerData: {
-					files: []
+					thumb: [],
+					name: "",
+					desc: "",
+					type_id: null
 				},
 				bannerRules: {
-					files: {
+					name: {
 						rules: [{
 							required: true,
-							errorMessage: '请选择文件',
+							errorMessage: '请输入标题'
+						}]
+					},
+					desc: {
+						rules: [{
+							required: true,
+							errorMessage: '请输入内容'
+						}]
+					},
+					type_id: {
+						rules: [{
+							required: true,
+							errorMessage: '请选择类型'
 						}]
 					}
 				}
 			};
 		},
 		methods: {
+			// 获取指定ID的banner
+			async getBannerById(id){
+				let res = await bannerCloudObj.getById(id)
+				this.bannerData = res.data[0]
+			},
+
 			// 提交
 			async onSubmit(){
                 // 先上传文件到云存储
-				await this.$refs.filePicker.upload()
+				await this.$refs.bannerForm.validate()
                 // 遍历上传每个文件到知识库
-				this.upload()
+				// this.upload()
 			},
 			// 上传知识库
 			async upload(){

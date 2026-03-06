@@ -3,6 +3,7 @@
 		<uni-forms ref="knowledgeForm" :model="knowledgeData" :rules="knowledgeRules" :label-width="90" label-align="right">
 			<uni-forms-item label="选择文件" required name="files">
 				<uni-file-picker 
+                ref="filePicker"
                 v-model="knowledgeData.files" 
                 file-mediatype="all" 
                 file-extname="txt,doc,docx,md" 
@@ -39,27 +40,22 @@
 		},
 		methods: {
 			// 提交
-			onSubmit(){
-				this.$refs.knowledgeForm.validate(err=>{
-					if(!err) this.upload()
-				})
+			async onSubmit(){
+                // 先上传文件到云存储
+				await this.$refs.filePicker.upload()
+                // 遍历上传每个文件到知识库
+				this.upload()
 			},
-			// 上传数据库
+			// 上传知识库
 			async upload(){
-				if (!this.knowledgeData.files || this.knowledgeData.files.length === 0) {
-					uni.showToast({ title: '请选择文件', icon: 'none' })
-					return
-				}
-
-				// 遍历上传每个文件
 				for (let i = 0; i < this.knowledgeData.files.length; i++) {
 					const file = this.knowledgeData.files[i];
-					// 这里需要根据实际情况获取文件内容，可能需要使用uniCloud的文件API
-					// 假设file对象中包含url和name属性
-					let res = await knowledgeCloudObj.add({
-						data: file.url, // 这里需要根据实际情况获取文件内容
-						file_name: file.name
-					})
+                    console.log(file.name)
+                    let res = await knowledgeCloudObj.uploadKnowledge({
+                        // data: file.url, // 这里需要根据实际情况获取文件内容
+                        file_name: file.name
+                    })
+                    console.log(res)
 				}
 
 				uni.showToast({

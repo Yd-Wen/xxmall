@@ -1,14 +1,17 @@
 <template>
 	<view class="bannerView">
-		<uni-forms ref="bannerForm" :model="bannerData" :rules="bannerRules" :label-width="60" label-align="right">
-			<uni-forms-item label="图片" required name="thumb">
-				<uni-file-picker v-model="bannerData.thumb" file-mediatype="image" mode="grid" :limit="1" dir="banner" ></uni-file-picker>
-			</uni-forms-item>
+		<uni-forms ref="bannerForm" :model="bannerData" :rules="bannerRules" :label-width="90" label-align="right">
 			<uni-forms-item label="标题" required name="name">
 				<uni-easyinput type="text" v-model="bannerData.name" placeholder="请输入标题" trim="both"></uni-easyinput>
 			</uni-forms-item>
 			<uni-forms-item label="内容" required name="desc">
 				<uni-easyinput type="textarea" v-model="bannerData.desc" placeholder="请输入内容" trim="both" maxlength="-1"></uni-easyinput>
+			</uni-forms-item>
+			<uni-forms-item class="thumbSrcItem" label="图片来源" name="thumbSrc">
+				<uni-data-checkbox v-model="bannerData.thumbSrc" :localdata="thumbSrcOptions" style="width: 100%"></uni-data-checkbox>
+			</uni-forms-item>
+			<uni-forms-item label="上传图片" v-if="bannerData.thumbSrc === '1'" name="thumb">
+				<uni-file-picker v-model="bannerData.thumb" file-mediatype="image" mode="grid" :limit="1" dir="banner" ></uni-file-picker>
 			</uni-forms-item>
 			<uni-forms-item label="类型" required name="type_id">
 				<uni-data-select collection="xxm-type" field="_id as value, name as text" v-model="bannerData.type_id"></uni-data-select>
@@ -25,7 +28,12 @@
 	export default {
 		data() {
 			return {
+				thumbSrcOptions: [
+					{ value: '0', text: '使用默认图片' },
+					{ value: '1', text: '上传图片' }
+				],
 				bannerData: {
+					thumbSrc: '0',
 					thumb: [],
 					name: "",
 					desc: "",
@@ -42,6 +50,12 @@
 						rules: [{
 							required: true,
 							errorMessage: '请输入内容'
+						}]
+					},
+					thumbSrc: {
+						rules: [{
+							required: true,
+							errorMessage: '请选择图片类型'
 						}]
 					},
 					type_id: {
@@ -93,9 +107,13 @@
 
 <style lang="scss">
 .bannerView{
-	padding: 30rpx 30rpx 30rpx 10rpx;
+	padding: 30rpx 30rpx 30rpx 0;
+	.thumbSrcItem{
+		display: flex;
+		align-items: center;
+	}
 	.button{
-		padding: 0 150rpx;
+		margin: 100rpx 150rpx;
 	}
 }
 </style>

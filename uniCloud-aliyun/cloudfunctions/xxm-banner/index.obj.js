@@ -10,6 +10,10 @@ module.exports = {
 		return await db.collection("xxm-banner").doc(id).get()
 	},
 	async get() {
+		return await db.collection("xxm-banner").get()
+
+	},
+	async getByGroup() {
 		let type = await db.collection("xxm-type").get()
 		let banner = await db.collection("xxm-banner").get()
 		type.data.forEach(item => {

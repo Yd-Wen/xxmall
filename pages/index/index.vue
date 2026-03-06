@@ -1,6 +1,6 @@
 <template>
 	<view class="home">
-		<xxm-header :foldState="foldState" id="header" :key="freshKey"></xxm-header>
+		<xxm-header id="header" :key="freshKey"></xxm-header>
 		<xxm-banner class="banner" :items="swiperItems"/>
 		<view class="wrapper">
 			<view class="info">
@@ -55,7 +55,6 @@
 				rightScrollValue: 0,
 				leftHeights: [],
 				rightHeights: [],
-				foldState: false,
 				dataList: [],
 				timeout: null,
 				freshKey: 0,

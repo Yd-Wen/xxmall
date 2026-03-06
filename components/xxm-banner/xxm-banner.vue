@@ -1,7 +1,7 @@
 <template>
 	<view class="banner">
 		<swiper class="swiper" circular indicator-dots indicator-color="rgba(255, 255, 255, 0.5)" 
-		indicator-active-color="rgba(255, 255, 255, 1)" autoplay interval="3000" duration="1000">
+		indicator-active-color="rgba(255, 255, 255, 1)" autoplay interval="3000" duration="1000" :vertical="foldState">
 			<swiper-item class="item" v-for="(item, index) in items" :key="index" @click="item.onClick">
 				<image :src="item.imageUrl" mode="aspectFill"></image>
                 <view class="title">{{item.title}}</view>
@@ -12,12 +12,16 @@
 </template>
 
 <script>
+	import {mapGetters} from "vuex"
     export default {
         props: {
             items: {
                 type: Array,
                 default: () => []
             }
+        },
+        computed:{
+            ...mapGetters(['foldState'])
         }
     }
 </script>

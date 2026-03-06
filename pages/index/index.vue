@@ -1,6 +1,7 @@
 <template>
 	<view class="home">
 		<xxm-header :foldState="foldState" id="header" :key="freshKey"></xxm-header>
+		<xxm-banner :items="swiperItems"/>
 		<view class="wrapper">
 			<view class="info">
 				<view class="left">免费配送</view>
@@ -57,7 +58,21 @@
 				foldState: false,
 				dataList: [],
 				timeout: null,
-				freshKey: 0
+				freshKey: 0,
+				swiperItems: [
+					{
+						imageUrl: 'https://oss.yindongwen.top/homepage/bg.jpg',
+						onClick: function() { console.log('点击了轮播图1'); }
+					},
+					{
+						imageUrl: 'https://oss.yindongwen.top/homepage/bg.jpg',
+						onClick: function() { console.log('点击了轮播图2'); }
+					},
+					{
+						imageUrl: 'https://oss.yindongwen.top/homepage/bg.jpg',
+						onClick: function() { console.log('点击了轮播图3'); }
+					}
+				]
 			}
 		},
 		async onLoad() {

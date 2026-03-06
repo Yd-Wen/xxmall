@@ -1,16 +1,16 @@
 <template>
 	<view class="bannerView">
-		<uni-forms ref="bannerForm" :model="bannerData" :rules="bannerRules" :label-width="90" label-align="right">
-			<uni-forms-item label="宣传图片" required name="thumb">
-				<uni-file-picker v-model="bannerData.thumb" file-mediatype="image" mode="grid" :limit="1"></uni-file-picker>
+		<uni-forms ref="bannerForm" :model="bannerData" :rules="bannerRules" :label-width="60" label-align="right">
+			<uni-forms-item label="图片" required name="thumb">
+				<uni-file-picker v-model="bannerData.thumb" file-mediatype="image" mode="grid" :limit="1" dir="banner/"></uni-file-picker>
 			</uni-forms-item>
 			<uni-forms-item label="标题" required name="name">
-				<uni-easyinput type="text" v-model="bannerData.name" placeholder="请输入宣传名称" trim="both"></uni-easyinput>
+				<uni-easyinput type="text" v-model="bannerData.name" placeholder="请输入标题" trim="both"></uni-easyinput>
 			</uni-forms-item>
 			<uni-forms-item label="内容" required name="desc">
 				<uni-easyinput type="textarea" v-model="bannerData.desc" placeholder="请输入内容" trim="both" maxlength="-1"></uni-easyinput>
 			</uni-forms-item>
-			<uni-forms-item label="宣传类型" required name="type_id">
+			<uni-forms-item label="类型" required name="type_id">
 				<uni-data-select collection="xxm-type" field="_id as value, name as text" v-model="bannerData.type_id"></uni-data-select>
 			</uni-forms-item>
 			<view class="button" @click="onSubmit">
@@ -71,8 +71,8 @@
 </script>
 
 <style lang="scss">
-.knowledgeView{
-	padding: 30rpx 30rpx 40rpx 10rpx;
+.bannerView{
+	padding: 30rpx 30rpx 30rpx 10rpx;
 	.button{
 		padding: 0 150rpx;
 	}

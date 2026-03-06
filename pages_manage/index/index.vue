@@ -14,7 +14,7 @@
 
 		<uni-section title="推荐管理" type="line"></uni-section>
 		<uni-list>
-			<uni-list-item title="推荐分类" showArrow to="/pages_manage/type/type"></uni-list-item>
+			<uni-list-item title="推荐类型" showArrow to="/pages_manage/type/type"></uni-list-item>
 			<uni-list-item title="所有推荐" showArrow to="/pages_manage/banner/list"></uni-list-item>
 			<uni-list-item title="新增推荐" showArrow to="/pages_manage/banner/add"></uni-list-item>
 		</uni-list>

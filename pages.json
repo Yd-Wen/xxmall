@@ -99,6 +99,13 @@
 					}
 				},
 				{
+					"path": "type/type",
+					"style": {
+						"navigationBarTitleText": "推荐类型",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
 					"path": "banner/list",
 					"style": {
 						"navigationBarTitleText": "所有推荐",

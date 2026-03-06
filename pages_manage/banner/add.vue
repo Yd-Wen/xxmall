@@ -9,10 +9,9 @@
 			</uni-forms-item>
 			<uni-forms-item label="内容" required name="desc">
 				<uni-easyinput type="textarea" v-model="bannerData.desc" placeholder="请输入内容" trim="both" maxlength="-1"></uni-easyinput>
-				<!-- <editor class="desc" placeholder="请输入商品介绍" @statuschange="onStatusChange"></editor> -->
 			</uni-forms-item>
 			<uni-forms-item label="宣传类型" required name="type_id">
-				<uni-data-select collection="xxm-banner-type" field="_id as value, name as text" v-model="bannerData.type_id"></uni-data-select>
+				<uni-data-select collection="xxm-type" field="_id as value, name as text" v-model="bannerData.type_id"></uni-data-select>
 			</uni-forms-item>
 			<view class="button" @click="onSubmit">
 				<button type="primary">提交</button>

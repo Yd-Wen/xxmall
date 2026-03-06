@@ -116,7 +116,7 @@
 					imageUrl: item.thumb_src=='0'?'../../static/images/banner/banner_default_'+ (index%3+1) +'.png':item.thumb[0].url,
 					title: item.name,
 					desc: item.desc,
-					// TODO: 点击轮播图跳转对应推荐页面
+					// TODO: 点击轮播图跳转推荐页面
 					onClick: function() { uni.showToast({title:'点击了轮播图'+(index+1)}); },
 				}))
 			},

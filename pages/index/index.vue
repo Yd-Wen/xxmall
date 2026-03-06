@@ -61,21 +61,21 @@
 				swiperItems: [
 					{
 						imageUrl: '../../static/images/banner/banner_default_1.png',
-						onClick: function() { console.log('点击了轮播图1'); },
 						title: '推荐内容默认标题',
-						desc: '这是一个推荐内容的默认描述 (背景为默认背景)。'
+						desc: '这是一个推荐内容的默认描述 (背景为默认背景)。',
+						onClick: function() { uni.showToast({title:'点击了轮播图1'}); },
 					},
 					{
 						imageUrl: '../../static/images/banner/banner_default_2.png',
-						onClick: function() { console.log('点击了轮播图2'); },
 						title: '标题2',
-						desc: '这是一个描述: 描述信息~描述信息~描述信息~描述信息~。'
+						desc: '这是一个描述: 描述信息~描述信息~描述信息~描述信息~。',
+						onClick: function() { uni.showToast({title:'点击了轮播图2'}); },
 					},
 					{
 						imageUrl: '../../static/images/banner/banner_default_3.png',
-						onClick: function() { console.log('点击了轮播图3'); },
 						title: '标题3',
-						desc: '这是一个描述: 描述信息~描述信息~描述信息~描述信息~描述信息~描述信息~。'
+						desc: '这是一个描述: 描述信息~描述信息~描述信息~描述信息~描述信息~描述信息~。',
+						onClick: function() { uni.showToast({title:'点击了轮播图3'}); },
 					}
 				]
 			}

@@ -4,6 +4,8 @@
 		indicator-active-color="rgba(255, 255, 255, 1)" autoplay interval="3000" duration="1000">
 			<swiper-item class="item" v-for="(item, index) in items" :key="index" @click="item.onClick">
 				<image :src="item.imageUrl" mode="aspectFill"></image>
+                <view class="title">{{item.title}}</view>
+                <view class="desc">{{item.desc}}</view>
 			</swiper-item>
 		</swiper>
 	</view>
@@ -22,7 +24,7 @@
 
 <style lang="scss" scoped>
 	.banner{
-		width: 750rpx;
+		width: 100%;
 		padding: 0 0 10rpx;
 		swiper{
 			width: 740rpx;
@@ -32,10 +34,31 @@
 				width: 100%;
 				height: 100%;
 				border-radius: 10rpx;
+                display: relative;
 				image{
 					width: 100%;
 					height: 350rpx;
+                    opacity: 0.9;
 				}
+                .title{
+                    width: 40%;
+                    position: absolute;
+                    top: 50rpx;
+                    left: 50rpx;
+                    font-size: 34rpx;
+                    color: #fff;
+                    font-weight: bold;
+                    @include ellipse();
+                }
+                .desc{
+                    width: 60%;
+                    position: absolute;
+                    top: 150rpx;
+                    left: 50rpx;
+                    font-size: 26rpx;
+                    color: #fff;
+                    @include ellipse(2);
+                }
 			}
 		}
 	}

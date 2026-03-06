@@ -62,15 +62,21 @@
 				swiperItems: [
 					{
 						imageUrl: 'https://oss.yindongwen.top/homepage/bg.jpg',
-						onClick: function() { console.log('点击了轮播图1'); }
+						onClick: function() { console.log('点击了轮播图1'); },
+						title: '这是一个标题，这是一个标题，这是一个标题',
+						desc: '这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述。'
 					},
 					{
 						imageUrl: 'https://oss.yindongwen.top/homepage/bg.jpg',
-						onClick: function() { console.log('点击了轮播图2'); }
+						onClick: function() { console.log('点击了轮播图2'); },
+						title: '这是一个标题',
+						desc: '这是一个描述'
 					},
 					{
 						imageUrl: 'https://oss.yindongwen.top/homepage/bg.jpg',
-						onClick: function() { console.log('点击了轮播图3'); }
+						onClick: function() { console.log('点击了轮播图3'); },
+						title: '这是一个标题',
+						desc: '这是一个描述'	
 					}
 				]
 			}

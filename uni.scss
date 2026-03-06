@@ -57,6 +57,7 @@ $uni-color-primary: $xxm-theme-color;
 	}
 }
 
+// 多行省略号
 @mixin ellipse($row: 1) {
 	text-overflow: -o-ellipsis-lastline;
 	overflow: hidden;

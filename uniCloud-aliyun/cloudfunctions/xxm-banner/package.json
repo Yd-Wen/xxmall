@@ -1,0 +1,9 @@
+{
+  "name": "xxm-banner",
+  "dependencies": {
+    "xxm-cloud-utils": "file:../common/xxm-cloud-utils"
+  },
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}

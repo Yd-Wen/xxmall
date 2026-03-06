@@ -17,7 +17,7 @@
 			</swiper-item>
 		</swiper>
         <view class="right" v-if="foldState" @click="onRightClick">
-            <uni-icons type="right" size="20" color="#000"/>
+            <uni-icons type="right" size="20" color="#bbbbbb"/>
         </view>
 	</view>
 </template>

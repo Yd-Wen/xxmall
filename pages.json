@@ -99,6 +99,20 @@
 					}
 				},
 				{
+					"path": "banner/list",
+					"style": {
+						"navigationBarTitleText": "所有推荐",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "banner/add",
+					"style": {
+						"navigationBarTitleText": "新增推荐",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
 					"path": "knowledge/list",
 					"style": {
 						"navigationBarTitleText": "查看知识库",

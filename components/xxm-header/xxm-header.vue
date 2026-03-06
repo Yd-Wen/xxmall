@@ -215,11 +215,6 @@
 		top: 0;
 		left: 0;
 		width: 100%;
-		.statusBar{
-			// 跳过APP/小程序的状态栏
-			// height: var(--status-bar-height);
-			// border: 1px solid green;
-		}
 		.service{
 			@include flex-box-set(start);
 			padding-left: 30rpx;	

@@ -24,17 +24,17 @@
 
 <style lang="scss" scoped>
 	.banner{
-		width: 100%;
 		padding: 0 0 10rpx;
 		swiper{
-			width: 740rpx;
+			// width: 740rpx;
 			height: 350rpx;
 			margin: 0 auto;
+			border-radius: 10rpx 10rpx 0 0;
+			overflow: hidden;
 			&-item{
 				width: 100%;
 				height: 100%;
-				border-radius: 10rpx;
-                display: relative;
+                position: relative;
 				image{
 					width: 100%;
 					height: 350rpx;

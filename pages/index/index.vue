@@ -1,7 +1,7 @@
 <template>
 	<view class="home">
 		<xxm-header :foldState="foldState" id="header" :key="freshKey"></xxm-header>
-		<xxm-banner :items="swiperItems"/>
+		<xxm-banner class="banner" :items="swiperItems"/>
 		<view class="wrapper">
 			<view class="info">
 				<view class="left">免费配送</view>
@@ -202,12 +202,14 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-
+		.banner{
+			margin-top: -10rpx;
+		}
 		.wrapper {
 			flex: 1;
 			background: #fff;
 			border-radius: 10px 10px 0 0;
-			margin-top: -10px;
+			margin-top: -25rpx;
 			position: relative;
 			z-index: 2;
 			overflow: hidden;
@@ -261,7 +263,6 @@
 						}
 					}
 				}
-
 				.rightScroll {
 					height: 100%;
 					flex: 1;
@@ -287,7 +288,6 @@
 						}
 					}
 				}
-
 				.scrollContent {
 					height: 100%;
 				}

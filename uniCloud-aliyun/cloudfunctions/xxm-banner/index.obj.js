@@ -31,6 +31,11 @@ module.exports = {
 	async add(params) {
 		return await db.collection("xxm-banner").add(params)
 	},
+	async deleteThumb(file_ids) {
+		uniCloud.deleteFile({
+			fileList: file_ids, // 待删除的文件地址列表
+		})
+	},
 	async update(params) {
 		let _params = { ...params }
 		delete _params._id

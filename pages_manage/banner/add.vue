@@ -33,6 +33,8 @@
 					{ value: '0', text: '使用默认图片' },
 					{ value: '1', text: '上传图片' }
 				],
+				originalThumbSrc: '0',
+				originalThumb: [],
 				bannerData: {
 					thumb_src: '0',
 					thumb: [],
@@ -78,6 +80,9 @@
 			async getBannerById(id){
 				let res = await bannerCloudObj.getById(id)
 				this.bannerData = res.data[0]
+				// 保存原始图片信息，用于判断是否需要删除旧图片
+				this.originalThumbSrc = this.bannerData.thumb_src || '0'
+				this.originalThumb = this.bannerData.thumb.length ? this.bannerData.thumb : []
 			},
 
 			// 提交
@@ -89,6 +94,9 @@
 			},
 			// 上传banner数据到云数据库
 			async upload(){
+				// 检查是否需要删除旧图片
+				await this.deleteOldImageIfNeeded()
+				
 				this.bannerData.thumb = this.bannerData.thumb.map(item=>{
 					return{
 						url: item.url,
@@ -112,6 +120,31 @@
 					setTimeout(()=>{
 						uni.navigateBack()
 					}, 1500)
+				}
+			},
+			
+			// 检查并删除旧图片
+			async deleteOldImageIfNeeded(){
+				// 只有在编辑模式下才需要处理
+				if (!bannerId) return
+				
+				// 情况1：原来是上传图片，现在改为默认图片
+				if (this.originalThumbSrc === '1' && this.bannerData.thumb_src === '0') {
+					// 删除原来的上传图片
+					await bannerCloudObj.deleteThumb(this.originalThumb.map(item => item.url))
+					this.bannerData.thumb = []
+				}
+				
+				// 情况2：原来是上传图片，现在还是上传图片，但换了新图片
+				if (this.originalThumbSrc === '1' && this.bannerData.thumb_src === '1') {
+					// 检查是否有旧图片需要删除
+					const newUrls = this.bannerData.thumb.map(item => item.url)
+					await bannerCloudObj.deleteThumb(
+						// 找出被替换掉的旧图片
+						this.originalThumb.filter(oldItem => {
+							return !newUrls.includes(oldItem.url)
+						}).map(item => item.url)
+					)
 				}
 			}
 		}

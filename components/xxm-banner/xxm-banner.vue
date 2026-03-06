@@ -86,16 +86,15 @@
 			overflow: hidden;
             transition: 0.4s;
             &.fold{
-                height: 100rpx;
+                height: 80rpx;
                 margin: 20rpx 0;
                 image{
-                    // height: 100rpx;
                     display: none;
                 }
                 .title{
                     width: 80%;
                     vertical-align: middle;
-                    top: 25rpx;
+                    top: 15rpx;
                     left: 0;
                 }
                 .desc{

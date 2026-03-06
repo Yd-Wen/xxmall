@@ -7,10 +7,10 @@
 			<uni-forms-item label="内容" required name="desc">
 				<uni-easyinput type="textarea" v-model="bannerData.desc" placeholder="请输入内容" trim="both" maxlength="-1"></uni-easyinput>
 			</uni-forms-item>
-			<uni-forms-item class="thumbSrcItem" label="图片来源" name="thumbSrc">
-				<uni-data-checkbox v-model="bannerData.thumbSrc" :localdata="thumbSrcOptions" style="width: 100%"></uni-data-checkbox>
+			<uni-forms-item class="thumbSrcItem" label="图片来源" name="thumb_src">
+				<uni-data-checkbox v-model="bannerData.thumb_src" :localdata="thumbSrcOptions" style="width: 100%"></uni-data-checkbox>
 			</uni-forms-item>
-			<uni-forms-item label="上传图片" v-if="bannerData.thumbSrc === '1'" name="thumb">
+			<uni-forms-item label="上传图片" v-if="bannerData.thumb_src === '1'" name="thumb">
 				<uni-file-picker v-model="bannerData.thumb" file-mediatype="image" mode="grid" :limit="1" dir="banner" ></uni-file-picker>
 			</uni-forms-item>
 			<uni-forms-item label="类型" required name="type_id">
@@ -25,6 +25,7 @@
 
 <script>
 	const bannerCloudObj = uniCloud.importObject("xxm-banner")
+	let bannerId = null
 	export default {
 		data() {
 			return {
@@ -33,7 +34,7 @@
 					{ value: '1', text: '上传图片' }
 				],
 				bannerData: {
-					thumbSrc: '0',
+					thumb_src: '0',
 					thumb: [],
 					name: "",
 					desc: "",
@@ -52,7 +53,7 @@
 							errorMessage: '请输入内容'
 						}]
 					},
-					thumbSrc: {
+					thumb_src: {
 						rules: [{
 							required: true,
 							errorMessage: '请选择图片类型'
@@ -67,6 +68,11 @@
 				}
 			};
 		},
+		onLoad(e){
+			this.isManage()
+			bannerId = e?.id || null
+			if(bannerId) this.getBannerById(e.id)
+		},
 		methods: {
 			// 获取指定ID的banner
 			async getBannerById(id){
@@ -78,28 +84,35 @@
 			async onSubmit(){
                 // 先上传文件到云存储
 				await this.$refs.bannerForm.validate()
-                // 遍历上传每个文件到知识库
-				// this.upload()
+                // 上传banner数据到云数据库
+				this.upload()
 			},
-			// 上传知识库
+			// 上传banner数据到云数据库
 			async upload(){
-				for (let i = 0; i < this.knowledgeData.files.length; i++) {
-					const file = this.knowledgeData.files[i];
-                    console.log(file.name)
-                    let res = await knowledgeCloudObj.uploadKnowledge({
-                        // data: file.url, // 这里需要根据实际情况获取文件内容
-                        file_name: file.name
-                    })
-                    console.log(res)
+				this.bannerData.thumb = this.bannerData.thumb.map(item=>{
+					return{
+						url: item.url,
+						name: item.name,
+						extname: item.extname
+					}
+				})	
+				let toastTitle, res
+				if (bannerId){
+					toastTitle = "修改成功"
+					res = await bannerCloudObj.update(this.bannerData)
+				}else{
+					toastTitle = "新增成功"
+					res = await bannerCloudObj.add(this.bannerData)
 				}
-
-				uni.showToast({
-					title: "上传成功",
-					mask: true
-				})
-				setTimeout(()=>{
-					uni.navigateBack()
-				}, 1500)
+				if(res){
+					uni.showToast({
+						title: toastTitle,
+						mask: true
+					})
+					setTimeout(()=>{
+						uni.navigateBack()
+					}, 1500)
+				}
 			}
 		}
 	}

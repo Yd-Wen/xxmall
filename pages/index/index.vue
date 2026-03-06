@@ -60,22 +60,22 @@
 				freshKey: 0,
 				swiperItems: [
 					{
-						imageUrl: 'https://oss.yindongwen.top/homepage/bg.jpg',
+						imageUrl: '../../static/images/banner/banner_default_1.png',
 						onClick: function() { console.log('点击了轮播图1'); },
-						title: '这是一个标题，这是一个标题，这是一个标题',
-						desc: '这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述，这是一个描述。'
+						title: '推荐内容默认标题',
+						desc: '这是一个推荐内容的默认描述 (背景为默认背景)。'
 					},
 					{
-						imageUrl: 'https://oss.yindongwen.top/homepage/bg.jpg',
+						imageUrl: '../../static/images/banner/banner_default_2.png',
 						onClick: function() { console.log('点击了轮播图2'); },
-						title: '这是一个标题',
-						desc: '这是一个描述'
+						title: '标题2',
+						desc: '这是一个描述: 描述信息~描述信息~描述信息~描述信息~。'
 					},
 					{
-						imageUrl: 'https://oss.yindongwen.top/homepage/bg.jpg',
+						imageUrl: '../../static/images/banner/banner_default_3.png',
 						onClick: function() { console.log('点击了轮播图3'); },
-						title: '这是一个标题',
-						desc: '这是一个描述'	
+						title: '标题3',
+						desc: '这是一个描述: 描述信息~描述信息~描述信息~描述信息~描述信息~描述信息~。'
 					}
 				]
 			}

@@ -6,15 +6,18 @@ module.exports = {
 		if (!this.userInfo.uid) throw this.userInfo
 		this.params = this.getParams()[0]
 	},
-	async get(){
+	async get() {
 		return await db.collection('xxm-brand').get()
 	},
-	async add(){
+	async add() {
 		return await db.collection('xxm-brand').add(this.params)
 	},
-	async update(){
-		let params = {...this.params} // 深拷贝
+	async update() {
+		let params = { ...this.params } // 深拷贝
 		delete params._id             // 删除ID
+		if (params.thumb_urls_delete && params.thumb_urls_delete.length) {
+			await cloudUtils.deleteThumb(params.thumb_urls_delete)
+		}
 		return await db.collection('xxm-brand').doc(this.params._id).update(params)
 	}
 }

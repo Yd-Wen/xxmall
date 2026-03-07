@@ -24,6 +24,7 @@
 </template>
 
 <script>
+	import {mapMutations} from "vuex"
 	const bannerCloudObj = uniCloud.importObject("xxm-banner")
 	let bannerId = null
 	export default {
@@ -76,6 +77,7 @@
 			if(bannerId) this.getBannerById(e.id)
 		},
 		methods: {
+			...mapMutations(['SET_BANNER']),
 			// 获取指定ID的banner
 			async getBannerById(id){
 				let res = await bannerCloudObj.getById(id)
@@ -121,6 +123,8 @@
 						uni.navigateBack()
 					}, 1500)
 				}
+				// 提交成功后，更新banner数据到vuex
+				this.SET_BANNER([])
 			},
 			
 			// 检查并删除旧图片

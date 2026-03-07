@@ -5,16 +5,19 @@ import cart from "@/store/modules/cart.js"
 import brand from "@/store/modules/brand.js"
 import goods from "@/store/modules/goods.js"
 import getters from "./getters.js"
+import banner from "@/store/modules/banner.js"
+
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
 	getters,
-	modules:{
+	modules: {
 		system,
 		cart,
 		brand,
-		goods
+		goods,
+		banner
 	}
 })
 

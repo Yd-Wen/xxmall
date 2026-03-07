@@ -37,6 +37,7 @@
 </template>
 
 <script>
+	import { mapMutations } from 'vuex'
 	const bannerCloudObj = uniCloud.importObject("xxm-banner")
 	export default {
 		data() {
@@ -51,6 +52,7 @@
 			this.getBanner()
 		},
 		methods:{
+			...mapMutations(['SET_BANNER']),
 			// 获取商品
 			async getBanner(){
 				let res = await bannerCloudObj.getByGroup()
@@ -84,6 +86,7 @@
 						this.getBanner()
 					}, 1000)
 				}
+				this.SET_BANNER([])
 			}
 		}
 	}

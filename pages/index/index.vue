@@ -1,7 +1,7 @@
 <template>
 	<view class="home">
 		<xxm-header id="header" :key="freshKey"></xxm-header>
-		<xxm-banner class="banner" :items="swiperItems"/>
+		<xxm-banner class="banner" :items="bannerData"/>
 		<view class="wrapper">
 			<view class="info">
 				<view class="left">免费配送</view>
@@ -45,7 +45,7 @@
 </template>
 
 <script>
-	import {mapGetters, mapMutations} from "vuex"
+	import {mapGetters, mapMutations, mapActions} from "vuex"
 	const bannerCloudObj = uniCloud.importObject("xxm-banner", {"customUI":true})
 	const goodsCloudObj = uniCloud.importObject("xxm-goods", {"customUI":true})
 	export default {
@@ -58,31 +58,12 @@
 				rightHeights: [],
 				dataList: [],
 				timeout: null,
-				freshKey: 0,
-				swiperItems: [
-					{
-						imageUrl: '../../static/images/banner/banner_default_1.png',
-						title: '推荐内容默认标题',
-						desc: '这是一个推荐内容的默认描述 (背景为默认背景)。',
-						onClick: function() { uni.showToast({title:'点击了轮播图1'}); },
-					},
-					{
-						imageUrl: '../../static/images/banner/banner_default_2.png',
-						title: '标题2',
-						desc: '这是一个描述: 描述信息~描述信息~描述信息~描述信息~。',
-						onClick: function() { uni.showToast({title:'点击了轮播图2'}); },
-					},
-					{
-						imageUrl: '../../static/images/banner/banner_default_3.png',
-						title: '标题3',
-						desc: '这是一个描述: 描述信息~描述信息~描述信息~描述信息~描述信息~描述信息~。',
-						onClick: function() { uni.showToast({title:'点击了轮播图3'}); },
-					}
-				]
+				freshKey: 0
 			}
 		},
 		async onLoad() {
-			await this.getBanner()
+			await this.getBannerData()
+			console.log(this.bannerData)
 			await this.getGoodsData() // 等待获取数据后获取高度
 			await this.$nextTick()
 			this.getHeights()
@@ -96,7 +77,7 @@
 			}	
 		},
 		computed:{
-			...mapGetters(['goodsCount', 'cartList'])
+			...mapGetters(['goodsCount', 'cartList', 'bannerData'])
 		},
 		watch:{
 			// 深度监听
@@ -109,17 +90,18 @@
 		},
 		methods: {
 			...mapMutations(['SET_FOLD_STATE']),
+			...mapActions(['getBannerData']),
 			// 点击轮播图
-			async getBanner(){
-				let res = await bannerCloudObj.get()
-				this.swiperItems = res.data.map((item, index) => ({
-					imageUrl: item.thumb_src=='0'?'../../static/images/banner/banner_default_'+ (index%3+1) +'.png':item.thumb[0].url,
-					title: item.name,
-					desc: item.desc,
-					// TODO: 点击轮播图跳转推荐页面
-					onClick: function() { uni.showToast({title:'点击了轮播图'+(index+1)}); },
-				}))
-			},
+			// async getBanner(){
+			// 	let res = await bannerCloudObj.get()
+			// 	this.swiperItems = res.data.map((item, index) => ({
+			// 		imageUrl: item.thumb_src=='0'?'../../static/images/banner/banner_default_'+ (index%3+1) +'.png':item.thumb[0].url,
+			// 		title: item.name,
+			// 		desc: item.desc,
+			// 		// TODO: 点击轮播图跳转推荐页面
+			// 		onClick: function() {}
+			// 	}))
+			// },
 			// 获取商品数据
 			async getGoodsData(){
 				let res = await goodsCloudObj.get()

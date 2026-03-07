@@ -12,8 +12,8 @@
                 v-for="(item, index) in items" 
                 :key="index" 
                 @click="item.onClick">
-					<image :src="item.imageUrl" mode="aspectFill"></image>
-                    <view class="title">{{item.title}}</view>
+					<image :src="item.thumb_src=='0'?'../../static/images/banner/banner_default_'+ (index%3+1) +'.png':item.thumb[0].url" mode="aspectFill"></image>
+                    <view class="title">{{item.name}}</view>
                     <view class="desc">{{item.desc}}</view>
 				</swiper-item>
 			</swiper>

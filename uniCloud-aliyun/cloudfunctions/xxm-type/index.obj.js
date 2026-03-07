@@ -10,6 +10,9 @@ module.exports = {
 	async get() {
 		return await db.collection("xxm-type").get()
 	},
+	async getById(id) {
+		return await db.collection("xxm-type").doc(id).get()
+	},
 	async add(params) {
 		return await db.collection("xxm-type").add(params)
 	},

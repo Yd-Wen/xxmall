@@ -23,7 +23,7 @@
 						<view class="desc">{{row.desc}}</view>
 						<view class="option">
 							<view class="icon" @click="onUpdate(row._id)">
-								<u-icon name="edit-pen" size="25" color="576b95"></u-icon>
+								<u-icon name="edit-pen" size="25" color="#576b95"></u-icon>
 							</view>
 							<view class="icon" @click="onDelete(row._id)">
 								<u-icon name="trash" size="25" color="#ec544f"></u-icon>

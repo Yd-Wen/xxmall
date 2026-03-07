@@ -5,8 +5,8 @@ const banner = {
         currentIndex: 0,
         currentBanner: {
             name: '',
-            thumb_src: '0',
-            thumb: [],
+            thumb_src: '',
+            thumb: [{ url: "../../static/images/no_address.png" }],
             desc: ''
         }
     },
@@ -34,6 +34,9 @@ const banner = {
                 state.bannerData.splice(index, 1)
             }
         },
+        CLEAR_BANNER(state) {
+            state.bannerData = []
+        },
         SET_CURRENT_BANNER(state, idx) {
             state.currentIndex = idx
             state.currentBanner = state.bannerData[idx]
@@ -44,6 +47,7 @@ const banner = {
         async getBannerData(context) {
             if (context.state.bannerData.length > 0) return  //跳过二次网络请求
             let res = await bannerCloudObj.get()
+            context.commit("CLEAR_BANNER")
             context.commit("ADD_BANNER", res.data)
         }
     }

@@ -22,7 +22,7 @@
 </template>
 
 <script>
-const db = uniCloud.database()
+const typeCloudObj = uniCloud.importObject("xxm-type")
 	export default {
 		data() {
 			return {
@@ -37,11 +37,9 @@ const db = uniCloud.database()
 		},
 		methods: {
 			// 获取商品分类
-			getType(){
-				db.collection('xxm-type').get().then(res=>{
-					console.log(res)
-					this.typeList = res.result.data
-				})
+			async getType(){
+				let res = await typeCloudObj.get()
+				this.typeList = res.data
 			},
 			// 添加类型
 			onAdd() {
@@ -53,22 +51,18 @@ const db = uniCloud.database()
 			async onConfirm(e) {
 				if(this.editId){
 					// 修改
-					await db.collection('xxm-type').doc(this.editId).update({
-						name: e
-					}).then(res=>{
-						uni.showToast({
-							title: '更新类型成功',
-							mask: true
-						})
+					await typeCloudObj.update(this.editId, e)
+					uni.showToast({
+						title: '更新类型成功',
+						mask: true
 					})
 				}else{
-					await db.collection('xxm-type').add({
+					await typeCloudObj.add({
 						name: e
-					}).then(res=>{
-						uni.showToast({
-							title: '新增类型成功',
-							mask: true
-						})
+					})
+					uni.showToast({
+						title: '新增类型成功',
+						mask: true
 					})
 				}
 				// 同步添加/修改后刷新
@@ -81,18 +75,17 @@ const db = uniCloud.database()
 				this.$refs.inputPopup.open()
 			},
 			// 删除类型
-			onDelete(id){
+			async onDelete(id){
 				uni.showModal({
 					content: '是否删除该类型?',
-					success: res=>{
+					success: async res=>{
 						if(res.confirm){
-							db.collection('xxm-type').doc(id).remove().then(res=>{
-								uni.showToast({
-									title: '删除类型成功',
-									mask: true
-								})
-								this.getType()
+							await typeCloudObj.delete(id)
+							uni.showToast({
+								title: '删除类型成功',
+								mask: true
 							})
+							this.getType()
 						} 
 					}
 				})

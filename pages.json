@@ -11,7 +11,6 @@
 			"path": "pages/order/order",
 			"style": {
 				"navigationBarTitleText": "我的订单",
-				"enablePullDownRefresh": false,
 				"navigationBarBackgroundColor": "#fff",
 				"navigationStyle": "custom"
 			}
@@ -19,45 +18,47 @@
 		{
 			"path": "pages/order/detail",
 			"style": {
-				"navigationBarTitleText": "订单详情",
-				"enablePullDownRefresh": false
+				"navigationBarTitleText": "订单详情"
 			}
 		},
 		{
 			"path": "pages/search/search",
 			"style": {
 				"navigationBarTitleText": "搜索",
-				"enablePullDownRefresh": false,
 				"navigationBarBackgroundColor": "#fff"
 			}
 		},
 		{
 			"path": "pages/pay/pay",
 			"style": {
-				"navigationBarTitleText": "确认订单",
-				"enablePullDownRefresh": false
+				"navigationBarTitleText": "确认订单"
 			}
 		},
 		{
 			"path": "pages/address/list",
 			"style": {
 				"navigationBarTitleText": "我的地址",
-				"enablePullDownRefresh": false,
 				"navigationBarBackgroundColor": "#fff"
 			}
 		},
 		{
 			"path": "pages/address/edit",
 			"style": {
-				"navigationBarTitleText": "修改地址",
-				"enablePullDownRefresh": false
+				"navigationBarTitleText": "修改地址"
+			}
+		},
+		{
+			"path": "pages/recommend/recommend",
+			"style": {
+				"navigationBarTitleText": "店长推荐"
 			}
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F7F7F7"
+		"navigationBarBackgroundColor": "#F7F7F7",
+		"enablePullDownRefresh": false
 	},
 	"subPackages": [
 		{
@@ -66,78 +67,67 @@
 				{
 					"path": "index/index",
 					"style": {
-						"navigationBarTitleText": "后台管理",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "后台管理"
 					}
 				},
 				{
 					"path": "category/category",
 					"style": {
-						"navigationBarTitleText": "分类管理",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "分类管理"
 					}
 				},
 				{
 					"path": "goods/list",
 					"style": {
-						"navigationBarTitleText": "商品列表",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "商品列表"
 					}
 				},
 				{
 					"path": "goods/add",
 					"style": {
-						"navigationBarTitleText": "新增商品",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "新增商品"
 					}
 				},
 				{
 					"path": "order/order",
 					"style": {
-						"navigationBarTitleText": "所有订单",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "所有订单"
 					}
 				},
 				{
 					"path": "type/type",
 					"style": {
-						"navigationBarTitleText": "推荐类型",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "推荐类型"
 					}
 				},
 				{
 					"path": "banner/list",
 					"style": {
-						"navigationBarTitleText": "所有推荐",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "所有推荐"
 					}
 				},
 				{
 					"path": "banner/add",
 					"style": {
-						"navigationBarTitleText": "新增推荐",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "新增推荐"
 					}
 				},
 				{
 					"path": "knowledge/list",
 					"style": {
-						"navigationBarTitleText": "查看知识库",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "查看知识库"
 					}
 				},
 				{
 					"path": "knowledge/add",
 					"style": {
-						"navigationBarTitleText": "知识库新增",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "知识库新增"
 					}
 				},
 				{
 					"path": "brand/brand",
 					"style": {
-						"navigationBarTitleText": "商家信息",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "商家信息"
 					}
 				}
 			]
@@ -175,106 +165,91 @@
 				{
 					"path": "register/register",
 					"style": {
-						"navigationBarTitleText": "注册",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "注册"
 					}
 				},
 				{
 					"path": "login/login-withoutpwd",
 					"style": {
-						"navigationBarTitleText": "登录",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "登录"
 					}
 				},
 				{
 					"path": "login/login-withpwd",
 					"style": {
-						"navigationBarTitleText": "账号密码登录",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "账号密码登录"
 					}
 				},
 				{
 					"path": "login/login-smscode",
 					"style": {
-						"navigationBarTitleText": "手机验证码登录",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "手机验证码登录"
 					}
 				},
 				{
 					"path": "userinfo/bind-mobile/bind-mobile",
 					"style": {
-						"navigationBarTitleText": "绑定手机号码",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "绑定手机号码"
 					}
 				},
 				{
 					"path": "userinfo/cropImage/cropImage",
 					"style": {
-						"navigationBarTitleText": "",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": ""
 					}
 				},
 				{
 					"path": "register/register-by-email",
 					"style": {
-						"navigationBarTitleText": "邮箱验证码注册",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "邮箱验证码注册"
 					}
 				},
 				{
 					"path": "retrieve/retrieve",
 					"style": {
-						"navigationBarTitleText": "重置密码",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "重置密码"	
 					}
 				},
 				{
 					"path": "retrieve/retrieve-by-email",
 					"style": {
-						"navigationBarTitleText": "通过邮箱重置密码",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "通过邮箱重置密码"
 					}
 				},
 				{
 					"path": "common/webview/webview",
 					"style": {
-						"navigationBarTitleText": "",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": ""
 					}
 				},
 				{
 					"path": "userinfo/change_pwd/change_pwd",
 					"style": {
-						"navigationBarTitleText": "修改密码",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "修改密码"	
 					}
 				},
 				{
 					"path": "register/register-admin",
 					"style": {
-						"navigationBarTitleText": "注册管理员账号",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "注册管理员账号"				
 					}
 				},
 				{
 					"path": "userinfo/set-pwd/set-pwd",
 					"style": {
-						"navigationBarTitleText": "设置密码",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "设置密码"					
 					}
 				},
 				{
 					"path": "userinfo/deactivate/deactivate",
 					"style": {
-						"navigationBarTitleText": "注销账号",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "注销账号"						
 					}
 				},
 				{
 					"path": "userinfo/realname-verify/realname-verify",
 					"style": {
-						"navigationBarTitleText": "实名认证",
-						"enablePullDownRefresh": false
+						"navigationBarTitleText": "实名认证"					
 					}
 				}
 			]

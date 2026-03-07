@@ -127,8 +127,6 @@
 			async deleteOldImageIfNeeded(){
 				// 只有在编辑模式下才需要处理
 				if (!bannerId) return
-
-				this.bannerData.thumb_urls_delete = []
 				
 				// 情况1：原来是上传图片，现在改为默认图片
 				if (this.originalThumbSrc === '1' && this.bannerData.thumb_src === '0') {

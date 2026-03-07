@@ -70,11 +70,12 @@
 		methods:{
 			...mapMutations(['SET_BRAND']),
 			// 获取商家信息
-			getBrand(){
-				brandCloudObj.get().then(res=>{
-					if(!res.data.length) return
-					this.brandData = res.data[0]
-				})
+			async getBrand(){
+				let res = await brandCloudObj.get()
+				if(!res.data.length) return
+				this.brandData = res.data[0]
+				// 保存原始图片数据
+				this.originalThumb = this.brandData.thumb.length ? this.brandData.thumb : []
 			},
 			// 提交
 			onSubmit(){
@@ -98,7 +99,7 @@
 			async addAndUpdata(){
 				let title
 				if(this.brandData._id){
-					await this.deleteOldImageIfNeeded()
+					this.deleteOldImageIfNeeded()
 					await brandCloudObj.update(this.brandData)
 					title = '信息更新成功'
 				}else{
@@ -116,15 +117,12 @@
 				this.SET_BRAND(this.brandData)
 			},
 			// 检查并删除旧图片
-			async deleteOldImageIfNeeded(){
-				// 检查是否有旧图片需要删除
+			deleteOldImageIfNeeded(){
+				// 待删除图片
 				const newUrls = this.brandData.thumb.map(item => item.url)
-				await brandCloudObj.deleteThumb(
-					// 找出被替换掉的旧图片
-					this.originalThumb.filter(oldItem => {
-						return !newUrls.includes(oldItem.url)
-					}).map(item => item.url)
-				)
+				this.brandData.thumb_urls_delete = this.originalThumb.filter(oldItem => {
+					return !newUrls.includes(oldItem.url)
+				}).map(item => item.url)
 			}
 		}
 	}

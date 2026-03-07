@@ -68,6 +68,7 @@
 		},
 		async onShow(){
 			this.freshKey += 1            // 强制刷新header
+			// await this.getBannerData()
 			if(this.dataList.length==0){
 				await this.getGoodsData() // 等待获取数据后获取高度
 				await this.$nextTick()
@@ -89,17 +90,6 @@
 		methods: {
 			...mapMutations(['SET_FOLD_STATE']),
 			...mapActions(['getBannerData']),
-			// 点击轮播图跳转
-			// async getBanner(){
-			// 	let res = await bannerCloudObj.get()
-			// 	this.swiperItems = res.data.map((item, index) => ({
-			// 		imageUrl: item.thumb_src=='0'?'../../static/images/banner/banner_default_'+ (index%3+1) +'.png':item.thumb[0].url,
-			// 		title: item.name,
-			// 		desc: item.desc,
-			// 		// TODO: 点击轮播图跳转推荐页面
-			// 		onClick: function() {}
-			// 	}))
-			// },
 			// 获取商品数据
 			async getGoodsData(){
 				let res = await goodsCloudObj.get()

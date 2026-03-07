@@ -1,7 +1,14 @@
 const bannerCloudObj = uniCloud.importObject("xxm-banner")
 const banner = {
     state: {
-        bannerData: []
+        bannerData: [],
+        currentIndex: 0,
+        currentBanner: {
+            name: '',
+            thumb_src: '0',
+            thumb: [],
+            desc: ''
+        }
     },
     mutations: {
         ADD_BANNER(state, data) {
@@ -27,12 +34,15 @@ const banner = {
                 state.bannerData.splice(index, 1)
             }
         },
+        SET_CURRENT_BANNER(state, idx) {
+            state.currentIndex = idx
+            state.currentBanner = state.bannerData[idx]
+        },
     },
     actions: {
         // 同步方法：网络请求
         async getBannerData(context) {
-            let arr = Object.keys(context.state.bannerData) // 获取键数组
-            if (arr.length) return                          //跳过二次网络请求
+            if (context.state.bannerData.length > 0) return  //跳过二次网络请求
             let res = await bannerCloudObj.get()
             context.commit("ADD_BANNER", res.data)
         }

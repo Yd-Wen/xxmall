@@ -1,32 +1,43 @@
 <template>
 	<view class="recommendView">
-		<view class="header">
-			<view class="title">{{banner.name}}</view>
+		<view class="header" v-if="currentBanner && currentBanner.name">
+			<view class="title">{{currentBanner.name}}</view>
 		</view>
-		<view class="img">
-			<image :src="banner.thumb_src=='0'?'../../static/images/banner/banner_default_'+ (index%3+1) +'.png':banner.thumb[0].url" mode="aspectFill"></image>
+		<view class="img" v-if="currentBanner">
+			<image :src="currentBanner.thumb_src=='0'?'../../static/images/banner/banner_default_'+ (currentIndex%3+1) +'.png':currentBanner.thumb[0].url" mode="aspectFill"></image>
 		</view>
-		<view class="desc">{{banner.desc}}</view>
+		<view class="desc" v-if="currentBanner && currentBanner.desc">
+			{{currentBanner.desc}}
+		</view>
 	</view>
 </template>
 
 <script>
-	import { mapGetters } from 'vuex'
-	const bannerCloudObj = uniCloud.importObject('xxm-banner')
+	import { mapGetters, mapMutations, mapActions } from 'vuex'
 	export default {
 		data() {
 			return {
-				banner: {},
 				index: 0
 			};
 		},
 		computed: {
-			...mapGetters(['bannerData'])
+			...mapGetters(['currentBanner', 'currentIndex'])
 		},
-		async onLoad(options){
-			this.index = options.idx
-			this.banner = this.bannerData[this.index]
-		}
+		async onLoad(options) {
+			this.index = options.idx ? Number(options.idx) : 0
+			await this.loadBannerData()
+		},
+		async onShow() {
+			await this.loadBannerData()
+		},
+		methods: {
+			...mapMutations(['SET_CURRENT_BANNER']),
+			...mapActions(['getBannerData']),
+			async loadBannerData() {
+				await this.getBannerData()
+				this.SET_CURRENT_BANNER(this.index)
+			}
+		}	
 	}
 </script>
 

@@ -39,7 +39,9 @@ const getters = {
 	detailData: state => state.goods.detailData,
 	selectionPopState: state => state.goods.selectionPopState,
 	// 轮播图状态
-	bannerData: state => state.banner.bannerData
+	bannerData: state => state.banner.bannerData,
+	currentIndex: state => state.banner.currentIndex,
+	currentBanner: state => state.banner.currentBanner
 }
 
 export default getters

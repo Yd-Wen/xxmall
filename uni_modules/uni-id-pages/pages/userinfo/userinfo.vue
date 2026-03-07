@@ -79,6 +79,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 			this.univerifyStyle.otherLoginButton.title = "其他号码绑定"
 		},
 		async onLoad(e) {
+			console.log('userInfo:', this.userInfo)
 			if (e.showLoginManage) {
 				this.showLoginManage = true //通过页面传参隐藏登录&退出登录按钮
 			}

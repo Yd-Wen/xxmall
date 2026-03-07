@@ -207,7 +207,7 @@
 				{
 					"path": "retrieve/retrieve",
 					"style": {
-						"navigationBarTitleText": "重置密码"	
+						"navigationBarTitleText": "重置密码"
 					}
 				},
 				{
@@ -225,31 +225,37 @@
 				{
 					"path": "userinfo/change_pwd/change_pwd",
 					"style": {
-						"navigationBarTitleText": "修改密码"	
+						"navigationBarTitleText": "修改密码"
 					}
 				},
 				{
 					"path": "register/register-admin",
 					"style": {
-						"navigationBarTitleText": "注册管理员账号"				
+						"navigationBarTitleText": "注册管理员账号"
 					}
 				},
 				{
 					"path": "userinfo/set-pwd/set-pwd",
 					"style": {
-						"navigationBarTitleText": "设置密码"					
+						"navigationBarTitleText": "设置密码"
 					}
 				},
 				{
 					"path": "userinfo/deactivate/deactivate",
 					"style": {
-						"navigationBarTitleText": "注销账号"						
+						"navigationBarTitleText": "注销账号"
 					}
 				},
 				{
 					"path": "userinfo/realname-verify/realname-verify",
 					"style": {
-						"navigationBarTitleText": "实名认证"					
+						"navigationBarTitleText": "实名认证"
+					}
+				},
+				{
+					"path": "userinfo/userinfo",
+					"style": {
+						"navigationBarTitleText": "个人资料"
 					}
 				}
 			]

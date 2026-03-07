@@ -24,9 +24,12 @@
 					v-model="formData.password" trim="both" />
 			</uni-forms-item>
 			<uni-forms-item name="password2" v-model="formData.password2" required>
-				<uni-easyinput :inputBorder="false" :focus="focusPassword2" @blur="focusPassword2 =false"
+				<uni-easyinput :inputBorder="false" :focus="focusPassword2" @blur="focusPassword2 = false"
 					class="input-box" placeholder="再次输入密码" maxlength="20" type="password" v-model="formData.password2"
 					trim="both" />
+			</uni-forms-item>
+			<uni-forms-item name="inviteCode" v-model="formData.inviteCode">
+				<uni-easyinput :inputBorder="false" :focus="inviteCode"	class="input-box" placeholder="请输入邀请码" maxlength="6" type="text" v-model="formData.inviteCode" trim="both" />
 			</uni-forms-item>
 			<uni-forms-item>
 				<uni-captcha ref="captcha" scene="register" v-model="formData.captcha" />
@@ -63,14 +66,16 @@
 					nickname: "",
 					password: "",
 					password2: "",
-					captcha: ""
+					captcha: "",
+					inviteCode: ""
 				},
 				rules,
 				focusUsername: false,
 				focusNickname: false,
 				focusPassword: false,
 				focusPassword2: false,
-				logo: "/static/logo.png"
+				inviteCode: false,
+				logo: "/static/images/logo.png"
 			}
 		},
 		onReady() {

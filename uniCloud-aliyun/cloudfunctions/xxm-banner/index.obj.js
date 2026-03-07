@@ -40,6 +40,10 @@ module.exports = {
 		return await db.collection("xxm-banner").doc(params._id).update(_params)
 	},
 	async remove(id) {
+		let banner = await db.collection("xxm-banner").doc(id).get()
+		if (banner.data[0].thumb && banner.data[0].thumb.length) {
+			await cloudUtils.deleteThumb(banner.data[0].thumb.map(item => item.url))
+		}
 		let res = await db.collection("xxm-banner").doc(id).remove()
 		return res
 	},

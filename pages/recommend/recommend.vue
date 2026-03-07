@@ -1,7 +1,7 @@
 <template>
 	<view class="recommendView">
 		<view class="header">
-			<view class="title">{{goods.name}}</view>
+			<view class="title">{{banner.name}}</view>
 		</view>
 		<view class="img">
 			<image :src="banner.thumb_src=='0'?'../../static/images/banner/banner_default_'+ (index%3+1) +'.png':banner.thumb[0].url" mode="aspectFill"></image>
@@ -11,17 +11,21 @@
 </template>
 
 <script>
+	import { mapGetters } from 'vuex'
 	const bannerCloudObj = uniCloud.importObject('xxm-banner')
 	export default {
 		data() {
 			return {
-				banner: {}
+				banner: {},
+				index: 0
 			};
 		},
-		async onLoad(){
-			let id = this.$route.query.id
-			let res = await bannerCloudObj.get({_id:id})
-			this.banner = res.data[0]
+		computed: {
+			...mapGetters(['bannerData'])
+		},
+		async onLoad(options){
+			this.index = options.idx
+			this.banner = this.bannerData[this.index]
 		}
 	}
 </script>

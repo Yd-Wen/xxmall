@@ -11,7 +11,7 @@
                 class="item" 
                 v-for="(item, index) in items" 
                 :key="index" 
-                @click="item.onClick">
+                @click="onClickBannerItem(index)">
 					<image :src="item.thumb_src=='0'?'../../static/images/banner/banner_default_'+ (index%3+1) +'.png':item.thumb[0].url" mode="aspectFill"></image>
                     <view class="title">{{item.name}}</view>
                     <view class="desc">{{item.desc}}</view>
@@ -45,11 +45,17 @@
             onSwiperChange(e) {
                 this.currentIndex = e.detail.current;
             },
+            // 点击轮播图跳转
+            onClickBannerItem(index) {
+                uni.navigateTo({
+                    url: "/pages/recommend/recommend?idx=" + index
+                })
+            },
             onRightClick() {
                 if (this.items && this.items.length > 0) {
                     const currentItem = this.items[this.currentIndex];
-                    if (currentItem && currentItem.onClick) {
-                        currentItem.onClick();
+                    if (currentItem && currentItem.onClickBannerItem) {
+                        this.onClickBannerItem(this.currentIndex);
                     }
                 }
             }

@@ -89,7 +89,7 @@
 		methods: {
 			...mapMutations(['SET_FOLD_STATE']),
 			...mapActions(['getBannerData']),
-			// 点击轮播图
+			// 点击轮播图跳转
 			// async getBanner(){
 			// 	let res = await bannerCloudObj.get()
 			// 	this.swiperItems = res.data.map((item, index) => ({

@@ -22,7 +22,7 @@
 </template>
 
 <script>
-	const db = uniCloud.database()
+	const categoryCloudObj = uniCloud.importObject("xxm-category")
 	export default {
 		data() {
 			return {
@@ -37,11 +37,9 @@
 		},
 		methods: {
 			// 获取商品分类
-			getCategory(){
-				db.collection('xxm-category').get().then(res=>{
-					console.log(res)
-					this.categoryList = res.result.data
-				})
+			async getCategory(){
+				let res = await categoryCloudObj.get()
+				this.categoryList = res.data
 			},
 			// 添加分类
 			onAdd() {
@@ -53,27 +51,17 @@
 			async onConfirm(e) {
 				if(this.editId){
 					// 修改
-					await db.collection('xxm-category').doc(this.editId).update({
-						name: e
-					}).then(res=>{
-						uni.showToast({
-							title: '更新分类成功',
-							mask: true
-						})
+					await categoryCloudObj.update(this.editId, e)
+					uni.showToast({
+						title: '更新分类成功',
+						mask: true
 					})
 				}else{
 					// 添加
-					// this.categoryList.push({
-					// 	_id: Date.now(),
-					// 	name: e
-					// })
-					await db.collection('xxm-category').add({
-						name: e
-					}).then(res=>{
-						uni.showToast({
-							title: '新增分类成功',
-							mask: true
-						})
+					await categoryCloudObj.add({name: e})
+					uni.showToast({
+						title: '新增分类成功',
+						mask: true
 					})
 				}
 				// 同步添加/修改后刷新
@@ -86,18 +74,17 @@
 				this.$refs.inputPopup.open()
 			},
 			// 删除分类
-			onDelete(id){
+			async onDelete(id){
 				uni.showModal({
 					content: '是否删除该分类?',
-					success: res=>{
+					success: async res=>{
 						if(res.confirm){
-							db.collection('xxm-category').doc(id).remove().then(res=>{
-								uni.showToast({
-									title: '删除分类成功',
-									mask: true
-								})
-								this.getCategory()
+							await categoryCloudObj.delete(id)
+							uni.showToast({
+								title: '删除分类成功',
+								mask: true
 							})
+							this.getCategory()
 						} 
 					}
 				})

@@ -57,9 +57,7 @@ const typeCloudObj = uniCloud.importObject("xxm-type")
 						mask: true
 					})
 				}else{
-					await typeCloudObj.add({
-						name: e
-					})
+					await typeCloudObj.add({name: e})
 					uni.showToast({
 						title: '新增类型成功',
 						mask: true

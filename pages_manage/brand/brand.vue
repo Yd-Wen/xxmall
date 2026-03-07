@@ -2,7 +2,7 @@
 	<view class="brand">
 		<uni-forms ref="brandForm" :model="brandData" :rules="brandRules" :label-width="100" label-align="right">
 			<uni-forms-item  label="品牌标识" name="logo" required>
-				<uni-file-picker v-model="brandData.thumb" file-mediatype="image" mode="grid" :limit="1"></uni-file-picker>
+				<uni-file-picker v-model="brandData.thumb" file-mediatype="image" mode="grid" :limit="1" dir="brand"></uni-file-picker>
 			</uni-forms-item>
 			<uni-forms-item  label="品牌名称" name="name" required>
 				<uni-easyinput type="text" v-model="brandData.name" placeholder="请输入品牌名称"></uni-easyinput>
@@ -27,6 +27,7 @@
 	export default {
 		data() {
 			return {
+				originalThumb: [],
 				brandData: {
 					thumb: {},
 					name: "", 
@@ -97,6 +98,7 @@
 			async addAndUpdata(){
 				let title
 				if(this.brandData._id){
+					await this.deleteOldImageIfNeeded()
 					await brandCloudObj.update(this.brandData)
 					title = '信息更新成功'
 				}else{
@@ -112,6 +114,17 @@
 					uni.navigateBack()
 				}, 1000)
 				this.SET_BRAND(this.brandData)
+			},
+			// 检查并删除旧图片
+			async deleteOldImageIfNeeded(){
+				// 检查是否有旧图片需要删除
+				const newUrls = this.brandData.thumb.map(item => item.url)
+				await brandCloudObj.deleteThumb(
+					// 找出被替换掉的旧图片
+					this.originalThumb.filter(oldItem => {
+						return !newUrls.includes(oldItem.url)
+					}).map(item => item.url)
+				)
 			}
 		}
 	}

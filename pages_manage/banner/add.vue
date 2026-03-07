@@ -127,24 +127,23 @@
 			async deleteOldImageIfNeeded(){
 				// 只有在编辑模式下才需要处理
 				if (!bannerId) return
+
+				this.bannerData.thumb_urls_delete = []
 				
 				// 情况1：原来是上传图片，现在改为默认图片
 				if (this.originalThumbSrc === '1' && this.bannerData.thumb_src === '0') {
-					// 删除原来的上传图片
-					await bannerCloudObj.deleteThumb(this.originalThumb.map(item => item.url))
+					// 获取待删除图片
+					this.bannerData.thumb_urls_delete = this.originalThumb.map(item => item.url)
 					this.bannerData.thumb = []
 				}
 				
 				// 情况2：原来是上传图片，现在还是上传图片，但换了新图片
 				if (this.originalThumbSrc === '1' && this.bannerData.thumb_src === '1') {
-					// 检查是否有旧图片需要删除
+					// 获取待删除图片
 					const newUrls = this.bannerData.thumb.map(item => item.url)
-					await bannerCloudObj.deleteThumb(
-						// 找出被替换掉的旧图片
-						this.originalThumb.filter(oldItem => {
-							return !newUrls.includes(oldItem.url)
-						}).map(item => item.url)
-					)
+					this.bannerData.thumb_urls_delete = this.originalThumb.filter(oldItem => {
+						return !newUrls.includes(oldItem.url)
+					}).map(item => item.url)
 				}
 			}
 		}

@@ -43,6 +43,10 @@ module.exports = {
 		return await db.collection("xxm-goods").doc(params._id).update(_params)
 	},
 	async remove(id) {
+		let goods = await db.collection("xxm-goods").doc(id).get()
+		if (goods.data[0].thumb && goods.data[0].thumb.length) {
+			await cloudUtils.deleteThumb(goods.data[0].thumb.map(item => item.url))
+		}
 		let res = await db.collection("xxm-goods").doc(id).remove()
 		return res
 	},

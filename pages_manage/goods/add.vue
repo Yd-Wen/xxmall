@@ -2,7 +2,8 @@
 	<view class="goodsView">
 		<uni-forms ref="goodsForm" :model="goodsData" :rules="goodsRules" :label-width="90" label-align="right">
 			<uni-forms-item label="商品图片" required name="thumb">
-				<uni-file-picker v-model="goodsData.thumb" file-mediatype="image" mode="grid"></uni-file-picker>
+				<uni-file-picker v-model="goodsData.thumb" file-mediatype="image" mode="grid" :limit="9" dir="goods">	
+				</uni-file-picker>
 			</uni-forms-item>
 			<uni-forms-item label="商品名称" required name="name">
 				<uni-easyinput type="text" v-model="goodsData.name" placeholder="请输入商品名称" trim="both"></uni-easyinput>
@@ -73,6 +74,7 @@
 	export default {
 		data() {
 			return {
+				originalThumb: [],
 				addType: "parent", //parent:父类属性, child:子类标签
 				goodsData: {
 					thumb: [],
@@ -112,10 +114,12 @@
 				skuArr:[]
 			};
 		},
-		onLoad(e){
+		async onLoad(e){
 			this.isManage()
 			goodsId = e?.id || null
-			if(goodsId) this.getGoodsById(e.id)
+			if(goodsId) await this.getGoodsById(e.id)
+			// 保存原始图片数据
+			this.originalThumb = this.goodsData.thumb.length ? this.goodsData.thumb : []
 			this.getSku()
 		},
 		computed:{
@@ -247,6 +251,8 @@
 				})
 				let toastTitle, res
 				if (goodsId){
+					// 检查并删除旧图片
+					this.deleteOldImageIfNeeded()
 					toastTitle = "修改成功"
 					res = await goodsCloudObj.update(this.goodsData)
 				}else{
@@ -262,6 +268,14 @@
 						uni.navigateBack()
 					}, 1500)
 				}
+			},
+			// 检查并删除旧图片
+			deleteOldImageIfNeeded(){
+				// 待删除图片
+				const newUrls = this.goodsData.thumb.map(item => item.url)
+				this.goodsData.thumb_urls_delete = this.originalThumb.filter(oldItem => {
+					return !newUrls.includes(oldItem.url)
+				}).map(item => item.url)
 			}
 		}
 	}

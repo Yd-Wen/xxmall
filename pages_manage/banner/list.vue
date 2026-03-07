@@ -52,7 +52,7 @@
 			this.getBanner()
 		},
 		methods:{
-			...mapMutations(['SET_BANNER']),
+			...mapMutations(['REMOVE_BANNER']),
 			// 获取商品
 			async getBanner(){
 				let res = await bannerCloudObj.getByGroup()
@@ -80,13 +80,15 @@
 				let res = await bannerCloudObj.remove(id)
 				if (res) {
 					uni.showToast({
-						title:"删除成功"
+						title:"删除成功",
+						mask: true
 					})
 					setTimeout(()=>{
 						this.getBanner()
 					}, 1000)
 				}
-				this.SET_BANNER([])
+				// 删除成功后，从vuex中删除banner数据
+				await this.REMOVE_BANNER(id)
 			}
 		}
 	}

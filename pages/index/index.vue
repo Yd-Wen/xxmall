@@ -46,7 +46,6 @@
 
 <script>
 	import {mapGetters, mapMutations, mapActions} from "vuex"
-	const bannerCloudObj = uniCloud.importObject("xxm-banner", {"customUI":true})
 	const goodsCloudObj = uniCloud.importObject("xxm-goods", {"customUI":true})
 	export default {
 		data() {
@@ -63,7 +62,6 @@
 		},
 		async onLoad() {
 			await this.getBannerData()
-			console.log(this.bannerData)
 			await this.getGoodsData() // 等待获取数据后获取高度
 			await this.$nextTick()
 			this.getHeights()

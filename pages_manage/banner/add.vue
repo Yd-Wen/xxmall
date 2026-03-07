@@ -77,7 +77,7 @@
 			if(bannerId) this.getBannerById(e.id)
 		},
 		methods: {
-			...mapMutations(['SET_BANNER']),
+			...mapMutations(['ADD_BANNER', 'SET_BANNER']),
 			// 获取指定ID的banner
 			async getBannerById(id){
 				let res = await bannerCloudObj.getById(id)
@@ -110,9 +110,13 @@
 				if (bannerId){
 					toastTitle = "修改成功"
 					res = await bannerCloudObj.update(this.bannerData)
+					// 提交成功后，更新banner数据到vuex
+					await this.SET_BANNER(this.bannerData)
 				}else{
 					toastTitle = "新增成功"
 					res = await bannerCloudObj.add(this.bannerData)
+					// 新增成功后，将banner数据添加到vuex
+					await this.ADD_BANNER(this.bannerData)
 				}
 				if(res){
 					uni.showToast({
@@ -123,8 +127,6 @@
 						uni.navigateBack()
 					}, 1500)
 				}
-				// 提交成功后，更新banner数据到vuex
-				this.SET_BANNER([])
 			},
 			
 			// 检查并删除旧图片

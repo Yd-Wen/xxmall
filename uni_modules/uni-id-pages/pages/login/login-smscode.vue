@@ -60,7 +60,7 @@
 			// #endif
 		},
 		methods: {
-			submit() { //完成并提交
+			async submit() { //完成并提交
 				const uniIdCo = uniCloud.importObject("uni-id-co", {
 					errorOptions: {
 						type: 'toast'
@@ -74,12 +74,33 @@
 						duration: 3000
 					});
 				}
-				uniIdCo.loginBySms({
+				// 登录参数
+				let loginParams = {
 					"mobile": this.phone,
 					"code": this.code,
-					"captcha": this.captcha,
-					"inviteCode": this.inviteCode
-				}).then(e => {
+					"captcha": this.captcha
+				}
+				if (this.inviteCode && this.inviteCode.length > 0) {
+					const confirm = await new Promise((resolve) => {
+						uni.showModal({
+							title: '提示',
+							content: `是否使用邀请码 ${this.inviteCode}`,
+							success: (res) => {
+								resolve(res.confirm)
+							},
+							fail: () => {
+								resolve(false)
+							}
+						})
+					})
+					
+					// 只有点击确定时才添加邀请码参数
+					if (confirm) {
+						loginParams.inviteCode = this.inviteCode
+					}
+				} 
+				// 登录
+				uniIdCo.loginBySms(loginParams).then(e => {
 					this.loginSuccess(e)
 				}).catch(e => {
 					if (e.errCode == 'uni-id-captcha-required') {

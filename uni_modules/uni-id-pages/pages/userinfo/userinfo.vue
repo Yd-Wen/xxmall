@@ -219,7 +219,6 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 	}
 </script>
 <style lang="scss" scoped>
-	@import "@/uni_modules/uni-id-pages/common/login-page.scss";
 
 	.uni-content {
 		padding: 0;

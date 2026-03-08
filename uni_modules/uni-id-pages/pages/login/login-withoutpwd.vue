@@ -59,6 +59,7 @@
 		mixins: [mixin],
 		data() {
 			return {
+				inviteCode: "", //邀请码
 				type: "", //快捷登录方式
 				phone: "", //手机号码
 				focusPhone: false,
@@ -83,6 +84,14 @@
 			}
 		},
 		async onLoad(e) {
+			// 邀请码赋值给 inviteCode（字符串）
+			if (e.inviteCode) {
+				this.inviteCode = e.inviteCode
+				console.log("this.inviteCode: -----------",this.inviteCode);
+			}
+			else{
+				console.log("inviteCode 为空");
+			}
 			//获取通过url传递的参数type设置当前登录方式，如果没传递直接默认以配置的登录
 			let type = e.type || config.loginTypes[0]
 			this.type = type
@@ -181,7 +190,7 @@
 				}
 				// 发送验证吗
 				uni.navigateTo({
-					url: '/uni_modules/uni-id-pages/pages/login/login-smscode?phoneNumber=' + this.phone
+					url: '/uni_modules/uni-id-pages/pages/login/login-smscode?phoneNumber=' + this.phone + '&inviteCode=' + this.inviteCode
 				});
 			},
 			//去密码登录页

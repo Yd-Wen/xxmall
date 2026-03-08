@@ -12,7 +12,7 @@
 			</uni-id-pages-sms-form>
 			<view class="inviteCode">
 				<uni-forms-item name="inviteCode" v-model="inviteCode">
-					<uni-easyinput :inputBorder="false" :focus="inviteCode" class="input-box" placeholder="请输入邀请码" maxlength="6" type="text" v-model="inviteCode" trim="both" />
+					<uni-easyinput :inputBorder="false" :focus="focusInviteCodeInput" class="input-box" placeholder="请输入邀请码" maxlength="6" type="text" v-model="inviteCode" trim="both" />
 				</uni-forms-item>
 			</view>
 			<button class="uni-btn send-btn" type="primary" @click="submit">登录</button>
@@ -30,6 +30,7 @@
 				"phone": "",
 				"captcha": "",
 				"inviteCode": "",
+				"focusInviteCodeInput": false,
 				"logo": "/static/images/logo.png"
 			}
 		},
@@ -38,10 +39,16 @@
 				return '验证码已通过短信发送至' + this.phone;
 			},
 		},
-		onLoad({
-			phoneNumber
-		}) {
-			this.phone = phoneNumber;
+		onLoad(e) {
+			if (e.phoneNumber) {
+				this.phone = e.phoneNumber;
+			}
+			// 邀请码赋值给 inviteCode（字符串）
+			if (e.inviteCode) {
+				this.inviteCode = e.inviteCode
+				console.log("this.inviteCode: -----------",this.inviteCode);
+				this.focusInviteCodeInput = true
+			}
 		},
 		onShow() {
 			// #ifdef H5

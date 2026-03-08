@@ -61,7 +61,7 @@
 						"id": "smsCode",
 						"text": "短信验证码",
 						"logo": "/uni_modules/uni-id-pages/static/login/uni-fab-login/sms.png",
-						"path": "/uni_modules/uni-id-pages/pages/login/login-withoutpwd?type=smsCode"
+						"path": "/uni_modules/uni-id-pages/pages/login/login-withoutpwd?type=smsCode&inviteCode="
 					},
 					{
 						"id": "weixin",
@@ -149,7 +149,19 @@
 		watch: {
 			agree(agree) {
 				this.univerifyStyle.privacyTerms.defaultCheckBoxState = agree
-			}
+			},
+			// 监听邀请码变化，更新短信验证码登录路径
+			inviteCode: {
+				immediate: true,
+				handler(newVal) {
+					// 更新 smsCode 的 path
+					const smsCodeIndex = this.servicesList.findIndex(item => item.id === 'smsCode')
+					if (smsCodeIndex !== -1) {
+						this.servicesList[smsCodeIndex].path = 
+							"/uni_modules/uni-id-pages/pages/login/login-withoutpwd?type=smsCode&inviteCode=" + (newVal || '')
+					}
+				}
+    		}
 		},
 		async created() {
 			let servicesList = this.servicesList
@@ -488,18 +500,37 @@
 					}
 				})
 			},
-			login(params, type) { //联网验证登录
-				// console.log('执行登录开始----');
+			async login(params, type) {
 				console.log({params,type});
-				//toLowerCase
 				let action = 'loginBy' + type.trim().replace(type[0], type[0].toUpperCase())
 				const uniIdCo = uniCloud.importObject("uni-id-co",{
 					customUI:true
 				})
-				// 添加邀请码参数
-				if (this.inviteCode&&this.inviteCode.length>0) {
+				
+				// 微信登录时，如果有邀请码，弹出确认框
+				if (type === 'weixin' && this.inviteCode && this.inviteCode.length > 0) {
+					const confirm = await new Promise((resolve) => {
+						uni.showModal({
+							title: '提示',
+							content: `是否使用邀请码 ${this.inviteCode}`,
+							success: (res) => {
+								resolve(res.confirm)
+							},
+							fail: () => {
+								resolve(false)
+							}
+						})
+					})
+					
+					// 只有点击确定时才添加邀请码参数
+					if (confirm) {
+						params.inviteCode = this.inviteCode
+					}
+				} else if (this.inviteCode && this.inviteCode.length > 0) {
+					// 其他登录方式，直接添加邀请码
 					params.inviteCode = this.inviteCode
 				}
+				
 				uniIdCo[action](params).then(result => {
 					uni.showToast({
 						title: '登录成功',

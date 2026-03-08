@@ -47,7 +47,7 @@
 			<button class="uni-btn" type="primary" @click="toSmsPage">获取验证码</button>
 		</template>
 		<!-- 固定定位的快捷登录按钮 -->
-		<uni-id-pages-fab-login ref="uniFabLogin"></uni-id-pages-fab-login>
+		<uni-id-pages-fab-login ref="uniFabLogin" :inviteCode="inviteCode"></uni-id-pages-fab-login>
 	</view>
 </template>
 

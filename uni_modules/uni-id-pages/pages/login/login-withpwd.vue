@@ -30,7 +30,7 @@
 			<!-- <text class="link" @click="toRegister" v-if="!config.isAdmin">注册账号</text> -->
 		</view>
 		<!-- 悬浮登录方式组件 -->
-		<uni-id-pages-fab-login ref="uniFabLogin"></uni-id-pages-fab-login>
+		<uni-id-pages-fab-login ref="uniFabLogin" :inviteCode="inviteCode"></uni-id-pages-fab-login>
 	</view>
 </template>
 
@@ -45,6 +45,7 @@
 		mixins: [mixin],
 		data() {
 			return {
+				"inviteCode": "",
 				"password": "",
 				"username": "",
 				"captcha": "",
@@ -64,7 +65,31 @@
 			};
 			// #endif
 		},
+		// 在 onCreated 中获取URL参数中的邀请码
+		onLoad(options) {
+			if (this.isValidInviteCode(options.inviteCode)){
+				this.inviteCode = options.inviteCode
+				uni.showToast({
+					title: '收到邀请码：' + this.inviteCode,
+					icon: 'none'
+				})
+			}
+		},
 		methods: {
+			/**
+			 * 验证邀请码格式是否合法（简化版本）
+			 * @param {string} inviteCode 邀请码
+			 * @returns {boolean} 是否合法
+			 */
+			isValidInviteCode(inviteCode) {
+				// 必须是6位字符串
+				if (!inviteCode || typeof inviteCode !== 'string' || inviteCode.length !== 6) {
+					return false
+				}
+				// 只能包含大写字母和数字，且排除 0, 1, I, O
+				return new RegExp(`^[2-9A-HJ-NP-Z]{6}$`).test(inviteCode)
+			},
+
 			// 页面跳转，找回密码
 			toRetrievePwd() {
 				let url = '/uni_modules/uni-id-pages/pages/retrieve/retrieve'
@@ -137,7 +162,7 @@
 			toRegister() {
 				uni.navigateTo({
 					url: this.config.isAdmin ? '/uni_modules/uni-id-pages/pages/register/register-admin' :
-						'/uni_modules/uni-id-pages/pages/register/register',
+						'/uni_modules/uni-id-pages/pages/register/register?inviteCode=' + this.inviteCode,
 					fail(e) {
 						console.error(e);
 					}

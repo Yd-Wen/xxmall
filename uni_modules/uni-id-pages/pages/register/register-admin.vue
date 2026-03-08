@@ -63,7 +63,7 @@
 				focusNickname:false,
 				focusPassword:false,
 				focusPassword2:false,
-				logo: "/static/logo.png"
+				logo: "/static/images/logo.png"
 			}
 		},
 		onReady() {

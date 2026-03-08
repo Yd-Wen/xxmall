@@ -61,7 +61,7 @@
 					},
           ...passwordMod.getPwdRules('newPassword', 'newPassword2')
         },
-				logo: "/static/logo.png"
+				logo: "/static/images/logo.png"
 			}
 		},
 		onReady() {

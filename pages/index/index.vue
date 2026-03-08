@@ -1,7 +1,7 @@
 <template>
 	<view class="home">
 		<xxm-header id="header" :key="freshKey"></xxm-header>
-		<xxm-banner class="banner" :items="bannerData"/>
+		<xxm-banner v-if="bannerData.length>0" class="banner" :items="bannerData"/>
 		<view class="wrapper">
 			<view class="info">
 				<view class="left">免费配送</view>

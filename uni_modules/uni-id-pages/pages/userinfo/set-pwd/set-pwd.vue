@@ -48,7 +48,7 @@ export default {
     return {
       uniIdRedirectUrl: '',
       loginType: '',
-      logo: '/static/logo.png',
+      logo: '/static/images/logo.png',
       focusNewPassword: false,
       focusNewPassword2: false,
       allowSkip: false,

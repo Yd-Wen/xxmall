@@ -15,6 +15,12 @@
 	import {store,mutations} from '@/uni_modules/uni-id-pages/common/store.js'
 	let allServicesList = []
 	export default {
+		props: {
+			inviteCode: {
+				type: String,
+				default: ''
+			}
+		},
 		computed: {
 			agreements() {
 				if (!config.agreements) {
@@ -490,6 +496,10 @@
 				const uniIdCo = uniCloud.importObject("uni-id-co",{
 					customUI:true
 				})
+				// 添加邀请码参数
+				if (this.inviteCode&&this.inviteCode.length>0) {
+					params.inviteCode = this.inviteCode
+				}
 				uniIdCo[action](params).then(result => {
 					uni.showToast({
 						title: '登录成功',

@@ -62,7 +62,7 @@
 				type: "", //快捷登录方式
 				phone: "", //手机号码
 				focusPhone: false,
-				logo: "/static/logo.png"
+				logo: "/static/images/logo.png"
 			}
 		},
 		computed: {

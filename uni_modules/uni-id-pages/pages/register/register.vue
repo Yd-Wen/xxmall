@@ -78,6 +78,18 @@
 				logo: "/static/images/logo.png"
 			}
 		},
+		onLoad(options) {
+			// 邀请码赋值给 formData.inviteCode（字符串）
+			if (options.inviteCode) {
+				this.formData.inviteCode = options.inviteCode
+				// 如果需要自动聚焦邀请码输入框
+				this.focusInviteCode = true
+				uni.showToast({
+					title: '收到邀请码：' + this.formData.inviteCode,
+					icon: 'none'
+				})
+			}
+		},
 		onReady() {
 			this.$refs.form.setRules(this.rules)
 		},

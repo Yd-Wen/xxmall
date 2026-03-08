@@ -116,7 +116,7 @@
 						]
 					}
 				},
-				logo: "/static/logo.png"
+				logo: "/static/images/logo.png"
 			}
 		},
 		computed: {

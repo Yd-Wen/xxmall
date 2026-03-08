@@ -10,9 +10,11 @@
 		<uni-forms>
 			<uni-id-pages-sms-form focusCaptchaInput v-model="code" type="login-by-sms" ref="smsCode" :phone="phone">
 			</uni-id-pages-sms-form>
-			<uni-forms-item class="inviteCode" name="inviteCode" v-model="inviteCode">
-				<uni-easyinput :inputBorder="false" :focus="inviteCode" class="input-box" placeholder="请输入邀请码" maxlength="6" type="text" v-model="inviteCode" trim="both" />
-			</uni-forms-item>
+			<view class="inviteCode">
+				<uni-forms-item name="inviteCode" v-model="inviteCode">
+					<uni-easyinput :inputBorder="false" :focus="inviteCode" class="input-box" placeholder="请输入邀请码" maxlength="6" type="text" v-model="inviteCode" trim="both" />
+				</uni-forms-item>
+			</view>
 			<button class="uni-btn send-btn" type="primary" @click="submit">登录</button>
 		</uni-forms>
 		<uni-popup-captcha @confirm="submit" v-model="captcha" scene="login-by-sms" ref="popup"></uni-popup-captcha>
@@ -28,7 +30,7 @@
 				"phone": "",
 				"captcha": "",
 				"inviteCode": "",
-				"logo": "/static/logo.png"
+				"logo": "/static/images/logo.png"
 			}
 		},
 		computed: {

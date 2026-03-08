@@ -1,7 +1,7 @@
 <template>
 	<button open-type="chooseAvatar" @chooseavatar="bindchooseavatar" @click="uploadAvatarImg" class="box" :class="{'showBorder':border}"  :style="{width,height,lineHeight:height}">
-		<cloud-image v-if="avatar_file" :src="avatar_file.url" :width="width" :height="height"></cloud-image>
-		<uni-icons v-else :style="{width,height,lineHeight:height}" class="chooseAvatar" type="plusempty" size="30"
+		<cloud-image :src="avatarUrl" :width="width" :height="height"></cloud-image>
+		<uni-icons :style="{width,height,lineHeight:height}" class="chooseAvatar" type="plusempty" size="30"
 			color="#dddddd"></uni-icons>
 	</button>
 </template>
@@ -60,6 +60,9 @@
 			},
 			avatar_file() {
 				return store.userInfo.avatar_file
+			},
+			avatarUrl() {
+				return this.avatar_file ? this.avatar_file.url : '/static/images/avatar.png'
 			}
 		},
 		methods: {
@@ -182,6 +185,8 @@
 	/* #endif */
 	.box{
 		padding: 0;
+		border-radius: 50%;
+		overflow: hidden;
 	}
 
 	.chooseAvatar {

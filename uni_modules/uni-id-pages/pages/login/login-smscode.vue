@@ -46,7 +46,6 @@
 			// 邀请码赋值给 inviteCode（字符串）
 			if (e.inviteCode) {
 				this.inviteCode = e.inviteCode
-				console.log("this.inviteCode: -----------",this.inviteCode);
 				this.focusInviteCodeInput = true
 			}
 		},

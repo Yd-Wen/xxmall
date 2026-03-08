@@ -8,13 +8,6 @@
 			}
 		},
 		{
-			"path": "pages/userinfo/userinfo",
-			"style": {
-				"navigationBarTitleText": "个人资料",
-				"navigationStyle": "custom"
-			}
-		},
-		{
 			"path": "pages/order/order",
 			"style": {
 				"navigationBarTitleText": "我的订单",
@@ -66,24 +59,6 @@
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F7F7F7",
 		"enablePullDownRefresh": false
-	},
-	"tabBar": {
-		"color": "#515151",
-		"selectedColor": "#ec544f",
-		"list": [
-			{
-				"text": "首页",
-				"pagePath": "pages/index/index",
-				"iconPath": "static/images/tabbar/home.png",
-				"selectedIconPath": "static/images/tabbar/home_selected.png"
-			},
-			{
-				"text": "我的",
-				"pagePath": "pages/userinfo/userinfo",
-				"iconPath": "static/images/tabbar/user.png",
-				"selectedIconPath": "static/images/tabbar/user_selected.png"
-			}
-		]
 	},
 	"subPackages": [
 		{

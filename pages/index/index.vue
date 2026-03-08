@@ -4,7 +4,10 @@
 		<xxm-banner v-if="bannerData.length>0" class="banner" :items="bannerData"/>
 		<view class="wrapper">
 			<view class="info">
-				<view class="left">免费配送</view>
+				<navigator class="left" url="/pages/order/order">
+					<u-icon name="gift" color="#576b95" size="22"></u-icon>
+					分享有礼
+				</navigator>
 				<navigator class="right" url="/pages/order/order">
 					<u-icon name="order" color="#576b95" size="22"></u-icon>
 					我的订单
@@ -204,7 +207,10 @@
 				padding: 0 30rpx;
 				font-size: 32rpx;
 				border-bottom: 1px solid $border-color;
-
+				.left {
+					color: $xxm-theme-color-aux;
+					@include flex-box();
+				}
 				.right {
 					color: $xxm-theme-color-aux;
 					@include flex-box();

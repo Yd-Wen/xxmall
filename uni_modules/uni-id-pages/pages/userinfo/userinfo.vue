@@ -5,9 +5,9 @@
 			<uni-id-pages-avatar width="260rpx" height="260rpx"></uni-id-pages-avatar>
 		</view>
 		<uni-list>
-			<uni-list-item class="item" @click="setNickname('')" title="昵称" :rightText="userInfo.nickname||'未设置'" link>
+			<uni-list-item thumb="/static/images/nickname.png" class="item" @click="setNickname('')" title="昵称" :rightText="userInfo.nickname||'未设置'" link>
 			</uni-list-item>
-			<uni-list-item class="item" @click="bindMobile" title="手机号" :rightText="userInfo.mobile||'未绑定'" link>
+			<uni-list-item thumb="/static/images/phone.png" class="item" @click="bindMobile" title="手机号" :rightText="userInfo.mobile||'未绑定'" link>
 			</uni-list-item>
 			<uni-list-item v-if="userInfo.email" class="item" title="电子邮箱" :rightText="userInfo.email">
 			</uni-list-item>
@@ -16,12 +16,12 @@
 			<uni-list-item class="item" @click="realNameVerify" title="实名认证" :rightText="realNameStatus !== 2 ? '未认证': '已认证'" link>
 			</uni-list-item>
 			<!-- #endif -->
-			<uni-list-item v-if="hasPwd" class="item" @click="changePassword" title="修改密码" link>
+			<uni-list-item thumb="/static/images/pwd.png" v-if="hasPwd" class="item" @click="changePassword" title="修改密码" link>
 			</uni-list-item>
 		</uni-list>
 		<!-- #ifndef MP -->
 		<uni-list class="mt10">
-			<uni-list-item @click="deactivate" title="注销账号" link="navigateTo"></uni-list-item>
+			<uni-list-item thumb="/static/images/account_delete.png" @click="deactivate" title="注销账号" link="navigateTo"></uni-list-item>
 		</uni-list>
 		<!-- #endif -->
 		<uni-popup ref="dialog" type="dialog">

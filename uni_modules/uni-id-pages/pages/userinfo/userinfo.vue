@@ -4,7 +4,7 @@
 		<view class="avatar">
 			<uni-id-pages-avatar width="260rpx" height="260rpx"></uni-id-pages-avatar>
 		</view>
-		<uni-list>
+		<uni-list class="list">
 			<uni-list-item thumb="/static/images/nickname.png" class="item" @click="setNickname('')" title="昵称" :rightText="userInfo.nickname||'未设置'" link>
 			</uni-list-item>
 			<uni-list-item thumb="/static/images/phone.png" class="item" @click="bindMobile" title="手机号" :rightText="userInfo.mobile||'未绑定'" link>
@@ -20,7 +20,7 @@
 			</uni-list-item>
 		</uni-list>
 		<!-- #ifndef MP -->
-		<uni-list class="mt10">
+		<uni-list class="list">
 			<uni-list-item thumb="/static/images/account_delete.png" @click="deactivate" title="注销账号" link="navigateTo"></uni-list-item>
 		</uni-list>
 		<!-- #endif -->
@@ -251,6 +251,12 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 		width: 100%;
 	}
 
+	.list {
+		margin: 10rpx 20rpx;
+		border-radius: 10rpx;
+		border: 1px solid #F5F5F5;
+	}
+
 	.item {
 		flex: 1;
 		flex-direction: row;
@@ -264,9 +270,5 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 		border-radius: 0;
 		background-color: #FFFFFF;
 		width: 80%;
-	}
-
-	.mt10 {
-		margin-top: 10px;
 	}
 </style>

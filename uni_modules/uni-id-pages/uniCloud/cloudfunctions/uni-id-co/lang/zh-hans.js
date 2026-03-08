@@ -38,6 +38,8 @@ const sentence = {
   'uni-id-set-invite-code-failed': '设置邀请码失败',
   'uni-id-invalid-invite-code': '邀请码不可用',
   'uni-id-change-inviter-forbidden': '禁止修改邀请人',
+  'uni-id-invite-level-exceeded': '邀请码失效：邀请层级已达上限',
+  'uni-id-invite-count-exceeded': '邀请码失效：邀请人数已达上限',
   'uni-id-bind-conflict': '此账号已被绑定',
   'uni-id-admin-exist-in-other-apps': '超级管理员已在其他控制台注册',
   'uni-id-unbind-failed': '请先绑定后再解绑',

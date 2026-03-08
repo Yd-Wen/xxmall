@@ -31,6 +31,8 @@ const ERROR = {
   SET_INVITE_CODE_FAILED: 'uni-id-set-invite-code-failed',
   INVALID_INVITE_CODE: 'uni-id-invalid-invite-code',
   CHANGE_INVITER_FORBIDDEN: 'uni-id-change-inviter-forbidden',
+  INVITE_LEVEL_EXCEEDED: 'uni-id-invite-level-exceeded',
+  INVITE_COUNT_EXCEEDED: 'uni-id-invite-count-exceeded',
   BIND_CONFLICT: 'uni-id-bind-conflict',
   UNBIND_FAIL: 'uni-id-unbind-failed',
   UNBIND_NOT_SUPPORTED: 'uni-id-unbind-not-supported',
@@ -51,12 +53,12 @@ const ERROR = {
   REAL_NAME_VERIFY_UPPER_LIMIT: 'uni-id-realname-verify-upper-limit'
 }
 
-function isUniIdError (errCode) {
+function isUniIdError(errCode) {
   return Object.values(ERROR).includes(errCode)
 }
 
 class UniCloudError extends Error {
-  constructor (options) {
+  constructor(options) {
     super(options.message)
     this.errMsg = options.message || ''
     this.errCode = options.code

@@ -5,12 +5,16 @@ const {
 const {
   ERROR
 } = require('../../common/error')
+
+const MAX_INVITE_LEVEL = 3
+const MAX_INVITE_COUNT = 3
+
 /**
  * 获取随机邀请码，邀请码由大写字母加数字组成，由于存在手动输入邀请码的场景，从可选字符中去除 0、1、I、O
  * @param {number} len 邀请码长度，默认6位
  * @returns {string} 随机邀请码
  */
-function getRandomInviteCode (len = 6) {
+function getRandomInviteCode(len = 6) {
   const charArr = ['2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
   let code = ''
   for (let i = 0; i < len; i++) {
@@ -25,7 +29,7 @@ function getRandomInviteCode (len = 6) {
  * @param {object} param
  * @param {string} param.inviteCode 初始随机邀请码
  */
-async function getValidInviteCode () {
+async function getValidInviteCode() {
   let retry = 10
   let code
   let codeValid = false
@@ -55,7 +59,7 @@ async function getValidInviteCode () {
  * @param {string} param.queryUid 受邀人id，非空时校验不可被下家或自己邀请
  * @returns
  */
-async function findUserByInviteCode ({
+async function findUserByInviteCode({
   inviteCode,
   queryUid
 } = {}) {
@@ -99,10 +103,26 @@ async function findUserByInviteCode ({
  * @param {string} param.queryUid 受邀人id，非空时校验不可被下家或自己邀请
  * @returns
  */
-async function generateInviteInfo ({
+async function generateInviteInfo({
   inviteCode,
   queryUid
 } = {}) {
+  // 通过邀请码获取邀请人
+  const inviteUser = await userCollection.where({
+    my_invite_code: inviteCode
+  }).limit(1).get()
+
+  // 查询邀请人已邀请人数
+  const inviteCountRes = await userCollection.where({
+    'inviter_uid.0': inviteUser.data[0]._id  // 精确匹配数组第一个元素
+  }).count()
+
+  if (inviteCountRes.total >= MAX_INVITE_COUNT) {
+    throw {
+      errCode: ERROR.INVITE_COUNT_EXCEEDED
+    }
+  }
+  // 查询邀请人的上级邀请记录
   const inviterRecord = await findUserByInviteCode({
     inviteCode,
     queryUid
@@ -120,7 +140,7 @@ async function generateInviteInfo ({
  * 检查当前用户是否可以接受邀请，如果可以返回用户记录
  * @param {string} uid
  */
-async function checkInviteInfo (uid) {
+async function checkInviteInfo(uid) {
   // 检查当前用户是否已有邀请人
   const getUserRes = await userCollection.doc(uid).field({
     my_invite_code: true,
@@ -147,7 +167,7 @@ async function checkInviteInfo (uid) {
  * @param {string} param.inviteCode 邀请人的邀请码
  * @returns
  */
-async function acceptInvite ({
+async function acceptInvite({
   uid,
   inviteCode
 } = {}) {
@@ -163,6 +183,24 @@ async function acceptInvite ({
   if (inviterUid === uid) {
     throw {
       errCode: ERROR.INVALID_INVITE_CODE
+    }
+  }
+
+  // 限制每层级最大邀请数（例如每人最多邀请3人）
+  const MAX_INVITE_COUNT = 3
+  const inviterId = inviterUid[0]  // 直接上级
+
+  // 查询直接上级已邀请的人数
+  const inviteCountRes = await userCollection.where({
+    inviter_uid: dbCmd.elemMatch({
+      0: inviterId  // 第一级是 inviterId
+    })
+  }).count()
+
+  if (inviteCountRes.total >= MAX_INVITE_COUNT) {
+    throw {
+      errCode: ERROR.INVITE_COUNT_EXCEEDED,
+      errMsg: '邀请人数已达上限'
     }
   }
 

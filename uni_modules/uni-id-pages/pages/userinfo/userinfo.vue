@@ -45,7 +45,7 @@
 			<button v-if="userInfo._id" @click="logout">退出登录</button>
 			<button v-else @click="login">去登录</button>
 		</template>
-		<user-detail v-model:userDetailPopState="userDetailPopState" :title="'我的邀请人'" :userDetailData="this.inviteData.inviter"></user-detail>
+		<user-detail :userDetailPopState="userDetailPopState" :title="'我的邀请人'" :userDetailData="inviteData.inviter" @close="userDetailPopState = false"></user-detail>
 	</view>
 </template>
 <script>
@@ -128,7 +128,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				})
 				this.inviteData.myInviteCode = codeRes.myInviteCode
 			},	
-			goInviter(){
+			goInviter(){	
 				this.userDetailPopState = true
 			},
 			login() {

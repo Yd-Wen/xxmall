@@ -8,7 +8,7 @@
 				<view class="body">
 					<scroll-view class="scroll" scroll-y>
 						<view class="avatar">
-							<image class="img" :src="userDetailData.avatarFile?.url || '/static/images/avatar.png'" mode="aspectFill"></image>
+							<image class="img" :src="(userDetailData.avatarFile && userDetailData.avatarFile.url) ? userDetailData.avatarFile.url : '/static/images/avatar.png'" mode="aspectFill"></image>
 						</view>
 						<view class="info">
 							<view class="username">用户名：{{userDetailData.username}}</view>
@@ -55,11 +55,11 @@
 		methods:{
 			// 点击遮罩层关闭弹窗
 			onClose(){
-				this.$emit('update:userDetailPopState', false)
+				this.$emit('close')
 			},
 			// 点击确认按钮
 			onConfirm(){
-				this.$emit('update:userDetailPopState', false)
+				this.$emit('close')
 			}
 		}
 	}
@@ -68,7 +68,6 @@
 <style lang="scss">
 .wrapper{
 	height: 50vh;
-    z-index: 20;
 	.header{
 		height: 80rpx;
 		width: 100%;

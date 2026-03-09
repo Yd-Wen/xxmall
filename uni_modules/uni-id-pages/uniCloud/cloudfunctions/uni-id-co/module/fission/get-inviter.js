@@ -76,7 +76,6 @@ module.exports = async function (params = {}) {
         uid: inviter._id,
         username: inviter.username,
         nickname: inviter.nickname,
-        avatar: inviter.avatar,
         avatarFile: inviter.avatar_file,
         myInviteCode: inviter.my_invite_code
       }

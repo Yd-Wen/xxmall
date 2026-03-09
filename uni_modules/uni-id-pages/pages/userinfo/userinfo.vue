@@ -20,7 +20,7 @@
 			</uni-list-item>
 		</uni-list>
 		<uni-list class="list">
-			<uni-list-item thumb="/static/images/inviter.png" @click="deactivate" title="我的邀请人" :rightText="inviteData.hasInviter?inviteData.inviter.username:'没有邀请人'" link>
+			<uni-list-item thumb="/static/images/inviter.png" @click="goInviter" title="我的邀请人" :rightText="inviteData.hasInviter?inviteData.inviter.username:'没有邀请人'" link>
 			</uni-list-item>
 			<uni-list-item thumb="/static/images/invite_code.png" @click="deactivate" title="我的邀请码" :rightText="inviteData.myInviteCode ||'没有邀请码'" link>
 			</uni-list-item>
@@ -45,6 +45,7 @@
 			<button v-if="userInfo._id" @click="logout">退出登录</button>
 			<button v-else @click="login">去登录</button>
 		</template>
+		<user-detail v-model:userDetailPopState="userDetailPopState" :title="'我的邀请人'" :userDetailData="this.inviteData.inviter"></user-detail>
 	</view>
 </template>
 <script>
@@ -87,6 +88,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 					invitedUserCount: 0,
 					invitedUser: [],
 				},
+				userDetailPopState: false,
 				hasPwd: false,
 				showLoginManage: false ,//通过页面传参隐藏登录&退出登录按钮
 				setNicknameIng:false
@@ -126,6 +128,9 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				})
 				this.inviteData.myInviteCode = codeRes.myInviteCode
 			},	
+			goInviter(){
+				this.userDetailPopState = true
+			},
 			login() {
 				uni.navigateTo({
 					url: '/uni_modules/uni-id-pages/pages/login/login-withoutpwd',

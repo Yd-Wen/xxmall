@@ -73,7 +73,7 @@
 
 <style lang="scss">
 .wrapper{
-	height: 85vh;
+	height: 80vh;
 	.header{
 		height: 80rpx;
 		width: 100%;

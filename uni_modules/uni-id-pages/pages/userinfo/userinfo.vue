@@ -20,11 +20,11 @@
 			</uni-list-item>
 		</uni-list>
 		<uni-list class="list">
-			<uni-list-item thumb="/static/images/invite_code.png" @click="deactivate" title="我的邀请码" :rightText="myInviteCode ||'未生成'" link>
+			<uni-list-item thumb="/static/images/inviter.png" @click="deactivate" title="我的邀请人" :rightText="inviteData.hasInviter?inviteData.inviter.username:'没有邀请人'" link>
 			</uni-list-item>
-			<uni-list-item thumb="/static/images/inviter.png" @click="deactivate" title="我的邀请人" :rightText="userInfo.inviteCode||'未生成'" link>
+			<uni-list-item thumb="/static/images/invite_code.png" @click="deactivate" title="我的邀请码" :rightText="inviteData.myInviteCode ||'没有邀请码'" link>
 			</uni-list-item>
-			<uni-list-item thumb="/static/images/invited.png" @click="deactivate" title="我邀请的用户" :rightText="userInfo.inviteCode||'未生成'" link>
+			<uni-list-item thumb="/static/images/invited.png" @click="deactivate" title="我邀请的用户" :rightText="inviteData.invitedUserCount||'没有邀请用户'" link>
 			</uni-list-item>
 		</uni-list>
 		<uni-list class="list">
@@ -79,7 +79,14 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				// 	mobile:'',
 				// 	nickname:''
 				// },
-				myInviteCode: '',
+				inviteData: {
+					hasInviter: false,
+					inviter: {},
+					myInviteCode: '',
+					hasInvitedUser: false,
+					invitedUserCount: 0,
+					invitedUser: [],
+				},
 				hasPwd: false,
 				showLoginManage: false ,//通过页面传参隐藏登录&退出登录按钮
 				setNicknameIng:false
@@ -95,16 +102,30 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				this.showLoginManage = true //通过页面传参隐藏登录&退出登录按钮
 			}
 			//判断当前用户是否有密码，否则就不显示密码修改功能
-		let res = await uniIdCo.getAccountInfo()
-		this.hasPwd = res.isPasswordSet
-		if (this.userInfo._id) {
-			let codeRes = await uniIdCo.queryMyInviteCode({
-				_id: this.userInfo._id
-			})
-			this.myInviteCode = codeRes.my_invite_code
-		}
+			let res = await uniIdCo.getAccountInfo()
+			this.hasPwd = res.isPasswordSet
+			
+			// 获取我的邀请人
+			await this.getInviter()
+
+			// 获取我的邀请码
+			await this.getMyInviteCode()
+
 		},
 		methods: {
+			async getInviter(){
+				let inviterRes = await uniIdCo.getInviter({
+					_id: this.userInfo._id
+				})
+				this.inviteData.hasInviter = inviterRes.data.hasInviter
+				this.inviteData.inviter = inviterRes.data.inviter || {}
+			},	
+			async getMyInviteCode(){
+				let codeRes = await uniIdCo.getMyInviteCode({
+					_id: this.userInfo._id
+				})
+				this.inviteData.myInviteCode = codeRes.myInviteCode
+			},	
 			login() {
 				uni.navigateTo({
 					url: '/uni_modules/uni-id-pages/pages/login/login-withoutpwd',

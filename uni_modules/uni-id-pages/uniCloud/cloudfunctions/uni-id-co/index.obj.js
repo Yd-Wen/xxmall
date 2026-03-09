@@ -79,7 +79,8 @@ const {
 const {
   getInvitedUser,
   acceptInvite,
-  queryMyInviteCode
+  getMyInviteCode,
+  getInviter
 } = require('./module/fission')
 const {
   authorizeAppLogin,
@@ -595,12 +596,19 @@ module.exports = {
    */
   getInvitedUser,
   /**
-   * 查询我的邀请码
+   * 获取我的邀请码
    * @param {Object} params
    * @param {String} params._id  用户ID
    * @returns
    */
-  queryMyInviteCode,
+  getMyInviteCode,
+  /**
+   * 查询我的邀请人
+   * @param {Object} params
+   * @param {String} params._id  用户ID
+   * @returns
+   */
+  getInviter,
   /**
    * 更新device表的push_clien_id
    * @tutorial https://uniapp.dcloud.net.cn/uniCloud/uni-id-pages.html#set-push-cid

@@ -5,7 +5,7 @@
 			:show="userDetailPopState" 
 			:zIndex="10075" 
 			:duration="100" 
-			:opacity="0.5" 
+			:opacity="0.1" 
 			@click="onClose"
 		></u-overlay>
 		<u-popup :show="userDetailPopState" closeable round="10" @close="onClose">

@@ -6,7 +6,7 @@
 			<view class="info">
 				<navigator class="left" url="/uni_modules/uni-id-pages/pages/userinfo/userinfo">
 					<u-icon name="gift" color="#576b95" size="22"></u-icon>
-					分享有礼
+					邀请有礼
 				</navigator>
 				<navigator class="right" url="/pages/order/order">
 					<u-icon name="order" color="#576b95" size="22"></u-icon>

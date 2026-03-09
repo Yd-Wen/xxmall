@@ -41,7 +41,7 @@ module.exports = async function (params = {}) {
       errCode: 0,
       data: {
         hasInviter: false,
-        inviter: null
+        inviter: {}
       }
     }
   }
@@ -61,7 +61,7 @@ module.exports = async function (params = {}) {
       errCode: 0,
       data: {
         hasInviter: false,
-        inviter: null
+        inviter: {}
       }
     }
   }

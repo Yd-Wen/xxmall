@@ -20,7 +20,7 @@
 			</uni-list-item>
 		</uni-list>
 		<uni-list class="list">
-			<uni-list-item thumb="/static/images/inviter.png" @click="goInviter" title="我的邀请人" :rightText="inviteData.hasInviter?inviteData.inviter.username:'没有邀请人'" link>
+			<uni-list-item thumb="/static/images/inviter.png" @click="goInviter(inviteData.bindInviteCode)" title="我的邀请人" :rightText="inviteData.hasInviter?inviteData.inviter.username:'没有邀请人'" link>
 			</uni-list-item>
 			<uni-list-item thumb="/static/images/invite_code.png" @click="deactivate" title="我的邀请码" :rightText="inviteData.myInviteCode ||'没有邀请码'" link>
 			</uni-list-item>
@@ -38,6 +38,10 @@
 		<uni-popup ref="dialog" type="dialog">
 			<uni-popup-dialog mode="input" :value="userInfo.nickname" @confirm="setNickname" :inputType="setNicknameIng?'nickname':'text'"
 				title="设置昵称" placeholder="请输入要设置的昵称">
+			</uni-popup-dialog>
+		</uni-popup>
+		<uni-popup ref="inviteDialog" type="dialog">
+			<uni-popup-dialog mode="input" :value="inviteData.bindInviteCode" @confirm="setInviter" title="绑定邀请码" placeholder="请输入要绑定的邀请码">
 			</uni-popup-dialog>
 		</uni-popup>
 		<uni-id-pages-bind-mobile ref="bind-mobile-by-sms" @success="bindMobileSuccess"></uni-id-pages-bind-mobile>
@@ -81,6 +85,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				// 	nickname:''
 				// },
 				inviteData: {
+					bindInviteCode: '',
 					hasInviter: false,
 					inviter: {},
 					myInviteCode: '',
@@ -121,6 +126,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				})
 				this.inviteData.hasInviter = inviterRes.data.hasInviter
 				this.inviteData.inviter = inviterRes.data.inviter || {}
+				this.inviteData.bindInviteCode = inviterRes.data.inviter.myInviteCode || ''
 			},	
 			async getMyInviteCode(){
 				let codeRes = await uniIdCo.getMyInviteCode({
@@ -128,9 +134,23 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				})
 				this.inviteData.myInviteCode = codeRes.myInviteCode
 			},	
-			goInviter(){	
-				this.userDetailPopState = true
+			goInviter(code){
+				if (code) {
+					this.userDetailPopState = true
+				}else{
+					this.$refs.inviteDialog.open()
+				}
 			},
+			async setInviter(inviteCode){
+				if (inviteCode) {
+					const res = await uniIdCo.acceptInvite({
+						_id: this.userInfo._id,
+						inviteCode
+					})
+					await this.getInviter()
+					this.$refs.inviteDialog.close()
+				}
+			},	
 			login() {
 				uni.navigateTo({
 					url: '/uni_modules/uni-id-pages/pages/login/login-withoutpwd',

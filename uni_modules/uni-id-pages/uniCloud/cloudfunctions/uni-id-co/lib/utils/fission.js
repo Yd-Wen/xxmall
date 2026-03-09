@@ -112,6 +112,12 @@ async function generateInviteInfo({
     my_invite_code: inviteCode
   }).limit(1).get()
 
+  if (inviteUser.data.length === 0) {
+    throw {
+      errCode: ERROR.INVALID_INVITE_CODE
+    }
+  }
+
   // 查询邀请人已邀请人数
   const inviteCountRes = await userCollection.where({
     'inviter_uid.0': inviteUser.data[0]._id  // 精确匹配数组第一个元素
@@ -219,7 +225,7 @@ async function acceptInvite({
 
   return {
     errCode: 0,
-    errMsg: ''
+    errMsg: '绑定邀请码成功'
   }
 }
 

@@ -20,7 +20,7 @@
 			</uni-list-item>
 		</uni-list>
 		<uni-list class="list">
-			<uni-list-item thumb="/static/images/inviter.png" @click="goInviter(inviteData.bindInviteCode)" title="我的邀请人" :rightText="inviteData.hasInviter?inviteData.inviter.username:'没有邀请人'" link>
+			<uni-list-item thumb="/static/images/inviter.png" @click="goInviter(inviteData.inviter.myInviteCode)" title="我的邀请人" :rightText="inviteData.hasInviter?inviteData.inviter.username:'没有邀请人'" link>
 			</uni-list-item>
 			<uni-list-item thumb="/static/images/invite_code.png" @click="deactivate" title="我的邀请码" :rightText="inviteData.myInviteCode ||'没有邀请码'" link>
 			</uni-list-item>
@@ -41,7 +41,7 @@
 			</uni-popup-dialog>
 		</uni-popup>
 		<uni-popup ref="inviteDialog" type="dialog">
-			<uni-popup-dialog mode="input" :value="inviteData.bindInviteCode" @confirm="setInviter" title="绑定邀请码" placeholder="请输入要绑定的邀请码">
+			<uni-popup-dialog mode="input" :value="inviteData.inviter.myInviteCode" @confirm="setInviter" title="绑定邀请码" placeholder="请输入要绑定的邀请码">
 			</uni-popup-dialog>
 		</uni-popup>
 		<uni-id-pages-bind-mobile ref="bind-mobile-by-sms" @success="bindMobileSuccess"></uni-id-pages-bind-mobile>
@@ -85,7 +85,6 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				// 	nickname:''
 				// },
 				inviteData: {
-					bindInviteCode: '',
 					hasInviter: false,
 					inviter: {},
 					myInviteCode: '',
@@ -126,7 +125,6 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				})
 				this.inviteData.hasInviter = inviterRes.data.hasInviter
 				this.inviteData.inviter = inviterRes.data.inviter || {}
-				this.inviteData.bindInviteCode = inviterRes.data.inviter.myInviteCode || ''
 			},	
 			async getMyInviteCode(){
 				let codeRes = await uniIdCo.getMyInviteCode({

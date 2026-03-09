@@ -128,6 +128,20 @@ async function generateInviteInfo({
       errCode: ERROR.INVITE_COUNT_EXCEEDED
     }
   }
+
+  // 查询邀请人的邀请人的层级
+  const inviterInviteLevelRes = await userCollection.where({
+    _id: inviteUser.data[0]._id
+  }).field({
+    inviter_uid: true
+  }).get()
+
+  if (inviterInviteLevelRes.data[0].inviter_uid.length >= MAX_INVITE_LEVEL) {
+    throw {
+      errCode: ERROR.INVITE_LEVEL_EXCEEDED
+    }
+  }
+
   // 查询邀请人的上级邀请记录
   const inviterRecord = await findUserByInviteCode({
     inviteCode,
@@ -189,24 +203,6 @@ async function acceptInvite({
   if (inviterUid === uid) {
     throw {
       errCode: ERROR.INVALID_INVITE_CODE
-    }
-  }
-
-  // 限制每层级最大邀请数（例如每人最多邀请3人）
-  const MAX_INVITE_COUNT = 3
-  const inviterId = inviterUid[0]  // 直接上级
-
-  // 查询直接上级已邀请的人数
-  const inviteCountRes = await userCollection.where({
-    inviter_uid: dbCmd.elemMatch({
-      0: inviterId  // 第一级是 inviterId
-    })
-  }).count()
-
-  if (inviteCountRes.total >= MAX_INVITE_COUNT) {
-    throw {
-      errCode: ERROR.INVITE_COUNT_EXCEEDED,
-      errMsg: '邀请人数已达上限'
     }
   }
 

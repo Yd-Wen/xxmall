@@ -16,7 +16,7 @@
 							邀请码：{{userListData.myInviteCode}}
 						</view>
 						<view class="inviteTime" v-if="userListData.inviteTime">
-							邀请时间：{{userListData.inviteTime}}
+							邀请于 {{timeFormat(userListData.inviteTime, 'yyyy-MM-dd hh:mm')}}
 						</view>
 					</view>
 				</view>
@@ -29,6 +29,7 @@
 </template>
 
 <script>
+	import {timeFormat} from '@/utils/tools.js'
 	export default {
 		name:"user-list",
 		props: {
@@ -54,6 +55,7 @@
 			}
 		},
 		methods:{
+            timeFormat,
 			// 点击遮罩层关闭弹窗
 			onClose(){
 				this.$emit('close')

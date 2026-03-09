@@ -24,7 +24,7 @@
 			</uni-list-item>
 			<uni-list-item thumb="/static/images/invite_code.png" @click="deactivate" title="我的邀请码" :rightText="inviteData.myInviteCode ||'没有邀请码'" link>
 			</uni-list-item>
-			<uni-list-item thumb="/static/images/invited.png" @click="deactivate" title="我邀请的用户" :rightText="inviteData.invitedUserCount||'没有邀请用户'" link>
+			<uni-list-item thumb="/static/images/invited.png" @click="deactivate" title="我邀请的用户" :rightText="'已邀请 ' + inviteData.invitedUserCount + ' 人'" link>
 			</uni-list-item>
 		</uni-list>
 		<uni-list class="list">
@@ -58,6 +58,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
     store,
     mutations
   } from '@/uni_modules/uni-id-pages/common/store.js'
+  import { MAX_INVITE_LEVEL } from '../../uniCloud/cloudfunctions/uni-id-co/lib/utils/fission.js'
 	export default {
     computed: {
         userInfo() {
@@ -89,8 +90,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 					inviter: {},
 					myInviteCode: '',
 					hasInvitedUser: false,
-					invitedUserCount: 0,
-					invitedUser: [],
+					invitedUserCount: 0
 				},
 				userDetailPopState: false,
 				hasPwd: false,
@@ -117,6 +117,9 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 			// 获取我的邀请码
 			await this.getMyInviteCode()
 
+			// 获取我邀请的用户数量
+			await this.getInvitedUserCount()
+
 		},
 		methods: {
 			async getInviter(){
@@ -131,6 +134,16 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 					_id: this.userInfo._id
 				})
 				this.inviteData.myInviteCode = codeRes.myInviteCode
+			},	
+			async getInvitedUserCount(){
+				for (let level = 1; level <= MAX_INVITE_LEVEL; level++) {
+					let countRes = await uniIdCo.getInvitedUser({
+						// _id: this.userInfo._id,
+						level,
+						needTotal: true
+					})
+					this.inviteData.invitedUserCount += countRes.total
+				}
 			},	
 			goInviter(code){
 				if (code) {

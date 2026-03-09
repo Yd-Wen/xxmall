@@ -226,6 +226,7 @@ async function acceptInvite({
 }
 
 module.exports = {
+  MAX_INVITE_LEVEL,
   acceptInvite,
   generateInviteInfo,
   getValidInviteCode

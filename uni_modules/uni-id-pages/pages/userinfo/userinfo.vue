@@ -24,7 +24,7 @@
 			</uni-list-item>
 			<uni-list-item thumb="/static/images/invite_code.png" @click="deactivate" title="我的邀请码" :rightText="inviteData.myInviteCode ||'没有邀请码'" link>
 			</uni-list-item>
-			<uni-list-item thumb="/static/images/invited.png" @click="deactivate" title="我邀请的用户" :rightText="'已邀请 ' + inviteData.invitedUserCount + ' 人'" link>
+			<uni-list-item thumb="/static/images/invited.png" @click="goInvited" title="我邀请的用户" :rightText="'已邀请 ' + inviteData.invitedUserCount + ' 人'" link>
 			</uni-list-item>
 		</uni-list>
 		<uni-list class="list">
@@ -49,7 +49,10 @@
 			<button v-if="userInfo._id" @click="logout">退出登录</button>
 			<button v-else @click="login">去登录</button>
 		</template>
-		<user-detail :userDetailPopState="userDetailPopState" :title="'我的邀请人'" :userDetailData="inviteData.inviter" @close="userDetailPopState = false"></user-detail>
+		<user-detail :userDetailPopState="inviterDetailPopState" :title="'我的邀请人'" :userDetailData="inviteData.inviter" @close="inviterDetailPopState = false"></user-detail>
+		<user-list :userListPopState="userListPopState" :title="'我邀请的用户'" :userListData="inviteData.invitedUser" :pageData="pageData"
+		@change-tab="changeTab" @select-user="selectUser" @close="userListPopState = false"></user-list>
+		<user-detail :userDetailPopState="inivitedDetailPopState" :title="'我邀请的用户'" :userDetailData="inviteData.currentInvitedUser" @close="inivitedDetailPopState = false"></user-detail>
 	</view>
 </template>
 <script>
@@ -90,9 +93,18 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 					inviter: {},
 					myInviteCode: '',
 					hasInvitedUser: false,
-					invitedUserCount: 0
+					invitedUser: [],
+					invitedUserCount: 0,
+					currentInvitedUser: {},
 				},
-				userDetailPopState: false,
+				pageData: {
+					current: 1,
+					pageSize: 2,
+					total: 0
+				},	
+				inviterDetailPopState: false,
+				userListPopState: false,
+				inivitedDetailPopState: false,
 				hasPwd: false,
 				showLoginManage: false ,//通过页面传参隐藏登录&退出登录按钮
 				setNicknameIng:false
@@ -117,9 +129,11 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 			// 获取我的邀请码
 			await this.getMyInviteCode()
 
-			// 获取我邀请的用户数量
+			// 获取我邀请的用户总数量
 			await this.getInvitedUserCount()
 
+			// 获取我邀请的用户
+			await this.getInvitedUser()
 		},
 		methods: {
 			async getInviter(){
@@ -147,7 +161,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 			},	
 			goInviter(code){
 				if (code) {
-					this.userDetailPopState = true
+					this.inviterDetailPopState = true
 				}else{
 					this.$refs.inviteDialog.open()
 				}
@@ -162,6 +176,36 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 					this.$refs.inviteDialog.close()
 				}
 			},	
+			goInvited(){
+				if (this.inviteData.invitedUserCount) {
+					this.userListPopState = true
+				}else{
+					uni.showToast({
+						title: '暂无邀请用户',
+						icon: 'none'
+					})
+				}
+			},
+			async getInvitedUser(){
+				let res = await uniIdCo.getInvitedUser({
+					// _id: this.userInfo._id,
+					level: this.pageData.current,
+					skip: (this.pageData.current - 1) * this.pageData.pageSize,
+					limit: this.pageData.pageSize,
+					needTotal: true
+				})
+				this.inviteData.invitedUser = res.invitedUser || []
+				this.pageData.total = res.total || 0
+			},
+			async changeTab(index){
+				this.pageData.current = index + 1
+				// 获取我邀请的用户
+				await this.getInvitedUser()
+			},
+			selectUser(user){
+				this.inviteData.currentInvitedUser = user
+				this.inivitedDetailPopState = true
+			},
 			login() {
 				uni.navigateTo({
 					url: '/uni_modules/uni-id-pages/pages/login/login-withoutpwd',

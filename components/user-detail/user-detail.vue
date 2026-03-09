@@ -1,7 +1,15 @@
 <template>
 	<view class="userDetail">
+		<!-- 遮罩层 -->
+		<u-overlay 
+			:show="userDetailPopState" 
+			:zIndex="10075" 
+			:duration="100" 
+			:opacity="0.5" 
+			@click="onClose"
+		></u-overlay>
 		<u-popup :show="userDetailPopState" closeable round="10" @close="onClose">
-			<view class="wrapper" v-if="userDetailData.username">
+			<view class="wrapper" v-if="userDetailData">
 				<view class="header">
                     <view class="title">{{title}}</view>
                 </view>

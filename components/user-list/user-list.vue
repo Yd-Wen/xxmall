@@ -1,7 +1,7 @@
 <template>
 	<view class="userList">
 		<u-popup :show="userListPopState" closeable round="10" @close="onClose">
-			<view class="wrapper" v-if="userListData && userListData.length > 0">
+			<view class="wrapper" v-if="userListData">
 				<view class="header">
                     <view class="title">{{title}}</view>
                 </view>
@@ -9,7 +9,7 @@
 					<view class="navList">
 						<view class="navTitle">邀请层级</view>
 						<scroll-view class="scrollView" scroll-y>
-							<view class="item" :class="index==pageData.current-1?'active':''" v-for="(item, index) in navList" :key="index" @click="onChangeTab(index)">
+							<view class="item" :class="index==activeLevel-1?'active':''" v-for="(item, index) in navList" :key="index" @click="onChangeTab(index)">
 							{{item}}
 							</view>
 						</scroll-view>
@@ -28,7 +28,7 @@
 						</view>
 						<view class="pagination">
 							<uni-pagination :show-icon="true" :total="pageData.total" :current="pageData.current" :page-size="pageData.pageSize" 
-							title="标题文字" />
+						title="标题文字" @change="onPageChange" />
 							<text class="pageInfo">共邀请{{ pageData.total }}人 当前页：{{ pageData.current}} 每页数据：{{ pageData.pageSize }}</text>
 						</view>
 					</view>
@@ -68,7 +68,11 @@
 						total: 0
                     }
                 }
-            }
+            },
+			activeLevel: {
+				type: Number,
+				default: 1
+			}
 		},
 		data(){
 			return {
@@ -99,6 +103,10 @@
 			// 点击确认按钮
 			onConfirm(){
 				this.$emit('close')
+			},
+			// 分页变化
+			onPageChange(e){
+				this.$emit('page-change', e)
 			}
 		}
 	}
@@ -157,6 +165,7 @@
 		}
 		.content{
 			flex: 1;
+			height: 80%;
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
@@ -165,8 +174,9 @@
 			.contentList{
 				flex: 1;
 				width: 100%;
+				height: calc(100% - 140rpx);
+				margin-top: 20rpx;
 				.item{
-					margin-bottom: 20rpx;
 					display: flex;
 					justify-content: space-around;
 					align-items: center;

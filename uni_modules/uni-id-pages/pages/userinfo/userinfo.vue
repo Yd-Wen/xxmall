@@ -50,8 +50,7 @@
 			<button v-else @click="login">去登录</button>
 		</template>
 		<user-detail :userDetailPopState="inviterDetailPopState" :title="'我的邀请人'" :userDetailData="inviteData.inviter" @close="inviterDetailPopState = false"></user-detail>
-		<user-list :userListPopState="userListPopState" :title="'我邀请的用户'" :userListData="inviteData.invitedUser" :pageData="pageData"
-		@change-tab="changeTab" @select-user="selectUser" @close="userListPopState = false"></user-list>
+		<user-list :userListPopState="userListPopState" :title="'我邀请的用户'" :userListData="inviteData.invitedUser" :pageData="pageData" :activeLevel="activeLevel" @change-tab="changeTab" @select-user="selectUser" @page-change="onPageChange" @close="userListPopState = false"></user-list>
 		<user-detail :userDetailPopState="inivitedDetailPopState" :title="'我邀请的用户'" :userDetailData="inviteData.currentInvitedUser" @close="inivitedDetailPopState = false"></user-detail>
 	</view>
 </template>
@@ -101,7 +100,8 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 					current: 1,
 					pageSize: 2,
 					total: 0
-				},	
+				},
+				activeLevel: 1,	
 				inviterDetailPopState: false,
 				userListPopState: false,
 				inivitedDetailPopState: false,
@@ -189,8 +189,8 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 			async getInvitedUser(){
 				let res = await uniIdCo.getInvitedUser({
 					// _id: this.userInfo._id,
-					level: this.pageData.current,
-					skip: (this.pageData.current - 1) * this.pageData.pageSize,
+					level: this.activeLevel,
+					offset: (this.pageData.current - 1) * this.pageData.pageSize,
 					limit: this.pageData.pageSize,
 					needTotal: true
 				})
@@ -198,13 +198,20 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				this.pageData.total = res.total || 0
 			},
 			async changeTab(index){
-				this.pageData.current = index + 1
+				this.activeLevel = index + 1
+				this.pageData.current = 1 // 切换层级时重置页码为1
 				// 获取我邀请的用户
 				await this.getInvitedUser()
 			},
 			selectUser(user){
 				this.inviteData.currentInvitedUser = user
 				this.inivitedDetailPopState = true
+			},
+			// 分页变化
+			onPageChange(e){
+				this.pageData.current = e.current
+				// 获取我邀请的用户
+				this.getInvitedUser()
 			},
 			login() {
 				uni.navigateTo({

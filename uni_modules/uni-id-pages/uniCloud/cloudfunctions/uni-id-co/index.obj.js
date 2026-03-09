@@ -78,7 +78,8 @@ const {
 } = require('./module/utils/index')
 const {
   getInvitedUser,
-  acceptInvite
+  acceptInvite,
+  queryMyInviteCode
 } = require('./module/fission')
 const {
   authorizeAppLogin,
@@ -99,7 +100,7 @@ const {
 } = require('./module/facial-recognition-verify')
 
 module.exports = {
-  async _before () {
+  async _before() {
     // 支持 callFunction 与 URL化
     universal.call(this)
 
@@ -207,7 +208,7 @@ module.exports = {
     // 挂载uni-captcha到this上，方便后续调用
     this.uniCaptcha = uniCaptcha
     Object.defineProperty(this, 'uniOpenBridge', {
-      get () {
+      get() {
         return require('uni-open-bridge-common')
       }
     })
@@ -239,7 +240,7 @@ module.exports = {
     // 通用权限校验模块
     await this.middleware.accessControl()
   },
-  _after (error, result) {
+  _after(error, result) {
     if (error) {
       // 处理中间件内抛出的标准响应对象
       if (error.errCode && getType(error) === 'object') {
@@ -593,6 +594,13 @@ module.exports = {
    * @returns
    */
   getInvitedUser,
+  /**
+   * 查询我的邀请码
+   * @param {Object} params
+   * @param {String} params._id  用户ID
+   * @returns
+   */
+  queryMyInviteCode,
   /**
    * 更新device表的push_clien_id
    * @tutorial https://uniapp.dcloud.net.cn/uniCloud/uni-id-pages.html#set-push-cid

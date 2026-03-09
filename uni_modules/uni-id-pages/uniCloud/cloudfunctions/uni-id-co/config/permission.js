@@ -57,6 +57,9 @@ module.exports = {
   getInvitedUser: {
     auth: true
   },
+  queryMyInviteCode: {
+    auth: true
+  },
   setPushCid: {
     auth: true
   },

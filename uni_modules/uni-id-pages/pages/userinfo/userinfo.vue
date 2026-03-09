@@ -19,6 +19,17 @@
 			<uni-list-item thumb="/static/images/pwd.png" v-if="hasPwd" class="item" @click="changePassword" title="修改密码" link>
 			</uni-list-item>
 		</uni-list>
+		<uni-list class="list">
+			<uni-list-item thumb="/static/images/invite_code.png" @click="deactivate" title="我的邀请码" :rightText="myInviteCode ||'未生成'" link>
+			</uni-list-item>
+			<uni-list-item thumb="/static/images/inviter.png" @click="deactivate" title="我的邀请人" :rightText="userInfo.inviteCode||'未生成'" link>
+			</uni-list-item>
+			<uni-list-item thumb="/static/images/invited.png" @click="deactivate" title="我邀请的用户" :rightText="userInfo.inviteCode||'未生成'" link>
+			</uni-list-item>
+		</uni-list>
+		<uni-list class="list">
+			<uni-list-item thumb="/static/images/client_service.png" @click="deactivate" title="联系客服" link="navigateTo"></uni-list-item>
+		</uni-list>
 		<!-- #ifndef MP -->
 		<uni-list class="list">
 			<uni-list-item thumb="/static/images/account_delete.png" @click="deactivate" title="注销账号" link="navigateTo"></uni-list-item>
@@ -44,16 +55,15 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
   } from '@/uni_modules/uni-id-pages/common/store.js'
 	export default {
     computed: {
-      userInfo() {
-        return store.userInfo
-      },
-	  realNameStatus () {
-		  if (!this.userInfo.realNameAuth) {
-			  return 0
-		  }
-
-		  return this.userInfo.realNameAuth.authStatus
-	  }
+        userInfo() {
+        	return store.userInfo
+        },
+	    realNameStatus () {
+			if (!this.userInfo.realNameAuth) {
+				return 0
+			}
+			return this.userInfo.realNameAuth.authStatus
+	    }
     },
 		data() {
 			return {
@@ -69,6 +79,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				// 	mobile:'',
 				// 	nickname:''
 				// },
+				myInviteCode: '',
 				hasPwd: false,
 				showLoginManage: false ,//通过页面传参隐藏登录&退出登录按钮
 				setNicknameIng:false
@@ -84,8 +95,14 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				this.showLoginManage = true //通过页面传参隐藏登录&退出登录按钮
 			}
 			//判断当前用户是否有密码，否则就不显示密码修改功能
-			let res = await uniIdCo.getAccountInfo()
-			this.hasPwd = res.isPasswordSet
+		let res = await uniIdCo.getAccountInfo()
+		this.hasPwd = res.isPasswordSet
+		if (this.userInfo._id) {
+			let codeRes = await uniIdCo.queryMyInviteCode({
+				_id: this.userInfo._id
+			})
+			this.myInviteCode = codeRes.my_invite_code
+		}
 		},
 		methods: {
 			login() {
@@ -254,7 +271,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 	.list {
 		margin: 10rpx 20rpx;
 		border-radius: 10rpx;
-		border: 1px solid #F5F5F5;
+		border: 1px solid $border-color;
 	}
 
 	.item {

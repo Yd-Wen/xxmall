@@ -6,18 +6,16 @@
                     <view class="title">{{title}}</view>
                 </view>
 				<view class="body">
-					<scroll-view class="scroll" scroll-y>
-						<view class="avatar">
-							<image class="img" :src="(userDetailData.avatarFile && userDetailData.avatarFile.url) ? userDetailData.avatarFile.url : '/static/images/avatar.png'" mode="aspectFill"></image>
+					<view class="avatar">
+						<image class="img" :src="(userDetailData.avatarFile && userDetailData.avatarFile.url) ? userDetailData.avatarFile.url : '/static/images/avatar.png'" mode="aspectFill"></image>
+					</view>
+					<view class="info">
+						<view class="username">用户：{{userDetailData.username}}</view>
+						<view class="nickname" v-if="userDetailData.nickname">昵  称：{{userDetailData.nickname}}</view>
+						<view class="inviteCode" v-if="userDetailData.myInviteCode">
+							邀请码：{{userDetailData.myInviteCode}}
 						</view>
-						<view class="info">
-							<view class="username">用户名：{{userDetailData.username}}</view>
-							<view class="nickname" v-if="userDetailData.nickname">昵  称：{{userDetailData.nickname}}</view>
-                            <view class="inviteCode" v-if="userDetailData.myInviteCode">
-                                邀请码：{{userDetailData.myInviteCode}}
-                            </view>
-						</view>
-					</scroll-view>
+					</view>
 				</view>
 				<view class="footer">
 					<u-button color="#ec544f" icon="checkmark-circle-fill" iconColor="#fff" @click="onConfirm">确定</u-button>
@@ -70,42 +68,47 @@
 	height: 50vh;
 	.header{
 		height: 80rpx;
-		width: 100%;
+		width: 100%;	
+		margin-top: 10rpx;
         .title{
+			line-height: 80rpx;
+			@include flex-box-set();
             font-size: 40rpx;
             font-weight: bold;
         }
 	}
 	.body{
 		height: calc(100% - 80rpx - 140rpx); // 减去 header 和 footer 的高度
-		.scroll{
-			height: 100%;
-			padding: 0 30rpx;
-			.avatar{
-				width: 200rpx;
-				height: 200rpx;
-				.img{
-					width: 100%;
-					height: 100%;
-				}
-			}
-			.info{
-				padding: 20rpx 0;
-				border-bottom: 1px solid $border-color-light;
-				.username{
-                    margin-bottom: 20rpx;
-					font-size: 32rpx;
-					font-weight: bold;
-				}
-				.nickname{
-                    margin-bottom: 20rpx;
-					font-size: 28rpx;
-				}
-                .inviteCode{
-                    font-size: 28rpx;
-                }
+		padding-left: 50rpx;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		.avatar{
+			width: 250rpx;
+			height: 250rpx;
+			border-radius: 50%;
+			overflow: hidden;
+			.img{
+				width: 100%;
+				height: 100%;
 			}
 		}
+		.info{
+			padding-left: 50rpx;
+			.username{
+				margin-bottom: 20rpx;
+				font-size: 32rpx;
+				font-weight: bold;
+			}
+			.nickname{
+				margin-bottom: 20rpx;
+				font-size: 28rpx;
+			}
+			.inviteCode{
+				font-size: 28rpx;
+			}
+		}
+		
 	}
 	.footer{
 		@include flex-box-set();

@@ -195,7 +195,7 @@
 				{
 					"path": "userinfo/cropImage/cropImage",
 					"style": {
-						"navigationBarTitleText": ""
+						"navigationBarTitleText": "裁剪图片"
 					}
 				},
 				{

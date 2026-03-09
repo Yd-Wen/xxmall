@@ -77,7 +77,7 @@
         }
 	}
 	.body{
-		height: calc(100% - 20rpx); //CSS的calc()函数要求运算符前后必须有空格
+		height: calc(100% - 80rpx - 140rpx); // 减去 header 和 footer 的高度
 		.scroll{
 			height: 100%;
 			padding: 0 30rpx;

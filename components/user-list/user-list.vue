@@ -1,22 +1,22 @@
 <template>
-	<view class="userDetail">
-		<u-popup :show="userDetailPopState" closeable round="10" @close="onClose">
-			<view class="wrapper" v-if="userDetailData.username">
+	<view class="userList">
+		<u-popup :show="userListPopState" closeable round="10" @close="onClose">
+			<view class="wrapper" v-if="userListData.username">
 				<view class="header">
                     <view class="title">{{title}}</view>
                 </view>
 				<view class="body">
 					<view class="avatar">
-						<image class="img" :src="(userDetailData.avatarFile && userDetailData.avatarFile.url) ? userDetailData.avatarFile.url : '/static/images/avatar.png'" mode="aspectFill"></image>
+						<image class="img" :src="(userListData.avatarFile && userListData.avatarFile.url) ? userListData.avatarFile.url : '/static/images/avatar.png'" mode="aspectFill"></image>
 					</view>
 					<view class="info">
-						<view class="username">用户：{{userDetailData.username}}</view>
-						<view class="nickname" v-if="userDetailData.nickname">昵  称：{{userDetailData.nickname}}</view>
-						<view class="inviteCode" v-if="userDetailData.myInviteCode">
-							邀请码：{{userDetailData.myInviteCode}}
+						<view class="username">用户：{{userListData.username}}</view>
+						<view class="nickname" v-if="userListData.nickname">昵  称：{{userListData.nickname}}</view>
+						<view class="inviteCode" v-if="userListData.myInviteCode">
+							邀请码：{{userListData.myInviteCode}}
 						</view>
-						<view class="inviteTime" v-if="userDetailData.inviteTime">
-							邀请于 {{timeFormat(userDetailData.inviteTime, 'yyyy-MM-dd hh:mm')}}
+						<view class="inviteTime" v-if="userListData.inviteTime">
+							邀请时间：{{userListData.inviteTime}}
 						</view>
 					</view>
 				</view>
@@ -29,19 +29,18 @@
 </template>
 
 <script>
-	import {timeFormat} from '@/utils/tools.js'
 	export default {
-		name:"user-detail",
+		name:"user-list",
 		props: {
-            userDetailPopState: {
+            userListPopState: {
                 type: Boolean,
                 default: false
             },  
             title: {
                 type: String,
-                default: '用户详情'
+                default: '用户列表'
             },
-			userDetailData: {
+			userListData: {
 				type: Object,
 				default: () => {
 					return {
@@ -49,14 +48,12 @@
 						username: '',
 						nickname: '',
 						avatarFile: {},
-						myInviteCode: '',
-						inviteTime: ''
+						myInviteCode: ''
 					}
 				}
 			}
 		},
 		methods:{
-			timeFormat,	
 			// 点击遮罩层关闭弹窗
 			onClose(){
 				this.$emit('close')
@@ -71,7 +68,8 @@
 
 <style lang="scss">
 .wrapper{
-	height: 50vh;
+	height: 80vh;
+    z-index: 10074;
 	.header{
 		height: 80rpx;
 		width: 100%;	
@@ -100,25 +98,18 @@
 			}
 		}
 		.info{
-			height: 60%;
-			display: flex;
-			flex-direction: column;
-			justify-content: space-between;
-			align-items: flex-start;	
 			padding-left: 50rpx;
 			.username{
+				margin-bottom: 20rpx;
 				font-size: 32rpx;
 				font-weight: bold;
 			}
 			.nickname{
+				margin-bottom: 20rpx;
 				font-size: 28rpx;
 			}
 			.inviteCode{
 				font-size: 28rpx;
-			}
-			.inviteTime{
-				font-size: 24rpx;
-				color: $text-font-color-3;
 			}
 		}
 		

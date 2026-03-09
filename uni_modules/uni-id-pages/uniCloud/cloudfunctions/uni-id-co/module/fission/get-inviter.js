@@ -17,7 +17,8 @@ module.exports = async function (params = {}) {
   // 查询用户信息，获取 inviter_uid
   const userRes = await userCollection.doc(_id).field({
     _id: true,
-    inviter_uid: true
+    inviter_uid: true,
+    invite_time: true
   }).get()
 
   if (userRes.data.length === 0) {
@@ -77,7 +78,8 @@ module.exports = async function (params = {}) {
         username: inviter.username,
         nickname: inviter.nickname,
         avatarFile: inviter.avatar_file,
-        myInviteCode: inviter.my_invite_code
+        myInviteCode: inviter.my_invite_code,
+        inviteTime: user.invite_time
       }
     }
   }

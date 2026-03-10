@@ -1,13 +1,5 @@
 <template>
     <view class="share-panel">
-        <!-- 遮罩层 -->
-		<u-overlay 
-			:show="sharePopState" 
-			:zIndex="10075" 
-			:duration="100" 
-			:opacity="0.1" 
-			@click="onClose">
-        </u-overlay>
         <u-popup :show="sharePopState" closeable round="10" @close="onClose">
             <view class="wrapper" v-if="shareData">
                 <view class="header">
@@ -19,12 +11,17 @@
                         <view class="copyBtn" @click="copyInviteCode">复制邀请码</view>
                     </view>
                 </view>
-                <!-- #ifdef H5 -->
-                <button v-if="shareData.url" @click="copyShareLink">复制分享链接</button>
-                <!-- #endif -->
-                <!-- #ifdef MP-WEIXIN -->
-                <button open-type="share">分享给好友</button>
-                <!-- #endif -->
+                <view class="footer">
+                    <!-- #ifdef H5 -->
+                    <u-button v-if="shareData.url" color="#ec544f" icon="checkmark-circle-fill" iconColor="#fff" @click="copyShareLink">复制分享链接</u-button>
+                    <!-- #endif -->
+                    <!-- #ifdef MP-WEIXIN -->
+                    <view class="shareMP">
+                        <u-icon name="share" size="24" color="#ec544f"></u-icon>
+                        <button open-type="share">分享给好友</button>
+                    </view>
+                    <!-- #endif -->
+                </view>
             </view>
         </u-popup>
     </view>
@@ -116,14 +113,20 @@ export default {
 }
 </script>
 
-<style scoped>
-    .share-panel {
+<style scoped lang="scss">
+    .wrapper {
         height: 50vh;
-        width: 80vw;
-        margin: 20rpx auto;
-        padding: 20rpx;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        .header{
+            height: 80rpx;
+            width: 100%;	
+            margin-top: 10rpx;
+            .title{
+                line-height: 80rpx;
+                @include flex-box-set();
+                font-size: 40rpx;
+                font-weight: bold;
+            }
+        }
     }
 </style>

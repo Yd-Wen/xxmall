@@ -116,13 +116,21 @@
 			align-items: flex-start;	
 			padding-left: 50rpx;
 			font-size: 28rpx;
-			> * {
-				margin: 15rpx 0;
-			}
 			.username{
+				margin: 10rpx 0;
 				font-weight: bold;
 			}
+			.nickname{
+				margin: 10rpx 0;
+			}
+			.mobile{
+				margin: 10rpx 0;
+			}
+			.inviteCode{
+				margin: 10rpx 0;
+			}
 			.inviteTime{
+				margin: 30rpx 0;
 				font-size: 24rpx;
 				color: $text-font-color-3;
 			}

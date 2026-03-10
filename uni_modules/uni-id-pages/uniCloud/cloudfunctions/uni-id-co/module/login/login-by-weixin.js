@@ -111,7 +111,11 @@ module.exports = async function (params = {}) {
     wx_openid: {
       [`${weixinPlatform}_${appId}`]: openid
     },
-    wx_unionid: unionid
+    wx_unionid: unionid,
+  }
+  if (type === 'register') {
+    extraData.username = '微信用户' + openid.slice(-4)
+    extraData.nickname = '微信用户' + openid.slice(-4)
   }
   if (type === 'register' && weixinPlatform !== 'mp') {
     const {

@@ -136,7 +136,8 @@ async function generateInviteInfo({
     inviter_uid: true
   }).get()
 
-  if (inviterInviteLevelRes.data[0].inviter_uid.length >= MAX_INVITE_LEVEL) {
+  const inviterUidLength = inviterInviteLevelRes.data[0].inviter_uid ? inviterInviteLevelRes.data[0].inviter_uid.length : 0
+  if (inviterUidLength >= MAX_INVITE_LEVEL) {
     throw {
       errCode: ERROR.INVITE_LEVEL_EXCEEDED
     }

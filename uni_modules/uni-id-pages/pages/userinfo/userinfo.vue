@@ -248,6 +248,8 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 					})
 					if (res.errCode == 0) {
 						this.inviteData.myInviteCode = res.myInviteCode
+						this.shareData.content.inviteCode = codeRes.myInviteCode
+						this.shareData.params.inviteCode = codeRes.myInviteCode
 						uni.showToast({
 							title: res.errMsg,
 							icon: 'success'

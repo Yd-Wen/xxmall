@@ -15,25 +15,29 @@
 						</scroll-view>
 					</view>
 					<view class="content">
-						<view class="contentList">
-							<scroll-view scroll-y>
-								<view class="item" v-for="(user, index) in userListData" :key="index" @click="onSelectUser(user)">
-									<view class="avatar">
-										<image class="img" :src="(user.avatarFile && user.avatarFile.url) ? user.avatarFile.url : '/static/images/avatar.png'" mode="aspectFill"></image>
+						<view class="page" v-if="userListData.length > 0">
+							<view class="contentList">
+								<scroll-view scroll-y>
+									<view class="item" v-for="(user, index) in userListData" :key="index" @click="onSelectUser(user)">
+										<view class="avatar">
+											<image class="img" :src="(user.avatarFile && user.avatarFile.url) ? user.avatarFile.url : '/static/images/avatar.png'" mode="aspectFill"></image>
+										</view>
+										<view class="name">
+											<view class="mobile" v-if="user.mobile">{{user.mobile}}</view>
+											<view class="username" v-else-if="user.username">{{user.username}}</view>
+											<view class="nickname" v-else-if="user.nickname">（{{user.nickname}}）</view>
+										</view>
+										<view class="inviteTime" v-if="user.inviteTime">{{timeFormat(user.inviteTime, 'yyyy-MM-dd hh:mm')}}</view>
 									</view>
-									<view class="name">
-										<view class="mobile" v-if="user.mobile">{{user.mobile}}</view>
-										<view class="username" v-else-if="user.username">{{user.username}}</view>
-										<view class="nickname" v-else-if="user.nickname">（{{user.nickname}}）</view>
-									</view>
-									<view class="inviteTime" v-if="user.inviteTime">{{timeFormat(user.inviteTime, 'yyyy-MM-dd hh:mm')}}</view>
-								</view>
-							</scroll-view>
+								</scroll-view>
+							</view>
+							<view class="pagination">
+								<uni-pagination :show-icon="true" :total="pageData.total" :current="pageData.current" :page-size="pageData.pageSize" title="标题文字" @change="onPageChange" />
+								<text class="pageInfo">共邀请{{ pageData.total }}人 当前页：{{ pageData.current}} 每页数据：{{ pageData.pageSize }}</text>
+							</view>
 						</view>
-						<view class="pagination">
-							<uni-pagination :show-icon="true" :total="pageData.total" :current="pageData.current" :page-size="pageData.pageSize" 
-						title="标题文字" @change="onPageChange" />
-							<text class="pageInfo">共邀请{{ pageData.total }}人 当前页：{{ pageData.current}} 每页数据：{{ pageData.pageSize }}</text>
+						<view class="empty" v-if="userListData.length == 0">
+							<u-empty mode="data" icon="/static/images/no_address.png"></u-empty>
 						</view>
 					</view>
 				</view>
@@ -176,44 +180,54 @@
 			flex-direction: column;
 			justify-content: space-between;
 			align-items: center;
-			.contentList{
+			.page{
 				flex: 1;
-				width: 100%;
-				height: calc(100% - 140rpx);
-				margin: 20rpx 0 50rpx;
-				.item{
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-					margin: 20rpx;
-					.avatar{
-						width: 100rpx;
-						height: 100rpx;
-						border-radius: 50%;
-						overflow: hidden;
-						.img{
-							width: 100%;
-							height: 100%;
+				.contentList{	
+					width: 100%;
+					height: calc(100% - 140rpx - 80rpx);
+					margin-top: 50rpx;
+					.item{
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
+						margin: 20rpx 0;
+						.avatar{
+							width: 100rpx;
+							height: 100rpx;
+							border-radius: 50%;
+							overflow: hidden;
+							.img{
+								width: 100%;
+								height: 100%;
+							}
 						}
+						.name{
+							flex: 1;
+							font-size: 28rpx;
+							text-align: center;
+						}
+						.inviteTime{
+							width: 200rpx;
+							font-size: 28rpx;
+							text-align: center;
+						}		
 					}
-					.name{
-						flex: 1;
-						font-size: 28rpx;
-						text-align: center;
+				}
+				.pagination{
+					height: 80rpx;
+					width: 100%;
+					margin: 20rpx 0 50rpx;
+					.pageInfo{
+						font-size: 32rpx;
 					}
-					.inviteTime{
-						width: 200rpx;
-						font-size: 28rpx;
-						text-align: center;
-					}		
 				}
 			}
-			.pagination{
-				height: 80rpx;
-				margin: 20rpx 0 50rpx;
-				.pageInfo{
-					font-size: 32rpx;
-				}
+			.empty{
+				height: 100%;
+				width: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 		}	
 	}

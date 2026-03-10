@@ -194,6 +194,9 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				this.pageData.total = res.total || 0
 			},
 			async changeTab(index){
+				if (index == this.activeLevel - 1) {
+					return
+				}
 				this.activeLevel = index + 1
 				this.pageData.current = 1 // 切换层级时重置页码为1
 				// 获取我邀请的用户

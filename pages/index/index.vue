@@ -91,6 +91,13 @@
 			}
 		},
 		methods: {
+			onShareAppMessage() {
+				return {
+					title: '小闲小店邀请你选购',
+					path: `/pages/index/index`,
+					imageUrl: '/static/images/logo.png'
+				}
+			},
 			...mapMutations(['SET_FOLD_STATE']),
 			...mapActions(['getBannerData']),
 			// 获取商品数据

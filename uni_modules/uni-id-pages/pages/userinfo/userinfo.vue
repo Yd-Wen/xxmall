@@ -50,7 +50,11 @@
 			<button v-else @click="login">去登录</button>
 		</template>
 		<user-detail :userDetailPopState="inviterDetailPopState" :title="'我的邀请人'" :userDetailData="inviteData.inviter" @close="inviterDetailPopState = false"></user-detail>
+
+		<xxm-share :sharePopState="sharePopState" :shareData="shareData" @close="sharePopState = false"></xxm-share>
+		
 		<user-list :userListPopState="userListPopState" :title="'我邀请的用户'" :userListData="inviteData.invitedUser" :pageData="pageData" :activeLevel="activeLevel" @change-tab="changeTab" @select-user="selectUser" @page-change="onPageChange" @close="userListPopState = false"></user-list>
+
 		<user-detail :userDetailPopState="inivitedDetailPopState" :title="'我邀请的用户'" :userDetailData="inviteData.currentInvitedUser" @close="inivitedDetailPopState = false"></user-detail>
 	</view>
 </template>
@@ -100,7 +104,21 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 					pageSize: 5,
 					total: 0
 				},
+				shareData: {
+					title: '分享邀请码',
+					msgTitle: '小闲小店邀请你加入',
+					content:{
+						inviteCode: '',
+					},
+					url: `https://yindongwen.top/demo/xxmall/#`,
+					path: `/uni_modules/uni-id-pages/pages/login/login-withpwd`,
+					params: {
+						inviteCode: ''
+					},
+					imageUrl: '/static/images/logo.png'
+				},
 				activeLevel: 1,	
+				sharePopState: false,
 				inviterDetailPopState: false,
 				userListPopState: false,
 				inivitedDetailPopState: false,
@@ -154,6 +172,9 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 					_id: this.userInfo._id
 				})
 				this.inviteData.myInviteCode = codeRes.myInviteCode
+				// 更新分享数据中的邀请码
+				this.shareData.content.inviteCode = codeRes.myInviteCode
+				this.shareData.params.inviteCode = codeRes.myInviteCode
 			},	
 			async getInvitedUserCount(){
 				let countRes = await uniIdCo.getInvitedUserCount({
@@ -220,26 +241,23 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 			},
 			async generateInviteCode(){
 				if (this.inviteData.myInviteCode) {
-					uni.showToast({
-						title: '已有邀请码：' + this.inviteData.myInviteCode,
-						icon: 'none'
-					})
-					return
-				}
-				let res = await uniIdCo.generateMyInviteCode({
-					_id: this.userInfo._id
-				})
-				if (res.errCode == 0) {
-					this.inviteData.myInviteCode = res.myInviteCode
-					uni.showToast({
-						title: res.errMsg,
-						icon: 'success'
-					})
+					this.sharePopState = true
 				}else{
-					uni.showToast({
-						title: res.errMsg,
-						icon: 'none'
+					let res = await uniIdCo.generateMyInviteCode({
+						_id: this.userInfo._id
 					})
+					if (res.errCode == 0) {
+						this.inviteData.myInviteCode = res.myInviteCode
+						uni.showToast({
+							title: res.errMsg,
+							icon: 'success'
+						})
+					}else{
+						uni.showToast({
+							title: res.errMsg,
+							icon: 'none'
+						})
+					}
 				}
 			},
 			login() {

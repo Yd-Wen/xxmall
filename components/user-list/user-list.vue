@@ -21,7 +21,11 @@
 									<view class="avatar">
 										<image class="img" :src="(user.avatarFile && user.avatarFile.url) ? user.avatarFile.url : '/static/images/avatar.png'" mode="aspectFill"></image>
 									</view>
-									<view class="username">{{user.username}}</view>
+									<view class="name">
+										<view class="username" v-if="user.username">{{user.username}}</view>
+										<view class="nickname" v-else-if="user.nickname">（{{user.nickname}}）</view>
+										<view class="mobile" v-else-if="user.mobile">{{user.mobile}}</view>
+									</view>
 									<view class="inviteTime" v-if="user.inviteTime">{{timeFormat(user.inviteTime, 'yyyy-MM-dd hh:mm')}}</view>
 								</view>
 							</scroll-view>
@@ -129,21 +133,23 @@
 	}
 	.body{
 		height: calc(100% - 80rpx - 140rpx); // 减去 header 和 footer 的高度
-		padding: 0 30rpx 0 10rpx;
 		display: flex;
 		justify-content: flex-start;
 		align-items: flex-start;
 		.navList{
-			padding-right: 10rpx;
 			font-size: 32rpx;
 			font-weight: bold;
 			height: 100%;
 			width: 190rpx;
-			border-right: 1px solid $border-color;
 			background: $page-bg-color;
+			.navTitle{
+				text-align: center;
+				padding: 30rpx 0;
+				border-bottom: 1px solid $border-color;
+			}
 			.item{
+				text-align: center;
 				font-size: 30rpx;
-				padding-left: 25rpx;
 				line-height: 100rpx;
 				color: $text-font-color-2;
 				position: relative;
@@ -153,7 +159,7 @@
 					&::after {
 						content: "";
 						width: 6rpx;
-						height: 30rpx;
+						height: 50rpx;
 						background-color: $xxm-theme-color;
 						position: absolute;
 						left: 0;
@@ -165,21 +171,21 @@
 		}
 		.content{
 			flex: 1;
-			height: 80%;
+			height: 100%;
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
 			align-items: center;
-			padding-right: 30rpx;
 			.contentList{
 				flex: 1;
 				width: 100%;
 				height: calc(100% - 140rpx);
-				margin-top: 20rpx;
+				margin: 20rpx 0 50rpx;
 				.item{
 					display: flex;
-					justify-content: space-around;
+					justify-content: space-between;
 					align-items: center;
+					margin: 20rpx;
 					.avatar{
 						width: 100rpx;
 						height: 100rpx;
@@ -190,17 +196,21 @@
 							height: 100%;
 						}
 					}
-					.username{
+					.name{
+						flex: 1;
 						font-size: 28rpx;
+						text-align: center;
 					}
 					.inviteTime{
+						width: 200rpx;
 						font-size: 28rpx;
+						text-align: center;
 					}		
 				}
 			}
 			.pagination{
 				height: 80rpx;
-				margin-top: 20rpx;
+				margin: 20rpx 0 50rpx;
 				.pageInfo{
 					font-size: 32rpx;
 				}

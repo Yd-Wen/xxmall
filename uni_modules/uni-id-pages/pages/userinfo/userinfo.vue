@@ -98,7 +98,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				},
 				pageData: {
 					current: 1,
-					pageSize: 2,
+					pageSize: 5,
 					total: 0
 				},
 				activeLevel: 1,	

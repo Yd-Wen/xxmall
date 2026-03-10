@@ -49,7 +49,7 @@ module.exports = async function (params = {}) {
       avatar_file: true,
       username: true,
       nickname: true,
-      // mobile: true,
+      mobile: true,
       invite_time: true
     })
     .orderBy('invite_time', 'desc')
@@ -62,7 +62,7 @@ module.exports = async function (params = {}) {
       uid: item._id,
       username: item.username,
       nickname: item.nickname,
-      // mobile: coverMobile(item.mobile),
+      mobile: coverMobile(item.mobile),
       inviteTime: item.invite_time,
       // avatar: item.avatar,
       avatarFile: item.avatar_file

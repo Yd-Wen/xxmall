@@ -52,6 +52,7 @@ module.exports = async function (params = {}) {
     _id: true,
     username: true,
     nickname: true,
+    mobile: true,
     avatar: true,
     avatar_file: true,
     my_invite_code: true
@@ -77,6 +78,7 @@ module.exports = async function (params = {}) {
         uid: inviter._id,
         username: inviter.username,
         nickname: inviter.nickname,
+        mobile: inviter.mobile,
         avatarFile: inviter.avatar_file,
         myInviteCode: inviter.my_invite_code,
         inviteTime: user.invite_time

@@ -22,9 +22,9 @@
 										<image class="img" :src="(user.avatarFile && user.avatarFile.url) ? user.avatarFile.url : '/static/images/avatar.png'" mode="aspectFill"></image>
 									</view>
 									<view class="name">
-										<view class="username" v-if="user.username">{{user.username}}</view>
+										<view class="mobile" v-if="user.mobile">{{user.mobile}}</view>
+										<view class="username" v-else-if="user.username">{{user.username}}</view>
 										<view class="nickname" v-else-if="user.nickname">（{{user.nickname}}）</view>
-										<view class="mobile" v-else-if="user.mobile">{{user.mobile}}</view>
 									</view>
 									<view class="inviteTime" v-if="user.inviteTime">{{timeFormat(user.inviteTime, 'yyyy-MM-dd hh:mm')}}</view>
 								</view>

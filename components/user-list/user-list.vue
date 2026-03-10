@@ -123,7 +123,6 @@
 <style lang="scss">
 .wrapper{
 	height: 80vh;
-    z-index: 10074;
 	.header{
 		height: 80rpx;
 		width: 100%;	

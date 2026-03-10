@@ -20,9 +20,9 @@
 			</uni-list-item>
 		</uni-list>
 		<uni-list class="list">
-			<uni-list-item thumb="/static/images/inviter.png" @click="goInviter(inviteData.inviter.myInviteCode)" title="我的邀请人" :rightText="inviteData.hasInviter?inviteData.inviter.username:'没有邀请人'" link>
+			<uni-list-item thumb="/static/images/inviter.png" @click="goInviter(inviteData.inviter.myInviteCode)" title="我的邀请人" :rightText="inviteData.hasInviter?inviteData.inviter.username:'绑定邀请码'" link>
 			</uni-list-item>
-			<uni-list-item thumb="/static/images/invite_code.png" @click="deactivate" title="我的邀请码" :rightText="inviteData.myInviteCode ||'没有邀请码'" link>
+			<uni-list-item thumb="/static/images/invite_code.png" @click="generateInviteCode" title="我的邀请码" :rightText="inviteData.myInviteCode ||'获取邀请码'" link>
 			</uni-list-item>
 			<uni-list-item thumb="/static/images/invited.png" @click="goInvited" title="我邀请的用户" :rightText="'已邀请 ' + inviteData.invitedUserCount + ' 人'" link>
 			</uni-list-item>

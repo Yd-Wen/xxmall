@@ -78,6 +78,7 @@ const {
 } = require('./module/utils/index')
 const {
   getInvitedUser,
+  getInvitedUserCount,
   acceptInvite,
   getMyInviteCode,
   getInviter
@@ -595,6 +596,13 @@ module.exports = {
    * @returns
    */
   getInvitedUser,
+  /**
+   * 获取受邀用户数量
+   * @param {Object} params
+   * @param {Number} params.maxLevel   最大层级数，默认3
+   * @returns {Object} { errCode: 0, counts: { "1": count, "2": count, "3": count }, total: number }
+   */
+  getInvitedUserCount,
   /**
    * 获取我的邀请码
    * @param {Object} params

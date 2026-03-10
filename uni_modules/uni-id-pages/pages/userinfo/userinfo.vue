@@ -150,14 +150,10 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				this.inviteData.myInviteCode = codeRes.myInviteCode
 			},	
 			async getInvitedUserCount(){
-				for (let level = 1; level <= MAX_INVITE_LEVEL; level++) {
-					let countRes = await uniIdCo.getInvitedUser({
-						// _id: this.userInfo._id,
-						level,
-						needTotal: true
-					})
-					this.inviteData.invitedUserCount += countRes.total
-				}
+				let countRes = await uniIdCo.getInvitedUserCount({
+					_id: this.userInfo._id
+				})
+				this.inviteData.invitedUserCount = countRes.total
 			},	
 			goInviter(code){
 				if (code) {

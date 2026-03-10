@@ -135,6 +135,13 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 			await this.getInvitedUser()
 		},
 		methods: {
+			onShareAppMessage() {
+				return {
+					title: '小闲小店邀请你加入',
+					path: `/uni_modules/uni-id-pages/pages/login/login-withpwd?inviteCode=${this.inviteData.myInviteCode}`,
+					imageUrl: '/static/images/logo.png'
+				}
+			},
 			async getInviter(){
 				let inviterRes = await uniIdCo.getInviter({
 					_id: this.userInfo._id

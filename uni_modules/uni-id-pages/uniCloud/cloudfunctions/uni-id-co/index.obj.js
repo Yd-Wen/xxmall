@@ -80,6 +80,7 @@ const {
   getInvitedUser,
   getInvitedUserCount,
   acceptInvite,
+  generateMyInviteCode,
   getMyInviteCode,
   getInviter
 } = require('./module/fission')
@@ -603,6 +604,13 @@ module.exports = {
    * @returns {Object} { errCode: 0, counts: { "1": count, "2": count, "3": count }, total: number }
    */
   getInvitedUserCount,
+  /**
+   * 生成我的邀请码
+   * @param {Object} params
+   * @param {String} params._id  用户ID
+   * @returns {Object} { errCode: 0, errMsg: string, myInviteCode: string }
+   */
+  generateMyInviteCode,
   /**
    * 获取我的邀请码
    * @param {Object} params

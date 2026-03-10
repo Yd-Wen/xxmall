@@ -60,7 +60,6 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
     store,
     mutations
   } from '@/uni_modules/uni-id-pages/common/store.js'
-  import { MAX_INVITE_LEVEL } from '../../uniCloud/cloudfunctions/uni-id-co/lib/utils/fission.js'
 	export default {
     computed: {
         userInfo() {
@@ -211,6 +210,30 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				this.pageData.current = e.current
 				// 获取我邀请的用户
 				this.getInvitedUser()
+			},
+			async generateInviteCode(){
+				if (this.inviteData.myInviteCode) {
+					uni.showToast({
+						title: '已有邀请码：' + this.inviteData.myInviteCode,
+						icon: 'none'
+					})
+					return
+				}
+				let res = await uniIdCo.generateMyInviteCode({
+					_id: this.userInfo._id
+				})
+				if (res.errCode == 0) {
+					this.inviteData.myInviteCode = res.myInviteCode
+					uni.showToast({
+						title: res.errMsg,
+						icon: 'success'
+					})
+				}else{
+					uni.showToast({
+						title: res.errMsg,
+						icon: 'none'
+					})
+				}
 			},
 			login() {
 				uni.navigateTo({

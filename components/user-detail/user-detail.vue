@@ -18,8 +18,9 @@
 						<image class="img" :src="(userDetailData.avatarFile && userDetailData.avatarFile.url) ? userDetailData.avatarFile.url : '/static/images/avatar.png'" mode="aspectFill"></image>
 					</view>
 					<view class="info">
-						<view class="username">用户：{{userDetailData.username}}</view>
+						<view class="username" v-if="userDetailData.username">用 户：{{userDetailData.username}}</view>
 						<view class="nickname" v-if="userDetailData.nickname">昵  称：{{userDetailData.nickname}}</view>
+						<view class="mobile" v-if="userDetailData.mobile">手机号：{{userDetailData.mobile}}</view>
 						<view class="inviteCode" v-if="userDetailData.myInviteCode">
 							邀请码：{{userDetailData.myInviteCode}}
 						</view>
@@ -111,25 +112,21 @@
 			height: 60%;
 			display: flex;
 			flex-direction: column;
-			justify-content: space-between;
+			justify-content: center;
 			align-items: flex-start;	
 			padding-left: 50rpx;
+			font-size: 28rpx;
+			> * {
+				margin: 15rpx 0;
+			}
 			.username{
-				font-size: 32rpx;
 				font-weight: bold;
-			}
-			.nickname{
-				font-size: 28rpx;
-			}
-			.inviteCode{
-				font-size: 28rpx;
 			}
 			.inviteTime{
 				font-size: 24rpx;
 				color: $text-font-color-3;
 			}
-		}
-		
+		}	
 	}
 	.footer{
 		@include flex-box-set();

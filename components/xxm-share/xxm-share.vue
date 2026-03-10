@@ -6,18 +6,30 @@
                     <view class="title">{{shareData.title}}</view>
                 </view>
                 <view class="body">
+                    <view  class="Image" :src="shareData.imageUrl">
+                        <image :src="shareData.imageUrl" class="img"></image>
+                    </view>
                     <view class="inviteCode" v-if="shareData.content.inviteCode">
-                        <view class="code">邀请码：{{ shareData.content.inviteCode }}</view>
-                        <view class="copyBtn" @click="copyInviteCode">复制邀请码</view>
+                        邀请码：{{ shareData.content.inviteCode }}
+                        <view class="copyBtn" @click="copyInviteCode">
+                            <view class="copyImage">
+                                <image src="/static/images/copy.png" class="img"></image>
+                            </view>
+                            复制
+                        </view>
                     </view>
                 </view>
                 <view class="footer">
+                    <view class="shareImage">
+                        <image src="/static/images/share.png" class="img"></image>
+                    </view>
                     <!-- #ifdef H5 -->
-                    <u-button v-if="shareData.url" color="#ec544f" icon="checkmark-circle-fill" iconColor="#fff" @click="copyShareLink">复制分享链接</u-button>
+                    <view class="shareLinkBtn" v-if="shareData.url" @click="copyShareLink">
+                        复制分享链接
+                    </view>
                     <!-- #endif -->
                     <!-- #ifdef MP-WEIXIN -->
-                    <view class="shareMP">
-                        <u-icon name="share" size="24" color="#ec544f"></u-icon>
+                    <view class="shareMPBtn" v-if="shareData.path">
                         <button open-type="share">分享给好友</button>
                     </view>
                     <!-- #endif -->
@@ -115,8 +127,12 @@ export default {
 
 <style scoped lang="scss">
     .wrapper {
-        height: 50vh;
+        height: 60vh;
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
         .header{
             height: 80rpx;
             width: 100%;	
@@ -126,6 +142,101 @@ export default {
                 @include flex-box-set();
                 font-size: 40rpx;
                 font-weight: bold;
+            }
+        }
+        .body{
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            align-items: center;
+            border-bottom: 1px solid $border-color-light;
+            .Image{
+                height: 200rpx;
+                width: 200rpx;
+                .img{
+                    height: 100%;
+                    width: 100%;
+                }
+            }
+            .inviteCode{
+                height: 80rpx;
+                width: 100%;	
+                align-items: center;
+                font-size: 32rpx;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                .copyBtn{
+                    height: 80rpx;
+                    line-height: 80rpx;
+                    text-align: center;
+                    margin: 0 20rpx;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    .copyImage{
+                        height: 50rpx;
+                        width: 50rpx;
+                        border-radius: 50%;
+                        overflow: hidden;
+                        .img{
+                            height: 100%;
+                            width: 100%;
+                        }
+                    }   
+                }   
+            }
+        }
+        .footer{
+            height: 80rpx;	
+            margin: 30rpx 50rpx;
+            padding: 0 50rpx;
+            border-radius: 40rpx;
+            font-size: 28rpx;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: $xxm-theme-color;
+            .shareImage{
+                height: 50rpx;
+                width: 50rpx;
+                border-radius: 50%;
+                overflow: hidden;
+                margin-right: 20rpx;
+                .img{
+                    height: 100%;
+                    width: 100%;
+                }
+            }
+            .shareLinkBtn{
+                height: 60rpx;
+                line-height: 60rpx;
+                text-align: center;
+            }
+            .shareMPBtn{
+                height: 80rpx;
+                background: $xxm-theme-color;
+                line-height: 80rpx;
+                text-align: center;
+                button{
+                    background: transparent;
+                    color: #fff;
+                    font-size: 28rpx;
+                    height: 100%;
+                    width: 100%;
+                    border: none;
+                    padding: 0;
+                    margin: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    &::after{
+                        border: none;
+                    }
+                }
             }
         }
     }

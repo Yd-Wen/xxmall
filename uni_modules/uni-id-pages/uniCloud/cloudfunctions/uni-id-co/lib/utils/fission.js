@@ -7,7 +7,7 @@ const {
 } = require('../../common/error')
 
 const MAX_INVITE_LEVEL = 3
-const MAX_INVITE_COUNT = 3
+// const MAX_INVITE_COUNT = 3
 
 /**
  * 获取随机邀请码，邀请码由大写字母加数字组成，由于存在手动输入邀请码的场景，从可选字符中去除 0、1、I、O
@@ -118,16 +118,16 @@ async function generateInviteInfo({
     }
   }
 
-  // 查询邀请人已邀请人数
-  const inviteCountRes = await userCollection.where({
-    'inviter_uid.0': inviteUser.data[0]._id  // 精确匹配数组第一个元素
-  }).count()
+  // // 查询邀请人已邀请人数
+  // const inviteCountRes = await userCollection.where({
+  //   'inviter_uid.0': inviteUser.data[0]._id  // 精确匹配数组第一个元素
+  // }).count()
 
-  if (inviteCountRes.total >= MAX_INVITE_COUNT) {
-    throw {
-      errCode: ERROR.INVITE_COUNT_EXCEEDED
-    }
-  }
+  // if (inviteCountRes.total >= MAX_INVITE_COUNT) {
+  //   throw {
+  //     errCode: ERROR.INVITE_COUNT_EXCEEDED
+  //   }
+  // }
 
   // 查询邀请人的邀请人的层级
   const inviterInviteLevelRes = await userCollection.where({

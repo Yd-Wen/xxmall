@@ -129,7 +129,7 @@ async function generateInviteInfo({
   //   }
   // }
 
-  // 查询邀请人的邀请人的层级
+  // 查询邀请人的受邀请层级
   const inviterInviteLevelRes = await userCollection.where({
     _id: inviteUser.data[0]._id
   }).field({
@@ -149,8 +149,31 @@ async function generateInviteInfo({
     queryUid
   })
   // 倒叙拼接当前用户邀请链
-  const inviterUid = inviterRecord.inviter_uid || []
-  inviterUid.unshift(inviterRecord._id)
+  const inviterUid = inviterRecord.inviter_uid || []  // L1
+  inviterUid.unshift(inviterRecord._id)               // L2
+
+  // 检查被邀请人（queryUid）的下级邀请链长度，确保总层级不超过限制
+  if (queryUid) {
+    // idx = Lmax - L2
+    const idx = MAX_INVITE_LEVEL - inviterUid.length
+
+    // 根据 L2 的长度，queryUid 的 maxSubChainLength 应该小于 Lmax - L2 + 1
+    // 否则 newChainLength 就是 Lmax + 1，超出了限制
+    // 此时只需查询 queryUid 的邀请链是否有指定索引位置（Lmax - L2 + 1 - 1）等于 queryUid 的用户
+    // 如果有用户（长度大于 0），抛出错误
+    if (idx >= 0) {
+      const checkRes = await userCollection.where({
+        [`inviter_uid.${idx}`]: queryUid
+      }).count()
+
+      if (checkRes.total > 0) {
+        throw {
+          errCode: ERROR.INVITE_LEVEL_EXCEEDED
+        }
+      }
+    }
+  }
+
   return {
     inviterUid,
     inviteTime: Date.now()

@@ -52,7 +52,11 @@
 		<user-detail :userDetailPopState="inviterDetailPopState" :title="'我的邀请人'" :userDetailData="inviteData.inviter" @close="inviterDetailPopState = false"></user-detail>
 
 		<xxm-share :sharePopState="sharePopState" :shareData="shareData" @close="sharePopState = false"></xxm-share>
-		
+		<!-- <uni-popup ref="msgTitlePrefixDialog" type="dialog">
+			<uni-popup-dialog mode="input" :value="shareData.msgTitlePrefix" @confirm="setMsgTitlePrefix" title="分享人" placeholder="请输入分享人">
+			</uni-popup-dialog>
+		</uni-popup> -->
+
 		<user-list :userListPopState="userListPopState" :title="'我邀请的用户'" :userListData="inviteData.invitedUser" :pageData="pageData" :activeLevel="activeLevel" @change-tab="changeTab" @select-user="selectUser" @page-change="onPageChange" @close="userListPopState = false"></user-list>
 
 		<user-detail :userDetailPopState="inivitedDetailPopState" :title="'我邀请的用户'" :userDetailData="inviteData.currentInvitedUser" @close="inivitedDetailPopState = false"></user-detail>
@@ -74,7 +78,14 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				return 0
 			}
 			return this.userInfo.realNameAuth.authStatus
-	    }
+	    },
+		msgTitlePrefix() {
+			return this.userInfo.mobile || this.userInfo.username || this.userInfo.nickname || '分享人'
+		},
+		shareData() {
+			this.shareData.msgTitlePrefix = this.msgTitlePrefix
+			return this.shareData
+		},
     },
 		data() {
 			return {
@@ -106,7 +117,8 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 				},
 				shareData: {
 					title: '分享邀请码',
-					msgTitle: '小闲小店邀请你加入',
+					msgTitlePrefix: '',
+					msgTitle: '邀请你加入小闲小店',
 					content:{
 						inviteCode: '',
 					},
@@ -155,7 +167,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 		methods: {
 			onShareAppMessage() {
 				return {
-					title: '小闲小店邀请你加入',
+					title: `${this.msgTitlePrefix} ${this.shareData.msgTitle}`,
 					path: `/uni_modules/uni-id-pages/pages/login/login-withpwd?inviteCode=${this.inviteData.myInviteCode}`,
 					imageUrl: '/static/images/logo.png'
 				}
@@ -191,7 +203,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 			},
 			async setInviter(inviteCode){
 				if (inviteCode) {
-					const res = await uniIdCo.acceptInvite({
+					await uniIdCo.acceptInvite({
 						_id: this.userInfo._id,
 						inviteCode
 					})

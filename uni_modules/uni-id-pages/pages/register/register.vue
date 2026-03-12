@@ -79,14 +79,12 @@
 			}
 		},
 		onLoad(options) {
-			// 邀请码赋值给 formData.inviteCode（字符串）
-			if (options.inviteCode) {
+			if (options.inviterName && options.inviteCode) {
 				this.formData.inviteCode = options.inviteCode
-				// 如果需要自动聚焦邀请码输入框
-				this.focusInviteCode = true
 				uni.showToast({
-					title: '收到邀请码：' + this.formData.inviteCode,
-					icon: 'none'
+					title: `收到 ${options.inviterName} 的邀请码：${this.formData.inviteCode}`,
+					icon: 'none',
+					duration: 2000
 				})
 			}
 		},

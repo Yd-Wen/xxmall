@@ -16,6 +16,10 @@
 	let allServicesList = []
 	export default {
 		props: {
+			inviterName: {
+				type: String,
+				default: ''
+			},
 			inviteCode: {
 				type: String,
 				default: ''
@@ -158,7 +162,7 @@
 					const smsCodeIndex = this.servicesList.findIndex(item => item.id === 'smsCode')
 					if (smsCodeIndex !== -1) {
 						this.servicesList[smsCodeIndex].path = 
-							"/uni_modules/uni-id-pages/pages/login/login-withoutpwd?type=smsCode&inviteCode=" + (newVal || '')
+							`/uni_modules/uni-id-pages/pages/login/login-withoutpwd?type=smsCode&inviterName=${this.inviterName}&inviteCode=${newVal || ''}`
 					}
 				}
     		}
@@ -512,7 +516,7 @@
 					const confirm = await new Promise((resolve) => {
 						uni.showModal({
 							title: '提示',
-							content: `是否使用邀请码 ${this.inviteCode}`,
+							content: `是否使用 ${this.inviterName} 的邀请码 ${this.inviteCode} 以注册？`,
 							success: (res) => {
 								resolve(res.confirm)
 							},

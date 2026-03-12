@@ -51,7 +51,6 @@ export default {
             default: () => {
                 return {
                     title: '分享',
-                    msgTitlePrefix: '',
                     msgTitle: '小闲小店邀请您选购',
                     content: {},
                     url: '',
@@ -117,7 +116,7 @@ export default {
             }
 
             return {
-                title: `${this.shareData.msgTitlePrefix}${this.shareData.msgTitle}`,
+                title: `${this.shareData.params.inviterName} ${this.shareData.msgTitle}`,
                 path: `${this.shareData.path}?${this.shareParams}`,
                 imageUrl: this.shareData.imageUrl
             }

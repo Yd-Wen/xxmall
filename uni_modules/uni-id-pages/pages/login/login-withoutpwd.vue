@@ -47,7 +47,7 @@
 			<button class="uni-btn" type="primary" @click="toSmsPage">获取验证码</button>
 		</template>
 		<!-- 固定定位的快捷登录按钮 -->
-		<uni-id-pages-fab-login ref="uniFabLogin" :inviteCode="inviteCode"></uni-id-pages-fab-login>
+		<uni-id-pages-fab-login ref="uniFabLogin" :inviterName="inviterName" :inviteCode="inviteCode"></uni-id-pages-fab-login>
 	</view>
 </template>
 
@@ -59,6 +59,7 @@
 		mixins: [mixin],
 		data() {
 			return {
+				inviterName: "", //邀请人
 				inviteCode: "", //邀请码
 				type: "", //快捷登录方式
 				phone: "", //手机号码
@@ -86,10 +87,12 @@
 		async onLoad(e) {
 			// 邀请码赋值给 inviteCode（字符串）
 			if (e.inviteCode) {
+				this.inviterName = e.inviterName
 				this.inviteCode = e.inviteCode
 				uni.showToast({
-					title: '收到邀请码：' + this.inviteCode,
-					icon: 'none'
+					title: `收到 ${this.inviterName} 的邀请码：${this.inviteCode}`,
+					icon: 'none',
+					duration: 2000
 				})
 			}
 			//获取通过url传递的参数type设置当前登录方式，如果没传递直接默认以配置的登录
@@ -190,7 +193,7 @@
 				}
 				// 发送验证吗
 				uni.navigateTo({
-					url: '/uni_modules/uni-id-pages/pages/login/login-smscode?phoneNumber=' + this.phone + '&inviteCode=' + this.inviteCode
+					url: `../login/login-smscode?phoneNumber=${this.phone}&inviterName=${this.inviterName}&inviteCode=${this.inviteCode}`
 				});
 			},
 			//去密码登录页

@@ -29,6 +29,7 @@
 				"code": "",
 				"phone": "",
 				"captcha": "",
+				"inviterName": "",
 				"inviteCode": "",
 				"focusInviteCodeInput": false,
 				"logo": "/static/images/logo.png"
@@ -42,6 +43,10 @@
 		onLoad(e) {
 			if (e.phoneNumber) {
 				this.phone = e.phoneNumber;
+			}
+			// 邀请人赋值给 inviterName（字符串）
+			if (e.inviterName) {
+				this.inviterName = e.inviterName
 			}
 			// 邀请码赋值给 inviteCode（字符串）
 			if (e.inviteCode) {
@@ -84,7 +89,7 @@
 					const confirm = await new Promise((resolve) => {
 						uni.showModal({
 							title: '提示',
-							content: `是否使用邀请码 ${this.inviteCode}`,
+							content: `是否使用 ${this.inviterName} 的邀请码 ${this.inviteCode} 以注册？`,
 							success: (res) => {
 								resolve(res.confirm)
 							},

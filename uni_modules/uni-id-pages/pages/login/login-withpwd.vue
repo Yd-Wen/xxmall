@@ -30,7 +30,7 @@
 			<!-- <text class="link" @click="toRegister" v-if="!config.isAdmin">注册账号</text> -->
 		</view>
 		<!-- 悬浮登录方式组件 -->
-		<uni-id-pages-fab-login ref="uniFabLogin" :inviteCode="inviteCode"></uni-id-pages-fab-login>
+		<uni-id-pages-fab-login ref="uniFabLogin" :inviterName="inviterName" :inviteCode="inviteCode"></uni-id-pages-fab-login>
 	</view>
 </template>
 
@@ -45,6 +45,7 @@
 		mixins: [mixin],
 		data() {
 			return {
+				"inviterName": "",
 				"inviteCode": "",
 				"password": "",
 				"username": "",
@@ -67,11 +68,14 @@
 		},
 		// 在 onCreated 中获取URL参数中的邀请码
 		onLoad(options) {
-			if (this.isValidInviteCode(options.inviteCode)){
+			if (options.inviterName && options.inviteCode) {
+				console.log(options)
+				this.inviterName = options.inviterName
 				this.inviteCode = options.inviteCode
 				uni.showToast({
-					title: '收到邀请码：' + this.inviteCode,
-					icon: 'none'
+					title: `收到 ${this.inviterName} 的邀请码：${this.inviteCode}`,
+					icon: 'none',
+					duration: 2000
 				})
 			}
 		},
@@ -162,7 +166,7 @@
 			toRegister() {
 				uni.navigateTo({
 					url: this.config.isAdmin ? '/uni_modules/uni-id-pages/pages/register/register-admin' :
-						'/uni_modules/uni-id-pages/pages/register/register?inviteCode=' + this.inviteCode,
+						'/uni_modules/uni-id-pages/pages/register/register?inviterName=' + this.inviterName + '&inviteCode=' + this.inviteCode,
 					fail(e) {
 						console.error(e);
 					}

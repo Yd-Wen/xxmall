@@ -1,19 +1,21 @@
 <template>
 	<view class="chatbot">
-		<view class="messageList" ref="messageList">
-			<view v-for="(msg, index) in messages" :key="index" class="message" :class="msg.role">
-                <view class="avatar" v-if="msg.role === 'ai'">
-                    <image :src="avatar[msg.role]" mode="aspectFill" />
+        <scroll-view class="scrollView" scroll-y="true" :scroll-top="scrollTop"  scroll-with-animation>
+            <view class="messageWrapper">
+                <view v-for="(msg, index) in messages" :key="index" class="message" :class="msg.role">
+                    <view class="avatar" v-if="msg.role === 'ai'">
+                        <image :src="avatar[msg.role]" mode="aspectFill" />
+                    </view>
+                    <view class="content" :class="msg.role+'Content'"> {{ msg.content }}</view>
+                    <view class="avatar" v-if="msg.role === 'human'">
+                        <image :src="avatar[msg.role]" mode="aspectFill" />
+                    </view>
                 </view>
-				<view class="content" :class="msg.role+'Content'"> {{ msg.content }}</view>
-                <view class="avatar" v-if="msg.role === 'human'">
-                    <image :src="avatar[msg.role]" mode="aspectFill" />
-                </view>
-			</view>
-		</view>
+            </view>
+        </scroll-view>
 		<view class="input-area">
-			<input v-model="inputMessage" type="text" placeholder="请输入..." class="input" />
-			<view @click="sendMessage" class="send-btn">发送</view>
+			<input v-model="inputMessage" type="text" placeholder="请输入..." class="input" ref="input" />
+			<button @click="sendMessage" class="send-btn" :class="isSending?'disabled':''" :disabled="isSending">发送</button>
 		</view>
 	</view>
 </template>
@@ -54,60 +56,76 @@
                     role: "ai",
                     content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
                 }],
-                inputMessage: ""
+                inputMessage: "",
+                scrollTop: 0,           // 滚动条位置
+                scrollViewHeight: 300,  // 滚动视图高度
+                isSending: false,       // 是否正在发送
             }
         },
         async onLoad() {
             // 获取历史消息
-            await this.getHistoryMessages()
+            // await this.getHistoryMessages()
+        },
+        onShow() {
             // 滚动到最新消息
-            this.$nextTick(() => {
-                this.scrollToBottom();
-            });
+            this.scrollToBottom()
         },
         methods: {
             // 获取历史消息
             async getHistoryMessages() {
-                
+                // TODO 获取历史消息
+
+                // 滚动到最新消息
+                // this.$nextTick(() => {
+                //     this.scrollToBottom();
+                // });
             },
-            sendMessage(content) {
+            // 滚动到最新消息
+            scrollToBottom() {
+                this.$nextTick(() => {
+                    uni.createSelectorQuery().in(this).select('.messageWrapper').boundingClientRect((res) => {
+                        this.scrollTop = res.height-this.scrollViewHeight > 0 ? res.height-this.scrollViewHeight : 0;
+                    }).exec();
+                });
+            },
+            // 发送消息
+            sendMessage() {
                 // 如果传入了content，使用传入的内容，否则使用输入框的内容
-                const messageContent = content || this.inputMessage
-                if (!messageContent) return
+                console.log(this.inputMessage)
+                if (!this.inputMessage) return
                 
                 // 添加用户消息
-                const userMessage = {
-                    role: "user",
-                    content: messageContent
-                }
-                this.messages.push(userMessage)
+                this.messages.push({
+                    role: "human",
+                    content: this.inputMessage
+                },{
+                    role: "ai",
+                    content: "思考中..."
+                })
                 
                 // 清空输入框
                 this.inputMessage = ""
                 
                 // 滚动到最新消息
-                this.$nextTick(() => {
-                    this.scrollToBottom();
-                });
+                this.scrollToBottom()
+
+                // 不可输入
+                this.isSending = true
                 
-                // 初始化机器人消息
-                this.currentBotMessage = ""        
-                
-                this.chatWithBot(messageContent)
+                // this.chatWithBot()
             },
-            // 滚动到最新消息
-            scrollToBottom() {
-                const messageList = this.$refs.messageList;
-                if (messageList) {
-                    messageList.scrollTop = messageList.scrollHeight;
-                }
-            },
-            async chatWithBot(messageContent) {
+            async chatWithBot() {
                 const url = await chatbotCloudObj.getUrl("chat")
+                const prompt = this.messages[this.messages.length - 2][0].content
+                const session_id = uni.getStorageSync("userInfo")._id
+
                 console.log(url)
+                console.log(prompt)
+                console.log(session_id)
+
                 const res = await post(url, {
-                    prompt: messageContent,
-                    session_id: this.userInfo.uid,
+                    prompt: prompt,
+                    session_id: session_id,
                     stream: true
                 })
                 res.onChunkReceived((chunk) => {
@@ -194,55 +212,60 @@ page {
     background-color: $page-bg-color;
 }
 .chatbot {
-    height: 100%;
-    .messageList {
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        padding: 20rpx 20rpx 140rpx;
-        .message {
-            margin-bottom: 20rpx;
-            max-width: 85%;
-            padding: 20rpx 0;
-            border-radius: 20rpx;
+    .scrollView {
+        height: calc(100vh - 140rpx);
+        width: 100%;
+        padding-bottom: 140rpx;
+        .messageWrapper {
             display: flex;
-            align-items: center;
-            &.human {
-                align-self: flex-end;
-                justify-content: flex-end;
-            }
-            &.ai {
-                align-self: flex-start;
-                justify-content: flex-start;
-            }
-            .avatar {
-                width: 100rpx;
-                height: 100rpx;
-                border-radius: 50%;
-                margin: 0 20rpx;
-                overflow: hidden;
-                border: 1rpx solid $border-color;
-                image {
-                    width: 100%;
-                    height: 100%;
+            flex-direction: column;
+            padding: 20rpx;
+            padding-bottom: 20rpx;
+            .message {
+                margin-bottom: 20rpx;
+                max-width: 85%;
+                padding: 20rpx 0;
+                border-radius: 20rpx;
+                display: flex;
+                align-items: center;
+                &.human {
+                    align-self: flex-end;
+                    justify-content: flex-end;
                 }
-            }
-            .content{
-                flex: 1;
-                padding: 20rpx;
-                &.humanContent {
-                    background: $xxm-theme-color-aux;
-                    color: white;
-                    border-radius: 20rpx 20rpx 0;
+                &.ai {
+                    align-self: flex-start;
+                    justify-content: flex-start;
                 }
-                &.aiContent {
-                    background: white;
-                    color: #333;
-                    border-radius: 20rpx 20rpx 20rpx 0;
+                .avatar {
+                    width: 100rpx;
+                    height: 100rpx;
+                    border-radius: 50%;
+                    margin: 0 20rpx;
+                    overflow: hidden;
+                    border: 1rpx solid $border-color;
+                    image {
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+                .content{
+                    flex: 1;
+                    padding: 20rpx;
+                    &.humanContent {
+                        background: $xxm-theme-color-aux;
+                        color: white;
+                        border-radius: 20rpx 20rpx 0;
+                    }
+                    &.aiContent {
+                        background: white;
+                        color: #333;
+                        border-radius: 20rpx 20rpx 20rpx 0;
+                    }
                 }
             }
         }
     }
+
     .input-area {
         position: fixed;
         bottom: 0;
@@ -266,11 +289,15 @@ page {
             height: 80rpx;
             background-color: $xxm-theme-color-aux;
             color: white;
+            border: none;
             border-radius: 40rpx;
             margin-left: 20rpx;
             font-size: 32rpx;
             text-align: center;
             line-height: 75rpx;
+            &.disabled {
+                opacity: 0.5;
+            }
         }
     }
 }

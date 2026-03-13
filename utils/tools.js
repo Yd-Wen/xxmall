@@ -43,24 +43,92 @@ export function isManage() {
 	}
 }
 
-// export function http(options, loading = true) {
-// 	console.log('%c请求拦截：', ' background:orange', options);
-// 	if (loading) {
-// 		uni.showLoading({
-// 			title: "加载中...",
-// 			mask: true
-// 		});
-// 	};
+// 通用请求函数（新增 headers 参数）
+const request = (
+	url,
+	method,
+	data,
+	headers
+) => {
+	return new Promise((resolve, reject) => {
+		// 合并默认 header 和自定义 header
+		const mergedHeaders = {
+			'Content-Type': 'application/json', // 默认保留
+			...headers, // 合并自定义 header（可覆盖默认值）
+		};
 
-// 	return new Promise((resolve, reject) => {
-// 		uni.request({
-// 			url: options.url,
-// 			method: options.method || 'GET',
-// 			data: options.data || {},
-// 			async success(res) {
-// 				uni.hideLoading();
-// 				resolve(res.data);
-// 			}
-// 		});
-// 	});
-// };
+		// 检查是否支持流式响应
+		const isStreamSupported = typeof uni.request === 'function' &&
+			(uni.getSystemInfoSync().platform === 'app' ||
+				uni.getSystemInfoSync().platform === 'mp-weixin' ||
+				uni.getSystemInfoSync().platform === 'mp-alipay');
+
+		// 创建一个请求task
+		const requestTask = uni.request({
+			url: url,
+			method: method,
+			data: data,
+			header: mergedHeaders, // 使用合并后的 header
+			enableChunked: isStreamSupported, // 只在支持的平台启用
+			success: (res) => {
+				// 如果不支持流式响应，直接返回完整响应
+				if (!isStreamSupported) {
+					resolve({
+						data: res.data,
+						onChunkReceived: (callback) => {
+							// 模拟流式响应，一次性返回所有数据
+							if (res.data) {
+								callback(res.data);
+							}
+						},
+						onHeadersReceived: (callback) => {
+							callback(res.header);
+						},
+						abort: () => { }
+					});
+				}
+			},
+			fail: (err) => {
+				reject(err);
+			},
+		});
+
+		// 如果支持流式响应，立即返回处理对象
+		if (isStreamSupported) {
+			resolve({
+				onHeadersReceived: (callback) => {
+					if (requestTask.onHeadersReceived) {
+						requestTask.onHeadersReceived((res) => {
+							callback(res.header);
+						});
+					}
+				},
+				onChunkReceived: (callback) => {
+					if (requestTask.onChunkReceived) {
+						requestTask.onChunkReceived((res) => {
+							callback(res.data);
+						});
+					}
+				},
+				abort: () => {
+					requestTask.abort();
+				},
+			});
+		}
+	});
+};
+
+
+// GET请求方法（保持原有参数）
+const get = (url, data) => {
+	return request(url, 'GET', data);
+};
+
+// POST请求方法（新增 headers 参数）
+const post = (url, data, headers) => {
+	return request(url, 'POST', data, headers);
+};
+
+// 导出GET和POST方法
+export { get, post };
+

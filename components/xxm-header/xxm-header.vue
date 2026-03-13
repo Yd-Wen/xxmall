@@ -7,10 +7,10 @@
 			<view class="containner">
 				<view class="statusBar" :style="{height: statusBarHeight+'px'}"></view>
 				<view v-if="!foldState" class="service" :style="{height: titleBarHeight+'px'}">
-					<view class="customer">
+					<navigator class="customer" url="/pages/chatbot/chatbot">
 						<u-icon name="server-fill" size="22" color="#fff"></u-icon>
 						联系客服
-					</view>
+					</navigator>
 					<navigator class="manage" url="/pages_manage/index/index" v-if="isManage">
 						<u-icon name="bag-fill" size="22" color="#fff"></u-icon>
 						后台管理

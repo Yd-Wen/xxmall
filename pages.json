@@ -52,6 +52,12 @@
 			"style": {
 				"navigationBarTitleText": "店长推荐"
 			}
+		},
+		{
+			"path": "pages/chatbot/chatbot",
+			"style": {
+				"navigationBarTitleText": "智能客服"
+			}
 		}
 	],
 	"globalStyle": {

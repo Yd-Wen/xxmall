@@ -8,6 +8,9 @@ module.exports = {
         this.params = this.getParams()[0]
     },
     getUrl: async function (urlType) {
-        return urlType === "chat" ? CHATURL : ""
+        return {
+            session_id: this.userInfo.uid,
+            url: urlType === "chat" ? CHATURL : ""
+        }
     }
 }

@@ -89,7 +89,6 @@
             // 发送消息
             sendMessage() {
                 // 如果传入了content，使用传入的内容，否则使用输入框的内容
-                console.log(this.inputMessage)
                 if (!this.inputMessage) return
                 
                 // 添加用户消息
@@ -107,95 +106,69 @@
                 // 滚动到最新消息
                 this.scrollToBottom()
 
-                // 不可输入
+                // 发送消息中
                 this.isSending = true
                 
-                // this.chatWithBot()
+                // 调用智能客服
+                this.chatWithBot()
             },
+            // 智能客服
             async chatWithBot() {
-                const url = await chatbotCloudObj.getUrl("chat")
-                const prompt = this.messages[this.messages.length - 2][0].content
-                const session_id = uni.getStorageSync("userInfo")._id
-
-                console.log(url)
-                console.log(prompt)
-                console.log(session_id)
-
+                const {session_id, url} = await chatbotCloudObj.getUrl("chat")
+                const prompt = this.messages[this.messages.length - 2].content
                 const res = await post(url, {
                     prompt: prompt,
                     session_id: session_id,
                     stream: true
                 })
-                res.onChunkReceived((chunk) => {
-                    console.log("Received chunk:", chunk);
-                    // 解析 JSON 数据
-                    this.parseData(chunk)
+                // 处理流式数据
+                res.onChunkReceived((chunks) => {
+                    this.parseData(chunks)
                 })
             },
-            parseData(chunk) {
+            parseData(chunks) {
                 try {
                     // 处理ArrayBuffer数据
                     let chunkStr;
-                    if (chunk instanceof ArrayBuffer) {
+                    if (chunks instanceof ArrayBuffer) {
                         // 将ArrayBuffer转换为字符串
-                        const decoder = new TextDecoder('utf-8');
-                        chunkStr = decoder.decode(chunk);
+                        chunkStr = new TextDecoder('utf-8').decode(chunks);
                     } else {
                         // 处理字符串数据
-                        chunkStr = chunk;
+                        chunkStr = chunks;
                     }
                     
                     // 按行分割处理
                     const lines = chunkStr.split('\n');
-                    
-                    for (const line of lines) {
-                        // 清理每行，去除首尾空白字符
-                        const cleanedLine = line.trim();
-                        
-                        // 跳过空行
-                        if (!cleanedLine) continue;
-                        
-                        // 处理SSE格式数据，移除"data: "前缀
-                        let dataStr = cleanedLine;
-                        if (dataStr.startsWith('data: ')) {
-                            dataStr = dataStr.substring(6); // 移除"data: "前缀
+                    let lineIndex = 0
+
+                    const interval = setInterval(() => {
+                        if (lineIndex == 0) {
+                            // 第一行，清空提示内容（思考中...）
+                            this.messages[this.messages.length - 1].content = ""
                         }
-                        
-                        // 检查是否是结束标志
-                        if (dataStr === '[DONE]') {
-                            // 完成接收，添加完整消息到列表
-                            // 使用Vue的响应式更新方式
-                            this.$set(this.messages, this.messages.length, {
-                                role: "assistant",
-                                content: this.currentBotMessage
-                            });
-                            this.currentBotMessage = "";
-                            // 强制UI更新并滚动到最新消息
-                            this.$nextTick(() => {
-                                this.scrollToBottom();
-                            });
-                            
-                            return;
+                        if (lineIndex >= lines.length || lines[lineIndex].trim() == 'data: [DONE]') {
+                            clearInterval(interval)
+                            this.isSending = false
+                            this.scrollToBottom()
+                            return
                         }
-                        
-                        // 尝试解析 JSON 数据
+                        const line = lines[lineIndex].replace('data: ', '').trim()
+                        // 尝试解析JSON
                         try {
-                            console.log("Data to parse:", dataStr);
-                            const jsonData = JSON.parse(dataStr);
-                            console.log("Parsed JSON:", jsonData);
-                            
-                            // 确保chunk字段存在
+                            const jsonData = JSON.parse(line);
                             if (jsonData.chunk) {
-                                // 累积消息内容
-                                this.currentBotMessage += jsonData.chunk;
+                                this.messages[this.messages.length - 1].content += jsonData.chunk;
                             }
                         } catch (jsonError) {
-                            console.warn("Error parsing line:", jsonError);
-                            console.log("Problematic line:", dataStr);
-                            // 继续处理下一行
-                            continue;
+                            // 如果不是JSON，直接添加
+                            this.messages[this.messages.length - 1].content += line;
+                        } finally {
+                            this.$forceUpdate()
+                            this.scrollToBottom()
                         }
-                    }
+                        lineIndex += 1
+                    }, 100)
                 } catch (error) {
                     console.error("Error in parseData:", error);
                     console.log("Raw chunk:", chunk);
@@ -210,10 +183,13 @@ page {
     background-color: $page-bg-color;
 }
 .chatbot {
+    background: $page-bg-color;
     .scrollView {
         height: calc(100vh - 140rpx);
         width: 100%;
-        padding-bottom: 140rpx;
+		/* #ifdef H5 */
+        height: calc(100vh - 180rpx);
+		/* #endif */
         .messageWrapper {
             display: flex;
             flex-direction: column;
@@ -225,7 +201,7 @@ page {
                 padding: 20rpx 0;
                 border-radius: 20rpx;
                 display: flex;
-                align-items: center;
+                align-items: flex-start;
                 &.human {
                     align-self: flex-end;
                     justify-content: flex-end;

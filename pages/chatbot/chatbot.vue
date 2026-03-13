@@ -71,15 +71,6 @@
             this.scrollToBottom()
         },
         methods: {
-            // 获取历史消息
-            async getHistoryMessages() {
-                // TODO 获取历史消息
-
-                // 滚动到最新消息
-                // this.$nextTick(() => {
-                //     this.scrollToBottom();
-                // });
-            },
             // 滚动到最新消息
             scrollToBottom() {
                 this.$nextTick(() => {
@@ -87,6 +78,13 @@
                         this.scrollTop = res.height-this.scrollViewHeight > 0 ? res.height-this.scrollViewHeight : 0;
                     }).exec();
                 });
+            },
+            // 获取历史消息
+            async getHistoryMessages() {
+                // TODO 获取历史消息
+
+                // 滚动到最新消息
+                this.scrollToBottom()
             },
             // 发送消息
             sendMessage() {

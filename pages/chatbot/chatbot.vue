@@ -24,7 +24,7 @@
                 messages: [],
                 inputMessage: "",
                 userInfo: {
-                    uid: "test-user-id-001" // 实际应用中应从登录信息中获取
+                    uid: "test-user-id-002" // 实际应用中应从登录信息中获取
                 },
                 currentBotMessage: ""
             }
@@ -70,44 +70,68 @@
             },
             parseData(chunk) {
                 try {
-                    // 清理chunk，去除首尾空白字符
-                    const cleanedChunk = chunk.trim();
-                    
-                    // 跳过空chunk
-                    if (!cleanedChunk) return;
-                    
-                    // 处理SSE格式数据，移除"data: "前缀
-                    let dataStr = cleanedChunk;
-                    if (dataStr.startsWith('data: ')) {
-                        dataStr = dataStr.substring(6); // 移除"data: "前缀
+                    // 处理ArrayBuffer数据
+                    let chunkStr;
+                    if (chunk instanceof ArrayBuffer) {
+                        // 将ArrayBuffer转换为字符串
+                        const decoder = new TextDecoder('utf-8');
+                        chunkStr = decoder.decode(chunk);
+                    } else {
+                        // 处理字符串数据
+                        chunkStr = chunk;
                     }
                     
-                    // 检查是否是结束标志
-                    if (dataStr === '[DONE]') {
-                        // 完成接收，添加完整消息到列表
-                        // 使用Vue的响应式更新方式
-                        this.$set(this.messages, this.messages.length, {
-                            role: "assistant",
-                            content: this.currentBotMessage
-                        });
-                        this.currentBotMessage = "";
-                        // 强制UI更新
-                        this.$nextTick();
+                    // 按行分割处理
+                    const lines = chunkStr.split('\n');
+                    
+                    for (const line of lines) {
+                        // 清理每行，去除首尾空白字符
+                        const cleanedLine = line.trim();
                         
-                        return;
-                    }
-                    
-                    // 解析 JSON 数据
-                    const jsonData = JSON.parse(dataStr);
-                    console.log("Parsed JSON:", jsonData);
-                    
-                    // 确保chunk字段存在
-                    if (jsonData.chunk) {
-                        // 累积消息内容
-                        this.currentBotMessage += jsonData.chunk;
+                        // 跳过空行
+                        if (!cleanedLine) continue;
+                        
+                        // 处理SSE格式数据，移除"data: "前缀
+                        let dataStr = cleanedLine;
+                        if (dataStr.startsWith('data: ')) {
+                            dataStr = dataStr.substring(6); // 移除"data: "前缀
+                        }
+                        
+                        // 检查是否是结束标志
+                        if (dataStr === '[DONE]') {
+                            // 完成接收，添加完整消息到列表
+                            // 使用Vue的响应式更新方式
+                            this.$set(this.messages, this.messages.length, {
+                                role: "assistant",
+                                content: this.currentBotMessage
+                            });
+                            this.currentBotMessage = "";
+                            // 强制UI更新
+                            this.$nextTick();
+                            
+                            return;
+                        }
+                        
+                        // 尝试解析 JSON 数据
+                        try {
+                            console.log("Data to parse:", dataStr);
+                            const jsonData = JSON.parse(dataStr);
+                            console.log("Parsed JSON:", jsonData);
+                            
+                            // 确保chunk字段存在
+                            if (jsonData.chunk) {
+                                // 累积消息内容
+                                this.currentBotMessage += jsonData.chunk;
+                            }
+                        } catch (jsonError) {
+                            console.warn("Error parsing line:", jsonError);
+                            console.log("Problematic line:", dataStr);
+                            // 继续处理下一行
+                            continue;
+                        }
                     }
                 } catch (error) {
-                    console.error("Error parsing JSON:", error);
+                    console.error("Error in parseData:", error);
                     console.log("Raw chunk:", chunk);
                 }
             }

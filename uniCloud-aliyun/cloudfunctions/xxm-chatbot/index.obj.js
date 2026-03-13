@@ -1,5 +1,5 @@
 const cloudUtils = require("xxm-cloud-utils")
-const CHATURL = "http://47.96.109.209:8000/v1/chat/stream"
+const CHATURL = "https://api-xxmall.yindongwen.top/v1/chat/stream"
 
 module.exports = {
     _before: async function () {

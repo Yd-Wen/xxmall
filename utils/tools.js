@@ -44,12 +44,7 @@ export function isManage() {
 }
 
 // 通用请求函数（新增 headers 参数）
-const request = (
-	url,
-	method,
-	data,
-	headers
-) => {
+const request = (url, method, data, headers) => {
 	return new Promise((resolve, reject) => {
 		// 合并默认 header 和自定义 header
 		const mergedHeaders = {
@@ -57,67 +52,80 @@ const request = (
 			...headers, // 合并自定义 header（可覆盖默认值）
 		};
 
-		// 检查是否支持流式响应
-		const isStreamSupported = typeof uni.request === 'function' &&
-			(uni.getSystemInfoSync().platform === 'app' ||
-				uni.getSystemInfoSync().platform === 'mp-weixin' ||
-				uni.getSystemInfoSync().platform === 'mp-alipay');
+		// 标记是否为流式请求（由调用方通过 data.stream 控制）
+		const isStreamRequest = data && data.stream === true;
+		// 存储流式处理的回调对象
+		let streamHandlers = null;
 
 		// 创建一个请求task
 		const requestTask = uni.request({
 			url: url,
 			method: method,
-			data: data,
+			// 移除 stream 标记（避免传给后端）
+			data: isStreamRequest ? { ...data, stream: undefined } : data,
 			header: mergedHeaders, // 使用合并后的 header
-			enableChunked: isStreamSupported, // 只在支持的平台启用
+			enableChunked: isStreamRequest, // 仅流式请求开启分片
 			success: (res) => {
-				// 如果不支持流式响应，直接返回完整响应
-				if (!isStreamSupported) {
-					resolve({
-						data: res.data,
-						onChunkReceived: (callback) => {
-							// 模拟流式响应，一次性返回所有数据
-							if (res.data) {
-								callback(res.data);
-							}
-						},
-						onHeadersReceived: (callback) => {
-							callback(res.header);
-						},
-						abort: () => { }
-					});
+				// 非流式请求：直接 resolve 结果
+				if (!isStreamRequest) {
+					resolve(res);
 				}
+				// 流式请求：通过 onChunkReceived 回调返回数据，这里不重复 resolve
 			},
 			fail: (err) => {
 				reject(err);
 			},
 		});
 
-		// 如果支持流式响应，立即返回处理对象
-		if (isStreamSupported) {
-			resolve({
-				onHeadersReceived: (callback) => {
-					if (requestTask.onHeadersReceived) {
-						requestTask.onHeadersReceived((res) => {
-							callback(res.header);
-						});
+		// 构建流式处理对象（只创建一次，避免 Promise 多次 resolve）
+		streamHandlers = {
+			onHeadersReceived: (callback) => {
+				if (requestTask.onHeadersReceived) {
+					requestTask.onHeadersReceived((res) => {
+						callback(res.header);
+					});
+				} else {
+					// 仅开发环境打印警告，生产环境静默
+					if (process.env.NODE_ENV === 'development') {
+						console.warn('当前平台不支持 onHeadersReceived 方法');
 					}
-				},
-				onChunkReceived: (callback) => {
-					if (requestTask.onChunkReceived) {
-						requestTask.onChunkReceived((res) => {
-							callback(res.data);
-						});
+				}
+			},
+			onChunkReceived: (callback) => {
+				if (requestTask.onChunkReceived) {
+					requestTask.onChunkReceived((res) => {
+						callback(res.data);
+					});
+				} else {
+					// 仅开发环境打印警告
+					if (process.env.NODE_ENV === 'development') {
+						console.warn('当前平台不支持 onChunkReceived，已自动降级为传统响应模式');
 					}
-				},
-				abort: () => {
+					// 降级处理：请求完成后一次性返回所有数据
+					const originalSuccess = requestTask.success;
+					requestTask.success = function (res) {
+						callback(res.data); // 模拟分片回调，一次性返回全部数据
+						if (originalSuccess) {
+							originalSuccess.call(this, res);
+						}
+					};
+				}
+			},
+			abort: () => {
+				if (requestTask.abort) {
 					requestTask.abort();
-				},
-			});
+				} else if (process.env.NODE_ENV === 'development') {
+					console.warn('当前平台不支持 abort 方法');
+				}
+			},
+		};
+
+		// 流式请求：resolve 处理对象；非流式请求：等待 success 回调 resolve
+		if (isStreamRequest) {
+			resolve(streamHandlers);
 		}
 	});
 };
-
 
 // GET请求方法（保持原有参数）
 const get = (url, data) => {

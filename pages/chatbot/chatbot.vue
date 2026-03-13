@@ -1,16 +1,19 @@
 <template>
 	<view class="chatbot">
-		<view class="messages">
+		<view class="messageList" ref="messageList">
 			<view v-for="(msg, index) in messages" :key="index" class="message" :class="msg.role">
-				<view class="content">{{ msg.content }}</view>
+                <view class="avatar" v-if="msg.role === 'ai'">
+                    <image :src="avatar[msg.role]" mode="aspectFill" />
+                </view>
+				<view class="content" :class="msg.role+'Content'"> {{ msg.content }}</view>
+                <view class="avatar" v-if="msg.role === 'human'">
+                    <image :src="avatar[msg.role]" mode="aspectFill" />
+                </view>
 			</view>
-            <view v-if="currentBotMessage" class="messagebot">
-                <view class="content">{{ currentBotMessage }}</view>
-            </view>
 		</view>
 		<view class="input-area">
-			<input v-model="inputMessage" type="text" placeholder="请输入消息" class="input" />
-			<button @click="sendMessage" class="send-btn">发送</button>
+			<input v-model="inputMessage" type="text" placeholder="请输入..." class="input" />
+			<view @click="sendMessage" class="send-btn">发送</view>
 		</view>
 	</view>
 </template>
@@ -21,19 +24,52 @@
 	export default {
 		data() {
 			return {
-                messages: [],
-                inputMessage: "",
-                userInfo: {
-                    uid: "test-user-id-002" // 实际应用中应从登录信息中获取
+                avatar:{
+                    // TODO 头像
+                    human: "/static/images/avatar.png",
+                    ai: "/static/images/logo.png"
                 },
-                currentBotMessage: ""
+                messages: [{
+                    role: "human",
+                    content: "你好"
+                },{
+                    role: "ai",
+                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
+                },{
+                    role: "human",
+                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题"
+                },{
+                    role: "ai",
+                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
+                },{
+                    role: "human",
+                    content: "你好"
+                },{
+                    role: "ai",
+                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
+                },{
+                    role: "human",
+                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题"
+                },{
+                    role: "ai",
+                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
+                }],
+                inputMessage: ""
             }
         },
-        onLoad() {
-            // 初始消息
-            this.sendMessage("你好，你的知识库有哪些内容？")
+        async onLoad() {
+            // 获取历史消息
+            await this.getHistoryMessages()
+            // 滚动到最新消息
+            this.$nextTick(() => {
+                this.scrollToBottom();
+            });
         },
         methods: {
+            // 获取历史消息
+            async getHistoryMessages() {
+                
+            },
             sendMessage(content) {
                 // 如果传入了content，使用传入的内容，否则使用输入框的内容
                 const messageContent = content || this.inputMessage
@@ -49,10 +85,22 @@
                 // 清空输入框
                 this.inputMessage = ""
                 
+                // 滚动到最新消息
+                this.$nextTick(() => {
+                    this.scrollToBottom();
+                });
+                
                 // 初始化机器人消息
                 this.currentBotMessage = ""        
                 
                 this.chatWithBot(messageContent)
+            },
+            // 滚动到最新消息
+            scrollToBottom() {
+                const messageList = this.$refs.messageList;
+                if (messageList) {
+                    messageList.scrollTop = messageList.scrollHeight;
+                }
             },
             async chatWithBot(messageContent) {
                 const url = await chatbotCloudObj.getUrl("chat")
@@ -106,8 +154,10 @@
                                 content: this.currentBotMessage
                             });
                             this.currentBotMessage = "";
-                            // 强制UI更新
-                            this.$nextTick();
+                            // 强制UI更新并滚动到最新消息
+                            this.$nextTick(() => {
+                                this.scrollToBottom();
+                            });
                             
                             return;
                         }
@@ -140,64 +190,88 @@
 </script>
 
 <style lang="scss" scoped>
+page {
+    background-color: $page-bg-color;
+}
 .chatbot {
     height: 100%;
-    background-color: #f5f5f5;
-    display: flex;
-    flex-direction: column;
-}
-
-.messages {
-    flex: 1;
-    padding: 20rpx;
-    overflow-y: auto;
-}
-
-.message {
-    margin-bottom: 20rpx;
-    max-width: 80%;
-    padding: 15rpx;
-    border-radius: 20rpx;
-}
-
-.message.user {
-    align-self: flex-end;
-    background-color: #007aff;
-    color: white;
-    border-bottom-right-radius: 5rpx;
-}
-
-.message.assistant {
-    align-self: flex-start;
-    background-color: white;
-    color: #333;
-    border-bottom-left-radius: 5rpx;
-}
-
-.input-area {
-    display: flex;
-    padding: 20rpx;
-    background-color: white;
-    border-top: 1rpx solid #e5e5e5;
-}
-
-.input {
-    flex: 1;
-    height: 80rpx;
-    border: 1rpx solid #e5e5e5;
-    border-radius: 40rpx;
-    padding: 0 20rpx;
-    font-size: 32rpx;
-}
-
-.send-btn {
-    width: 120rpx;
-    height: 80rpx;
-    background-color: #007aff;
-    color: white;
-    border: none;
-    border-radius: 40rpx;
-    margin-left: 20rpx;
-    font-size: 32rpx;
+    .messageList {
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        padding: 20rpx 20rpx 140rpx;
+        .message {
+            margin-bottom: 20rpx;
+            max-width: 85%;
+            padding: 20rpx 0;
+            border-radius: 20rpx;
+            display: flex;
+            align-items: center;
+            &.human {
+                align-self: flex-end;
+                justify-content: flex-end;
+            }
+            &.ai {
+                align-self: flex-start;
+                justify-content: flex-start;
+            }
+            .avatar {
+                width: 100rpx;
+                height: 100rpx;
+                border-radius: 50%;
+                margin: 0 20rpx;
+                overflow: hidden;
+                border: 1rpx solid $border-color;
+                image {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+            .content{
+                flex: 1;
+                padding: 20rpx;
+                &.humanContent {
+                    background: $xxm-theme-color-aux;
+                    color: white;
+                    border-radius: 20rpx 20rpx 0;
+                }
+                &.aiContent {
+                    background: white;
+                    color: #333;
+                    border-radius: 20rpx 20rpx 20rpx 0;
+                }
+            }
+        }
+    }
+    .input-area {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 140rpx;
+        display: flex;
+        padding: 20rpx;
+        background-color: white;
+        border-top: 1rpx solid #e5e5e5;
+        .input {
+            flex: 1;
+            height: 80rpx;
+            border: 1rpx solid #e5e5e5;
+            border-radius: 40rpx;
+            padding: 0 20rpx;
+            font-size: 32rpx;
+        }
+        .send-btn {
+            width: 120rpx;
+            height: 80rpx;
+            background-color: $xxm-theme-color-aux;
+            color: white;
+            border-radius: 40rpx;
+            margin-left: 20rpx;
+            font-size: 32rpx;
+            text-align: center;
+            line-height: 75rpx;
+        }
+    }
 }
 </style>

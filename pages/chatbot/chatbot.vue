@@ -6,7 +6,9 @@
                     <view class="avatar" v-if="msg.role === 'ai'">
                         <image :src="avatar[msg.role]" mode="aspectFill" />
                     </view>
-                    <view class="content" :class="msg.role+'Content'"> {{ msg.content }}</view>
+                    <view class="content" :class="msg.role+'Content'">
+                        <rich-text :nodes="msg.role === 'ai' ? markdownToHtml(msg.content) : msg.content"></rich-text>
+                    </view>
                     <view class="avatar" v-if="msg.role === 'human'">
                         <image :src="avatar[msg.role]" mode="aspectFill" />
                     </view>
@@ -151,6 +153,20 @@
                 // });
 
             },
+            // Markdown 转 HTML
+            markdownToHtml(text) {
+                if (!text) return '';
+                return text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // 粗体 **text**
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')              // 斜体 *text*
+                    .replace(/^### (.*$)/gim, '<h3>$1</h3>')           // 三级标题
+                    .replace(/^## (.*$)/gim, '<h2>$1</h2>')           // 二级标题
+                    .replace(/^# (.*$)/gim, '<h1>$1</h1>')            // 一级标题
+                    .replace(/^\s*\- (.*$)/gim, '<li>$1</li>')        // 一级和二级列表项（支持缩进）
+                    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')        // 列表
+                    .replace(/^>\s*(.*$)/gim, '$1')                   // 去掉引用符号 >
+                    .replace(/\n/g, '<br>');                           // 换行
+            },
         }
     }
 </script>
@@ -186,6 +202,7 @@ page {
                 &.ai {
                     align-self: flex-start;
                     justify-content: flex-start;
+                    white-space: pre-wrap;
                 }
                 .avatar {
                     width: 100rpx;

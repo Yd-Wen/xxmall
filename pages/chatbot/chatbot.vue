@@ -114,66 +114,43 @@
             },
             // 智能客服
             async chatWithBot() {
-                const {session_id, url} = await chatbotCloudObj.getUrl("chat")
+				let isStream = false
+				// #ifdef MP-WEIXIN
+				isStream = true
+				// #endif	
+                
+                // 请求智能客服URL
+                const {session_id, url} = await chatbotCloudObj.getUrl("chat", isStream)
                 const prompt = this.messages[this.messages.length - 2].content
                 const res = await post(url, {
                     prompt: prompt,
                     session_id: session_id,
-                    stream: true
                 })
-                // 处理流式数据
-                res.onChunkReceived((chunks) => {
-                    this.parseData(chunks)
-                })
-            },
-            parseData(chunks) {
-                try {
-                    // 处理ArrayBuffer数据
-                    let chunkStr;
-                    if (chunks instanceof ArrayBuffer) {
-                        // 将ArrayBuffer转换为字符串
-                        chunkStr = new TextDecoder('utf-8').decode(chunks);
-                    } else {
-                        // 处理字符串数据
-                        chunkStr = chunks;
-                    }
-                    
-                    // 按行分割处理
-                    const lines = chunkStr.split('\n');
-                    let lineIndex = 0
 
-                    const interval = setInterval(() => {
-                        if (lineIndex == 0) {
-                            // 第一行，清空提示内容（思考中...）
-                            this.messages[this.messages.length - 1].content = ""
-                        }
-                        if (lineIndex >= lines.length || lines[lineIndex].trim() == 'data: [DONE]') {
-                            clearInterval(interval)
-                            this.isSending = false
-                            this.scrollToBottom()
-                            return
-                        }
-                        const line = lines[lineIndex].replace('data: ', '').trim()
-                        // 尝试解析JSON
-                        try {
-                            const jsonData = JSON.parse(line);
-                            if (jsonData.chunk) {
-                                this.messages[this.messages.length - 1].content += jsonData.chunk;
-                            }
-                        } catch (jsonError) {
-                            // 如果不是JSON，直接添加
-                            this.messages[this.messages.length - 1].content += line;
-                        } finally {
-                            this.$forceUpdate()
-                            this.scrollToBottom()
-                        }
-                        lineIndex += 1
-                    }, 100)
-                } catch (error) {
-                    console.error("Error in parseData:", error);
-                    console.log("Raw chunk:", chunk);
-                }
-            }
+                // 核心：监听 onData，直接拿到纯文本片段
+                res.onData((textChunk) => {
+                    // 首次触发清空「思考中...」
+                    if (this.messages[this.messages.length - 1].content === "思考中...") {
+                        this.messages[this.messages.length - 1].content = "";
+                    }
+                    // 处理结束标记
+                    if (textChunk.includes("[DONE]")) {
+                        this.isSending = false
+                        return
+                    }                    
+                    // 追加文本片段（直接渲染）
+                    this.messages[this.messages.length - 1].content += textChunk;
+                    // 强制刷新 UI 并滚动到底部
+                    this.$forceUpdate();
+                    this.scrollToBottom();
+                }, { speed: 100 }); // 可选：控制逐字输出速率（ms）
+
+                // 监听结束（如果需要）
+                // res.getResult().then(() => {
+                //   this.isSending = false;
+                // });
+
+            },
         }
     }
 </script>

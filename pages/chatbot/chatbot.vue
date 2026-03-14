@@ -136,22 +136,25 @@
                     if (this.messages[this.messages.length - 1].content === "思考中...") {
                         this.messages[this.messages.length - 1].content = "";
                     }
-                    // 处理结束标记
-                    if (textChunk.includes("[DONE]")) {
-                        this.isSending = false
-                        return
-                    }                    
+                    // 处理结束标记（兼容非流式：非流式不会返回 [DONE]，需单独处理）
+                    const isDone = textChunk.includes("[DONE]") || (!isStream && textChunk);
+                    if (isDone) {
+                        // 非流式：移除可能的结束标记，确保内容干净
+                        const cleanText = textChunk.replace("[DONE]", "").trim();
+                        if (cleanText) {
+                            this.messages[this.messages.length - 1].content += cleanText;
+                        }
+                        this.isSending = false;
+                        this.$forceUpdate();
+                        this.scrollToBottom();
+                        return;
+                    }					
                     // 追加文本片段（直接渲染）
                     this.messages[this.messages.length - 1].content += textChunk;
                     // 强制刷新 UI 并滚动到底部
                     this.$forceUpdate();
                     this.scrollToBottom();
-                }, { speed: 100 }); // 可选：控制逐字输出速率（ms）
-
-                // 监听结束（如果需要）
-                // res.getResult().then(() => {
-                //   this.isSending = false;
-                // });
+                }, { speed: isStream ? 100 : 0 }); // 可选：控制逐字输出速率（ms）
 
             },
             // Markdown 转 HTML
@@ -161,8 +164,8 @@
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // 粗体 **text**
                     .replace(/\*(.*?)\*/g, '<em>$1</em>')              // 斜体 *text*
                     .replace(/^\s*### (.*$)/gim, '<h4>$1</h4>')        // 三级标题（支持空格）
-                    .replace(/^\s*## (.*$)/gim, '<h4>$1</h4>')         // 二级标题（支持空格）
-                    .replace(/^\s*# (.*$)/gim, '<h4>$1</h4>')          // 一级标题（支持空格）
+                    .replace(/^\s*## (.*$)/gim, '<h3>$1</h3>')         // 二级标题（支持空格）
+                    .replace(/^\s*# (.*$)/gim, '<h2>$1</h2>')          // 一级标题（支持空格）
                     .replace(/^\s*\- (.*$)/gim, '<li>$1</li>')        // 一级和二级列表项（支持缩进）
                     .replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>')       // 列表（非贪婪匹配）
                     .replace(/^>\s*(.*$)/gim, '$1')                   // 去掉引用符号 >

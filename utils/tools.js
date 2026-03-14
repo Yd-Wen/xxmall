@@ -55,27 +55,37 @@ const request = (url, method, data, headers) => {
 		// 核心：根据接口路径判断是否为流式接口
 		const isStreamApi = url.includes('/chat/stream');
 
-		// 创建请求任务（自动控制 enableChunked）
+		// 非流式：直接返回简单对象
+		if (!isStreamApi) {
+			uni.request({
+				url,
+				method,
+				data,
+				header: mergedHeaders,
+				enableChunked: false,
+				success: (res) => {
+					const result = res.data?.response || res.data;
+					resolve({
+						onData: (callback) => callback(result),
+						onHeaders: () => { },
+						abort: () => { },
+						getResult: () => Promise.resolve(result),
+					});
+				},
+				fail: reject,
+			});
+			return;
+		}
+
+		// 流式处理
 		const requestTask = uni.request({
 			url,
 			method,
 			data,
 			header: mergedHeaders,
-			enableChunked: isStreamApi, // 流式接口自动开启，非流式关闭
-			success: (res) => {
-				if (!isStreamApi) {
-					// 非流式：直接返回处理后的结果
-					resolve({
-						onData: (callback) => callback(res.data),
-						onHeaders: () => { },
-						abort: () => { },
-						getResult: () => Promise.resolve(res.data),
-					});
-				}
-			},
-			fail: (err) => {
-				reject(err);
-			},
+			enableChunked: true,
+			success: () => { }, // 流式响应通过 onChunkReceived 处理
+			fail: reject,
 		});
 
 		// 统一的响应处理对象（适配 UI 刷新）
@@ -87,21 +97,8 @@ const request = (url, method, data, headers) => {
 			 */
 			onData: (callback, options = { speed: 100 }) => {
 				const { speed } = options;
-				// 存储未处理的分片缓存（解决分片粘包问题）
 				let chunkCache = '';
 
-				// 非流式处理
-				if (!isStreamApi) {
-					const originalSuccess = requestTask.success;
-					requestTask.success = function (res) {
-						// 非流式直接触发一次回调
-						callback(res.data?.response || res.data);
-						if (originalSuccess) originalSuccess.call(this, res);
-					};
-					return;
-				}
-
-				// 流式处理：解析 SSE 并按速率返回文本片段
 				if (requestTask.onChunkReceived) {
 					requestTask.onChunkReceived((res) => {
 						// 1. 解析 ArrayBuffer 为字符串
@@ -112,7 +109,7 @@ const request = (url, method, data, headers) => {
 							chunkStr = res.data || '';
 						}
 
-						// 2. 合并缓存（处理粘包：上一个分片未处理完的内容）
+						// 2. 合并缓存
 						chunkStr = chunkCache + chunkStr;
 						chunkCache = '';
 
@@ -120,7 +117,7 @@ const request = (url, method, data, headers) => {
 						const lines = chunkStr.split('\n');
 						const validLines = [];
 
-						// 处理最后一行可能不完整的情况（存入缓存）
+						// 处理最后一行可能不完整的情况
 						if (lines.length > 0) {
 							const lastLine = lines[lines.length - 1];
 							if (!lastLine.startsWith('data: ') || !lastLine.trim()) {
@@ -131,37 +128,31 @@ const request = (url, method, data, headers) => {
 
 						// 过滤有效行并解析
 						lines.forEach(line => {
-							// 移除 data: 前缀
 							const jsonStr = line.replace('data: ', '').trim();
 							try {
 								const jsonData = JSON.parse(jsonStr);
-								// 提取纯文本片段（优先取 chunk，兼容 error）
 								validLines.push(jsonData.chunk || jsonData.error || '');
 							} catch (e) {
-								// 非 JSON 格式直接作为文本
 								validLines.push(jsonStr);
 							}
 						});
 
-						// 4. 按速率逐行触发回调（适配 UI 刷新）
+						// 4. 按速率逐行触发回调
 						let lineIndex = 0;
 						const interval = setInterval(() => {
 							if (lineIndex >= validLines.length) {
 								clearInterval(interval);
 								return;
 							}
-							// 触发业务层回调，直接返回纯文本
 							callback(validLines[lineIndex]);
 							lineIndex++;
 						}, speed);
 					});
 				} else {
-					// 降级处理：一次性返回
-					console.warn('当前平台不支持流式，已降级为非流式');
-					const originalSuccess = requestTask.success;
+					// 降级处理
+					console.warn('当前平台不支持流式，已降级');
 					requestTask.success = function (res) {
 						callback(res.data?.response || res.data);
-						if (originalSuccess) originalSuccess.call(this, res);
 					};
 				}
 			},
@@ -178,14 +169,14 @@ const request = (url, method, data, headers) => {
 			getResult: () => {
 				return new Promise((resolve) => {
 					let fullText = '';
-					this.onData((chunk) => {
+					responseHandler.onData((chunk) => {
 						fullText += chunk;
 					}, { speed: 0 });
 					setTimeout(() => resolve(fullText), 100);
 				});
 			},
 		};
-		// 统一返回处理对象
+
 		resolve(responseHandler);
 	});
 };

@@ -131,6 +131,7 @@
 
                 // 核心：监听 onData，直接拿到纯文本片段
                 res.onData((textChunk) => {
+                    console.log(textChunk)
                     // 首次触发清空「思考中...」
                     if (this.messages[this.messages.length - 1].content === "思考中...") {
                         this.messages[this.messages.length - 1].content = "";
@@ -159,11 +160,11 @@
                 return text
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // 粗体 **text**
                     .replace(/\*(.*?)\*/g, '<em>$1</em>')              // 斜体 *text*
-                    .replace(/^### (.*$)/gim, '<h3>$1</h3>')           // 三级标题
-                    .replace(/^## (.*$)/gim, '<h2>$1</h2>')           // 二级标题
-                    .replace(/^# (.*$)/gim, '<h1>$1</h1>')            // 一级标题
+                    .replace(/^\s*### (.*$)/gim, '<h4>$1</h4>')        // 三级标题（支持空格）
+                    .replace(/^\s*## (.*$)/gim, '<h4>$1</h4>')         // 二级标题（支持空格）
+                    .replace(/^\s*# (.*$)/gim, '<h4>$1</h4>')          // 一级标题（支持空格）
                     .replace(/^\s*\- (.*$)/gim, '<li>$1</li>')        // 一级和二级列表项（支持缩进）
-                    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')        // 列表
+                    .replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>')       // 列表（非贪婪匹配）
                     .replace(/^>\s*(.*$)/gim, '$1')                   // 去掉引用符号 >
                     .replace(/\n/g, '<br>');                           // 换行
             },

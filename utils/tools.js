@@ -10,8 +10,10 @@ export function discount(num1, num2) {
 
 // 日期格式化
 export function timeFormat(timestamp, fmt = "yyyy-MM-dd hh:mm:ss", targetTimezone = 0) {
-	const validTimestamp = String(timestamp).length === 10 ? timestamp * 1000 : timestamp;
-	const date = new Date(validTimestamp);
+	if (typeof timestamp === 'number' || /^\d+$/.test(timestamp)) {
+		timestamp = String(timestamp).length === 10 ? Number(timestamp) * 1000 : Number(timestamp);
+	}
+	const date = new Date(timestamp);
 	if (isNaN(date.getTime())) {
 		return "无效的时间戳";
 	}

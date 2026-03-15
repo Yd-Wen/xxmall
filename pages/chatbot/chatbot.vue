@@ -3,8 +3,8 @@
         <scroll-view class="scrollView" scroll-y="true" :scroll-top="scrollTop"  scroll-with-animation>
             <view class="messageWrapper">
                 <view v-for="(msg, index) in messages" :key="index" class="message">
-                    <view class="time">
-                        {{ msg.time }}
+                    <view class="time" v-if="msg.time">
+                        {{ timeFormat(msg.time) }}
                     </view>
                     <view class="messageContent" :class="msg.role">
                         <view class="avatar">
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-    import { post } from "@/utils/tools.js"
+    import { timeFormat, post } from "@/utils/tools.js"
 	const chatbotCloudObj = uniCloud.importObject("xxm-chatbot", {"customUI":true})
 	export default {
 		data() {
@@ -69,6 +69,7 @@
                     content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。\n你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。\n你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
                 }],
                 inputMessage: "",
+                timestamp: Date.now(),  // 时间戳
                 scrollTop: 0,           // 滚动条位置
                 scrollViewHeight: 300,  // 滚动视图高度
                 isSending: false,       // 是否正在发送
@@ -83,6 +84,7 @@
             this.scrollToBottom()
         },
         methods: {
+            timeFormat,
             // 滚动到最新消息
             scrollToBottom() {
                 this.$nextTick(() => {
@@ -102,13 +104,17 @@
             sendMessage() {
                 // 如果传入了content，使用传入的内容，否则使用输入框的内容
                 if (!this.inputMessage) return
+
+                this.timestamp = Date.now()
                 
                 // 添加用户消息
                 this.messages.push({
                     role: "human",
+                    time: this.timestamp,
                     content: this.inputMessage
                 },{
                     role: "ai",
+                    time: this.timestamp,
                     content: "思考中..."
                 })
                 
@@ -135,8 +141,9 @@
                 const {session_id, url} = await chatbotCloudObj.getUrl("chat", isStream)
                 const prompt = this.messages[this.messages.length - 2].content
                 const res = await post(url, {
-                    prompt: prompt,
                     session_id: session_id,
+                    timestamp: this.timestamp,
+                    prompt: prompt,
                 })
 
                 // 核心：监听 onData，直接拿到纯文本片段

@@ -18,7 +18,7 @@
             </view>
         </scroll-view>
 		<view class="input-area">
-			<input v-model="inputMessage" type="text" placeholder="请输入..." class="input" ref="input" :disabled="isSending" />
+			<input v-model="inputMessage" type="text" placeholder="请输入..." class="input" ref="input" />
 			<button @click="sendMessage" class="send-btn" :class="isSending?'disabled':''" :disabled="isSending">发送</button>
 		</view>
 	</view>
@@ -156,8 +156,9 @@
                     .replace(/^\s*### (.*$)/gim, '<h4>$1</h4>')        // 三级标题（支持空格）
                     .replace(/^\s*## (.*$)/gim, '<h3>$1</h3>')         // 二级标题（支持空格）
                     .replace(/^\s*# (.*$)/gim, '<h2>$1</h2>')          // 一级标题（支持空格）
-                    .replace(/^\s*\- (.*$)/gim, '<li>$1</li>')        // 一级和二级列表项（支持缩进）
-                    .replace(/(<li>.*?<\/li>)/gs, '<ul style="list-style-type:none; padding-left:0;">$1</ul>')  // 列表（非贪婪匹配，无缩进）
+                    .replace(/^\s*\- (.*$)/gim, '<li>$1</li>')        // 一级和二级列表项
+                    // .replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>')       // 列表（非贪婪匹配）
+                    .replace(/(<li>.*?<\/li>)/gs, '<ul style="list-style-type:none; padding-left:0;">$1</ul>')       // 列表（非贪婪匹配，无缩进）
                     .replace(/^>\s*(.*$)/gim, '$1')                   // 去掉引用符号 >
                     .replace(/\n+/g, '\n')                            // 合并连续的换行符
                     .replace(/\n/g, '<br>');                           // 换行
@@ -199,6 +200,7 @@ page {
                     align-items: flex-start;
                     margin-top: 20rpx;
                     max-width: 85%;
+                    font-size: 30rpx;
                     &.human {
                         flex-direction: row-reverse;
                         align-self: flex-end;

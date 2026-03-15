@@ -2,15 +2,17 @@
 	<view class="chatbot">
         <scroll-view class="scrollView" scroll-y="true" :scroll-top="scrollTop"  scroll-with-animation>
             <view class="messageWrapper">
-                <view v-for="(msg, index) in messages" :key="index" class="message" :class="msg.role">
-                    <view class="avatar" v-if="msg.role === 'ai'">
-                        <image :src="avatar[msg.role]" mode="aspectFill" />
+                <view v-for="(msg, index) in messages" :key="index" class="message">
+                    <view class="time">
+                        {{ msg.time }}
                     </view>
-                    <view class="content" :class="msg.role+'Content'">
-                        <rich-text :nodes="msg.role === 'ai' ? markdownToHtml(msg.content) : msg.content"></rich-text>
-                    </view>
-                    <view class="avatar" v-if="msg.role === 'human'">
-                        <image :src="avatar[msg.role]" mode="aspectFill" />
+                    <view class="messageContent" :class="msg.role">
+                        <view class="avatar">
+                            <image :src="avatar[msg.role]" mode="aspectFill" />
+                        </view>
+                        <view class="content" :class="msg.role+'Content'">
+                            <rich-text :nodes="msg.role === 'ai' ? markdownToHtml(msg.content) : msg.content"></rich-text>
+                        </view>
                     </view>
                 </view>
             </view>
@@ -35,28 +37,36 @@
                 },
                 messages: [{
                     role: "human",
+                    time: "10:00",
                     content: "你好"
                 },{
                     role: "ai",
+                    time: "10:01",
                     content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
                 },{
                     role: "human",
+                    time: "10:02",
                     content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题"
                 },{
                     role: "ai",
+                    time: "10:03",
                     content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
                 },{
                     role: "human",
+                    time: "10:04",
                     content: "你好"
                 },{
                     role: "ai",
+                    time: "10:04",
                     content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
                 },{
                     role: "human",
+                    time: "10:05",
                     content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题"
                 },{
                     role: "ai",
-                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
+                    time: "10:06",
+                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。\n你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。\n你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
                 }],
                 inputMessage: "",
                 scrollTop: 0,           // 滚动条位置
@@ -191,47 +201,56 @@ page {
             display: flex;
             flex-direction: column;
             padding: 20rpx;
-            padding-bottom: 20rpx;
             .message {
-                margin-bottom: 20rpx;
-                max-width: 85%;
-                padding: 20rpx 0;
-                border-radius: 20rpx;
+                width: 100%; 
+                margin: 20rpx 0;
                 display: flex;
-                align-items: flex-start;
-                &.human {
-                    align-self: flex-end;
-                    justify-content: flex-end;
-                }
-                &.ai {
-                    align-self: flex-start;
-                    justify-content: flex-start;
-                    white-space: pre-wrap;
-                }
-                .avatar {
-                    width: 100rpx;
-                    height: 100rpx;
-                    border-radius: 50%;
+                flex-direction: column;
+                .time {
+                    font-size: 24rpx;
+                    color: #999;
                     margin: 0 20rpx;
-                    overflow: hidden;
-                    border: 1rpx solid $border-color;
-                    image {
-                        width: 100%;
-                        height: 100%;
-                    }
+                    text-align: center;
+                    line-height: 24rpx;
                 }
-                .content{
-                    flex: 1;
-                    padding: 20rpx;
-                    &.humanContent {
-                        background: $xxm-theme-color-aux;
-                        color: white;
-                        border-radius: 20rpx 20rpx 0;
+                .messageContent {
+                    display: flex;
+                    align-items: flex-start;
+                    margin-top: 20rpx;
+                    max-width: 85%;
+                    &.human {
+                        flex-direction: row-reverse;
+                        align-self: flex-end;
                     }
-                    &.aiContent {
-                        background: white;
-                        color: #333;
-                        border-radius: 20rpx 20rpx 20rpx 0;
+                    &.ai {
+                        flex-direction: row;
+                        align-self: flex-start;
+                    }
+                    .avatar {
+                        width: 100rpx;
+                        height: 100rpx;
+                        border-radius: 50%;
+                        margin: 0 20rpx;
+                        overflow: hidden;
+                        border: 1rpx solid $border-color;
+                        image {
+                            width: 100%;
+                            height: 100%;
+                        }
+                    }
+                    .content{
+                        flex: 1;
+                        padding: 20rpx;
+                        &.humanContent {
+                            background: $xxm-theme-color-aux;
+                            color: white;
+                            border-radius: 20rpx 20rpx 0;
+                        }
+                        &.aiContent {
+                            background: white;
+                            color: #333;
+                            border-radius: 20rpx 20rpx 20rpx 0;
+                        }
                     }
                 }
             }

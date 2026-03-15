@@ -78,7 +78,6 @@ const request = (url, method, data, headers) => {
 				header: mergedHeaders,
 				enableChunked: false,
 				success: (res) => {
-					console.log('非流式响应:', res);
 					const result = res.data?.response || res.data;
 					resolve({
 						onData: (callback) => {

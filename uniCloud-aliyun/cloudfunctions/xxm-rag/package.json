@@ -1,5 +1,5 @@
 {
-  "name": "xxm-knowledge",
+  "name": "xxm-rag",
   "dependencies": {
     "xxm-cloud-utils": "file:../common/xxm-cloud-utils"
   },

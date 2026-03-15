@@ -21,7 +21,7 @@
 </template>
 
 <script>
-	const knowledgeCloudObj = uniCloud.importObject("xxm-knowledge")
+	const ragCloudObj = uniCloud.importObject("xxm-rag")
 	export default {
 		data() {
 			return {
@@ -51,7 +51,7 @@
 				for (let i = 0; i < this.knowledgeData.files.length; i++) {
 					const file = this.knowledgeData.files[i];
                     console.log(file.name)
-                    let res = await knowledgeCloudObj.uploadKnowledge({
+                    let res = await ragCloudObj.uploadKnowledge({
                         // data: file.url, // 这里需要根据实际情况获取文件内容
                         file_name: file.name
                     })

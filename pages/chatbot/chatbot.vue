@@ -1,10 +1,10 @@
 <template>
 	<view class="chatbot">
-        <scroll-view class="scrollView" scroll-y="true" :scroll-top="scrollTop"  scroll-with-animation>
+        <scroll-view class="scrollView" scroll-y="true" :scroll-top="scrollTop">
             <view class="messageWrapper">
                 <view v-for="(msg, index) in messages" :key="index" class="message">
-                    <view class="time" v-if="msg.time">
-                        {{ timeFormat(msg.time) }}
+                    <view class="timestamp" v-if="msg.timestamp">
+                        {{ timeFormat(msg.timestamp) }}
                     </view>
                     <view class="messageContent" :class="msg.role">
                         <view class="avatar">
@@ -26,7 +26,7 @@
 
 <script>
     import { getLocalDatetimeString, timeFormat, post } from "@/utils/tools.js"
-	const chatbotCloudObj = uniCloud.importObject("xxm-chatbot", {"customUI":true})
+	const ragCloudObj = uniCloud.importObject("xxm-rag", {"customUI":true})
 	export default {
 		data() {
 			return {
@@ -35,31 +35,7 @@
                     human: "/static/images/avatar.png",
                     ai: "/static/images/logo.png"
                 },
-                messages: [{
-                    role: "human",
-                    time: "10:00",
-                    content: "你好"
-                },{
-                    role: "ai",
-                    time: "10:01",
-                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
-                },{
-                    role: "human",
-                    time: "10:02",
-                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题"
-                },{
-                    role: "ai",
-                    time: "10:03",
-                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
-                },{
-                    role: "human",
-                    time: "10:04",
-                    content: "你好"
-                },{
-                    role: "ai",
-                    time: "10:06",
-                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。\n你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。\n你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
-                }],
+                messages: [],
                 inputMessage: "",
                 timestamp: new Date().toISOString(),  // 时间戳
                 scrollTop: 0,           // 滚动条位置
@@ -69,7 +45,7 @@
         },
         async onLoad() {
             // 获取历史消息
-            // await this.getHistoryMessages()
+            await this.getHistoryMessages()
         },
         onShow() {
             // 滚动到最新消息
@@ -89,7 +65,8 @@
             // 获取历史消息
             async getHistoryMessages() {
                 // TODO 获取历史消息
-
+                let res = await ragCloudObj.queryHistory()
+                this.messages = res.data.messages
                 // 滚动到最新消息
                 this.scrollToBottom()
             },
@@ -103,11 +80,10 @@
                 // 添加用户消息
                 this.messages.push({
                     role: "human",
-                    time: this.timestamp,
+                    timestamp: this.timestamp,
                     content: this.inputMessage
                 },{
                     role: "ai",
-                    // time: this.timestamp,
                     content: "思考中..."
                 })
                 
@@ -131,7 +107,7 @@
 				// #endif	
                 
                 // 请求智能客服URL
-                const {session_id, url} = await chatbotCloudObj.getUrl("chat", isStream)
+                const {session_id, url} = await ragCloudObj.getUrl("chat", isStream)
                 const prompt = this.messages[this.messages.length - 2].content
                 const res = await post(url, {
                     session_id: session_id,
@@ -160,17 +136,13 @@
                             this.$forceUpdate();
                             this.scrollToBottom();
                             break;
-
                         case 'timestamp': // 时间戳
-                            this.messages[this.messages.length - 1].time = chunk.data;
+                            this.messages[this.messages.length - 1].timestamp = chunk.data;
                             this.$forceUpdate();
                             this.scrollToBottom();
                             break;
-
                         case 'done': // 结束标记
                             this.isSending = false;
-                            this.$forceUpdate();
-                            this.scrollToBottom();
                             break;
                     }
                 }, { speed: isStream ? 100 : 0 }); // 可选：控制逐字输出速率（ms）
@@ -208,13 +180,13 @@ page {
         .messageWrapper {
             display: flex;
             flex-direction: column;
-            padding: 20rpx;
+            padding-bottom: 60rpx;
             .message {
                 width: 100%; 
                 margin: 20rpx 0;
                 display: flex;
                 flex-direction: column;
-                .time {
+                .timestamp {
                     font-size: 24rpx;
                     color: #999;
                     margin: 0 20rpx;
@@ -249,15 +221,16 @@ page {
                     .content{
                         flex: 1;
                         padding: 20rpx;
+                        font-size: 30rpx;
                         &.humanContent {
                             background: $xxm-theme-color-aux;
                             color: white;
-                            border-radius: 20rpx 20rpx 0;
+                            border-radius: 20rpx 0 20rpx 20rpx;
                         }
                         &.aiContent {
                             background: white;
                             color: #333;
-                            border-radius: 20rpx 20rpx 20rpx 0;
+                            border-radius: 0 20rpx 20rpx;
                         }
                     }
                 }

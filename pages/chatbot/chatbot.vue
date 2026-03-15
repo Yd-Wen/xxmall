@@ -57,14 +57,6 @@
                     content: "你好"
                 },{
                     role: "ai",
-                    time: "10:04",
-                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
-                },{
-                    role: "human",
-                    time: "10:05",
-                    content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题"
-                },{
-                    role: "ai",
                     time: "10:06",
                     content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。\n你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。\n你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
                 }],
@@ -107,8 +99,6 @@
                 if (!this.inputMessage) return
 
                 this.timestamp = getLocalDatetimeString()
-
-                console.log(this.timestamp)
                 
                 // 添加用户消息
                 this.messages.push({
@@ -150,36 +140,40 @@
                 })
 
                 // 核心：监听 onData，直接拿到纯文本片段
-                res.onData((textChunk) => {
-                    // 首次触发清空「思考中...」
-                    if (this.messages[this.messages.length - 1].content === "思考中...") {
-                        this.messages[this.messages.length - 1].content = "";
+                res.onData((chunk) => {
+                    // 分类处理
+                    switch (chunk.type) {
+                        case 'content': // 文本内容
+                            // 首次触发清空「思考中...」
+                            if (this.messages[this.messages.length - 1].content === "思考中...") {
+                                this.messages[this.messages.length - 1].content = "";
+                            }
+                            // 追加文本片段
+                            if (!isStream) {
+                                // 非流式：直接覆盖（避免追加空字符串）
+                                this.messages[this.messages.length - 1].content = chunk.data;
+                            } else {
+                                // 流式：追加
+                                this.messages[this.messages.length - 1].content += chunk.data;
+                            }
+                            // 强制刷新 UI 并滚动到底部
+                            this.$forceUpdate();
+                            this.scrollToBottom();
+                            break;
+
+                        case 'timestamp': // 时间戳
+                            this.messages[this.messages.length - 1].time = chunk.data;
+                            this.$forceUpdate();
+                            this.scrollToBottom();
+                            break;
+
+                        case 'done': // 结束标记
+                            this.isSending = false;
+                            this.$forceUpdate();
+                            this.scrollToBottom();
+                            break;
                     }
-                    // 处理结束标记（兼容非流式：非流式不会返回 [DONE]，需单独处理）
-                    const isDone = textChunk.includes("[DONE]") || (!isStream && textChunk);
-                    if (isDone) {
-                        // 非流式：移除可能的结束标记，确保内容干净
-                        const cleanText = textChunk.replace("[DONE]", "").trim();
-                        if (cleanText) {
-                            this.messages[this.messages.length - 1].content += cleanText;
-                        }
-                        this.isSending = false;
-                        this.$forceUpdate();
-                        this.scrollToBottom();
-                        return;
-                    }					
-                    // 追加文本片段（直接渲染）
-                    this.messages[this.messages.length - 1].content += textChunk;
-                    // 强制刷新 UI 并滚动到底部
-                    this.$forceUpdate();
-                    this.scrollToBottom();
                 }, { speed: isStream ? 100 : 0 }); // 可选：控制逐字输出速率（ms）
-
-                res.onHeaders((headers) => {
-                    console.log(headers.timestamp)
-                    this.messages[this.messages.length - 1].time = headers.timestamp
-                })
-
             },
             // Markdown 转 HTML
             markdownToHtml(text) {

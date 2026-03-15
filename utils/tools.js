@@ -78,9 +78,15 @@ const request = (url, method, data, headers) => {
 				header: mergedHeaders,
 				enableChunked: false,
 				success: (res) => {
+					console.log('非流式响应:', res);
 					const result = res.data?.response || res.data;
 					resolve({
-						onData: (callback) => callback(result),
+						onData: (callback) => {
+							// 包装成和流式一致的格式
+							callback({ type: 'content', data: result });
+							callback({ type: 'timestamp', data: res.data.timestamp });
+							callback({ type: 'done', data: null });
+						},
 						onHeaders: () => { },
 						abort: () => { },
 						getResult: () => Promise.resolve(result),
@@ -143,9 +149,17 @@ const request = (url, method, data, headers) => {
 						// 过滤有效行并解析
 						lines.forEach(line => {
 							const jsonStr = line.replace('data: ', '').trim();
+							if (jsonStr === '[DONE]') {
+								validLines.push({ type: 'done', data: null });
+								return; // 直接跳过后续逻辑
+							}
 							try {
 								const jsonData = JSON.parse(jsonStr);
-								validLines.push(jsonData.chunk || jsonData.error || '');
+								if (jsonData.chunk) {
+									validLines.push({ type: 'content', data: jsonData.chunk });
+								} else if (jsonData.timestamp) {
+									validLines.push({ type: 'timestamp', data: jsonData.timestamp });
+								}
 							} catch (e) {
 								validLines.push(jsonStr);
 							}

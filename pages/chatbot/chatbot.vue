@@ -25,7 +25,7 @@
 </template>
 
 <script>
-    import { timeFormat, post } from "@/utils/tools.js"
+    import { getLocalDatetimeString, timeFormat, post } from "@/utils/tools.js"
 	const chatbotCloudObj = uniCloud.importObject("xxm-chatbot", {"customUI":true})
 	export default {
 		data() {
@@ -69,7 +69,7 @@
                     content: "你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。\n你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。\n你好，我是小闲商城的智能客服，我可以回答你关于小闲商城的问题。"
                 }],
                 inputMessage: "",
-                timestamp: Date.now(),  // 时间戳
+                timestamp: new Date().toISOString(),  // 时间戳
                 scrollTop: 0,           // 滚动条位置
                 scrollViewHeight: 300,  // 滚动视图高度
                 isSending: false,       // 是否正在发送
@@ -84,6 +84,7 @@
             this.scrollToBottom()
         },
         methods: {
+            getLocalDatetimeString,
             timeFormat,
             // 滚动到最新消息
             scrollToBottom() {
@@ -105,7 +106,9 @@
                 // 如果传入了content，使用传入的内容，否则使用输入框的内容
                 if (!this.inputMessage) return
 
-                this.timestamp = Date.now()
+                this.timestamp = getLocalDatetimeString()
+
+                console.log(this.timestamp)
                 
                 // 添加用户消息
                 this.messages.push({
@@ -114,7 +117,7 @@
                     content: this.inputMessage
                 },{
                     role: "ai",
-                    time: this.timestamp,
+                    // time: this.timestamp,
                     content: "思考中..."
                 })
                 
@@ -148,7 +151,6 @@
 
                 // 核心：监听 onData，直接拿到纯文本片段
                 res.onData((textChunk) => {
-                    console.log(textChunk)
                     // 首次触发清空「思考中...」
                     if (this.messages[this.messages.length - 1].content === "思考中...") {
                         this.messages[this.messages.length - 1].content = "";
@@ -172,6 +174,11 @@
                     this.$forceUpdate();
                     this.scrollToBottom();
                 }, { speed: isStream ? 100 : 0 }); // 可选：控制逐字输出速率（ms）
+
+                res.onHeaders((headers) => {
+                    console.log(headers.timestamp)
+                    this.messages[this.messages.length - 1].time = headers.timestamp
+                })
 
             },
             // Markdown 转 HTML

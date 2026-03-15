@@ -8,8 +8,20 @@ export function discount(num1, num2) {
 	return res + '折'
 }
 
+// 生成带本地时区偏移的 ISO 8601 字符串
+export function getLocalDatetimeString() {
+	const now = new Date();
+	// 1. 计算时区偏移（分钟）：东八区为 -480 分钟
+	const timezoneOffset = now.getTimezoneOffset();
+	// 2. 修正时间戳：抵消时区偏移，得到纯本地时间的时间戳（毫秒）
+	const localTimeMs = now.getTime() - timezoneOffset * 60 * 1000;
+	// 3. 生成 ISO 字符串并移除所有时区标识（Z/+08:00 等）
+	const localIsoString = new Date(localTimeMs).toISOString().replace(/(Z|([+-]\d{2}:\d{2}))$/, "");
+	return localIsoString;
+}
+
 // 日期格式化
-export function timeFormat(timestamp, fmt = "yyyy-MM-dd hh:mm:ss", targetTimezone = 0) {
+export function timeFormat(timestamp, fmt = "yyyy-MM-dd hh:mm:ss") {
 	if (typeof timestamp === 'number' || /^\d+$/.test(timestamp)) {
 		timestamp = String(timestamp).length === 10 ? Number(timestamp) * 1000 : Number(timestamp);
 	}

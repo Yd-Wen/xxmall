@@ -29,6 +29,14 @@ module.exports = {
 			}
 		})
 	},
+	async getCloudFileContent(url) {
+		return await uniCloud.request({
+			url: url,
+			method: 'GET',
+			dataType: 'text',
+			responseType: 'text'
+		});
+	},
 	async uploadKnowledge(options) {
 		return await uniCloud.request({
 			url: URL_KNOWLEDGE_UPLOAD,

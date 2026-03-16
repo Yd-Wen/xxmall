@@ -30,6 +30,11 @@
 				<uni-easyinput type="textarea" v-model="goodsData.desc" placeholder="请输入商品介绍" trim="both" maxlength="-1"></uni-easyinput>
 				<!-- <editor class="desc" placeholder="请输入商品介绍" @statuschange="onStatusChange"></editor> -->
 			</uni-forms-item>
+			<uni-forms-item label="是否同步" class="syncToKnowledge">
+				<u-checkbox-group>
+					<u-checkbox label="同步到知识库" name="syncToKnowledge" :checked="isSync"></u-checkbox>
+				</u-checkbox-group>
+			</uni-forms-item>
 			<view class="button" @click="onSubmit">
 				<button type="primary">提交</button>
 			</view>
@@ -70,12 +75,14 @@
 <script>
 	const skuCloudObj = uniCloud.importObject("xxm-sku")
 	const goodsCloudObj = uniCloud.importObject("xxm-goods")
+	const ragCloudObj = uniCloud.importObject("xxm-rag", {customUI:true})
 	let goodsId
 	export default {
 		data() {
 			return {
 				originalThumb: [],
 				addType: "parent", //parent:父类属性, child:子类标签
+				isSync: true,
 				goodsData: {
 					thumb: [],
 					name: "",
@@ -191,7 +198,7 @@
 						selected: true
 					}
 					let id = this.skuArr[this.addIndex]._id
-					let res = await skuCloudObj.update(id, obj)
+					await skuCloudObj.update(id, obj)
 					this.skuArr[this.addIndex].children.push(obj)
 				}
 			},
@@ -284,6 +291,10 @@
 <style lang="scss">
 .goodsView{
 	padding: 30rpx 30rpx 40rpx 10rpx;
+	.syncToKnowledge{
+		display: flex;
+		align-items: center;
+	}
 	.button{
 		padding: 0 150rpx;
 	}

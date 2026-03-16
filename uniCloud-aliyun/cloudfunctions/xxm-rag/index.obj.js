@@ -3,6 +3,9 @@ const URL_CHAT_STREAM = "https://api-xxmall.yindongwen.top/v1/chat/stream"
 const URL_CHAT_COMPLETION = "https://api-xxmall.yindongwen.top/v1/chat/completion"
 const URL_HISTORY_QUERY = "https://api-xxmall.yindongwen.top/v1/history/query"
 const URL_KNOWLEDGE_UPLOAD = "https://api-xxmall.yindongwen.top/v1/knowledge/upload"
+const URL_KNOWLEDGE_UPDATE = "https://api-xxmall.yindongwen.top/v1/knowledge/update"
+const URL_KNOWLEDGE_DELETE = "https://api-xxmall.yindongwen.top/v1/knowledge/delete"
+const URL_KNOWLEDGE_GET = "https://api-xxmall.yindongwen.top/v1/knowledge/get"
 
 module.exports = {
 	_before: async function () {
@@ -27,14 +30,40 @@ module.exports = {
 		})
 	},
 	async uploadKnowledge(options) {
-		return res = await uniCloud.request({
+		return await uniCloud.request({
 			url: URL_KNOWLEDGE_UPLOAD,
 			method: 'POST',
 			data: {
-				data: options.data || "test",
-				file_name: options.file_name || 'knowledge.txt'
+				id: options.id,
+				category: options.category || 'file',
+				content: options.content,
+				url: options.url
 			}
 		});
-	}
+	},
+	async updateKnowledge(options) {
+		return await uniCloud.request({
+			url: `${URL_KNOWLEDGE_UPDATE}/${options.id}`,
+			method: 'PUT',
+			data: {
+				id: options.id,
+				category: options.category || 'file',
+				content: options.content,
+				url: options.url
+			}
+		});
+	},
+	async getKnowledge(options) {
+		return await uniCloud.request({
+			url: URL_KNOWLEDGE_GET + "?category=" + (options.category || 'file'),
+			method: 'GET',
+		});
+	},
+	async deleteKnowledge(options) {
+		return await uniCloud.request({
+			url: `${URL_KNOWLEDGE_DELETE}/${options.id}`,
+			method: 'DELETE'
+		});
+	},
 }
 

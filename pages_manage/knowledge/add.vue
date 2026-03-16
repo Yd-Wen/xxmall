@@ -1,5 +1,9 @@
 <template>
 	<view class="knowledgeView">
+		<view class="title">
+			<view class="desc">批量添加文件到知识库</view>
+			<view class="tips">（请确保文件名唯一）</view>
+		</view>
 		<uni-forms ref="knowledgeForm" :model="knowledgeData" :rules="knowledgeRules" :label-width="90" label-align="right">
 			<uni-forms-item label="选择文件" required name="files">
 				<uni-file-picker 
@@ -7,7 +11,7 @@
                 v-model="knowledgeData.files" 
                 file-mediatype="all" 
                 file-extname="txt,doc,docx,md" 
-                dir="knowledge/" 
+                dir="knowledge" 
                 title="最多选择9个文件" 
                 :limit="9"
                 :auto-upload="false">
@@ -50,10 +54,12 @@
 			async upload(){
 				for (let i = 0; i < this.knowledgeData.files.length; i++) {
 					const file = this.knowledgeData.files[i];
-                    console.log(file.name)
+                    console.log(file)
                     let res = await ragCloudObj.uploadKnowledge({
-                        // data: file.url, // 这里需要根据实际情况获取文件内容
-                        file_name: file.name
+                        id: file.name,
+						category: "file",
+						content: file.content,
+						url: file.url
                     })
                     console.log(res)
 				}
@@ -62,9 +68,6 @@
 					title: "上传成功",
 					mask: true
 				})
-				setTimeout(()=>{
-					uni.navigateBack()
-				}, 1500)
 			}
 		}
 	}
@@ -72,8 +75,22 @@
 
 <style lang="scss">
 .knowledgeView{
-	padding: 30rpx 30rpx 40rpx 10rpx;
+	padding: 30rpx 40rpx 40rpx 10rpx;
+	.title{
+		font-size: 30rpx;
+		color: #333;
+		margin: 50rpx 0 100rpx 0;
+		border-bottom: 1px solid $border-color-light;
+		.desc{
+			padding-bottom: 30rpx;
+		}
+		.tips{
+			padding-bottom: 20rpx;
+			font-weight: bold;
+		}
+	}
 	.button{
+		margin-top: 150rpx;
 		padding: 0 150rpx;
 	}
 }

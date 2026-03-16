@@ -157,7 +157,6 @@
                     .replace(/^\s*## (.*$)/gim, '<h3>$1</h3>')         // 二级标题（支持空格）
                     .replace(/^\s*# (.*$)/gim, '<h2>$1</h2>')          // 一级标题（支持空格）
                     .replace(/^\s*\- (.*$)/gim, '<li>$1</li>')        // 一级和二级列表项
-                    // .replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>')       // 列表（非贪婪匹配）
                     .replace(/(<li>.*?<\/li>)/gs, '<ul style="list-style-type:none; padding-left:0;">$1</ul>')       // 列表（非贪婪匹配，无缩进）
                     .replace(/^>\s*(.*$)/gim, '$1')                   // 去掉引用符号 >
                     .replace(/\n+/g, '\n')                            // 合并连续的换行符

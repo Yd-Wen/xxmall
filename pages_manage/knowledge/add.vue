@@ -5,7 +5,7 @@
 			<view class="tips">（请确保文件名唯一）</view>
 		</view>
 		<uni-forms ref="knowledgeForm" :model="knowledgeData" :rules="knowledgeRules" :label-width="90" label-align="right">
-			<uni-forms-item label="选择文件" required name="files" class="form">
+			<uni-forms-item label="选择文件" required name="files" class="file">
 				<uni-file-picker 
                 ref="filePicker"
                 v-model="knowledgeData.files" 
@@ -20,14 +20,21 @@
 				<button type="primary">添加到知识库</button>
 			</view>
 		</uni-forms>
+		<xxm-progress :progressPopState="isUploading" :progressData="progressData"></xxm-progress>
 	</view>
 </template>
 
 <script>
-	const ragCloudObj = uniCloud.importObject("xxm-rag")
+	const ragCloudObj = uniCloud.importObject("xxm-rag", {customUI:true})
 	export default {
 		data() {
 			return {
+				progressData: {
+					title: '上传文件中',
+					text: '上传进度：',
+					percentage: 0
+				},
+				isUploading: false,
 				knowledgeData: {
 					files: []
 				},
@@ -51,20 +58,23 @@
 			},
 			// 上传知识库
 			async upload(){
+				this.isUploading = true
 				for (let i = 0; i < this.knowledgeData.files.length; i++) {
 					const file = this.knowledgeData.files[i];
 					let res = await ragCloudObj.getCloudFileContent(file.url)
-                    await ragCloudObj.uploadKnowledge({
+                    let uploadRes = await ragCloudObj.uploadKnowledge({
                         id: file.name,
 						category: "file",
 						content: res.data,
 						url: [file.url]
                     })
+					// 更新上传进度
+					this.progressData.percentage = Math.round((i + 1) / this.knowledgeData.files.length * 100)
 				}
-				uni.showToast({
-					title: "上传成功",
-					mask: true
-				})
+				// 延迟0.3s后关闭进度条
+				setTimeout(() => {
+					this.isUploading = false
+				}, 300)
 			}
 		}
 	}
@@ -86,7 +96,7 @@
 			font-weight: bold;
 		}
 	}
-	.form{
+	.file{
 		padding: 30rpx 40rpx 40rpx 10rpx;
 	}
 	.button{

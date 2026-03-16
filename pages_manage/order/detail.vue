@@ -6,7 +6,7 @@
 			<view class="text">
 				<view class="big">
 					实付款{{priceFormat(params.totalFee)}}
-					<text style="{font-size: 26rpx; padding-left: 10rpx; color: #ec544f;}" v-if="params.realFee">应付款 ￥{{priceFormat(params.realFee)}}</text>
+				<text :style="{fontSize: '26rpx', paddingLeft: '10rpx', color: '#ec544f'}" v-if="params.realFee">应付款 ￥{{priceFormat(params.realFee)}}</text>
 				</view>
 				<view class="small">请等待商家配送</view>
 			</view>

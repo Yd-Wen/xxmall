@@ -19,10 +19,10 @@
             </uni-file-picker>
 			</uni-forms-item>
 			<view class="button" @click="onSubmit">
-				<button type="primary">添加到知识库</button>
+				<button type="primary" :disabled="knowledgeData.files.length === 0">添加到知识库</button>
 			</view>
 		</uni-forms>
-		<xxm-progress :progressPopState="knowledgeData.isUploading" :progressData="progressData"></xxm-progress>
+		<xxm-progress :progressPopState="knowledgeData.isUploading" :progressData="progressData" @confirm="knowledgeData.isUploading = false"></xxm-progress>
 	</view>
 </template>
 
@@ -34,7 +34,9 @@
 					progressData: {
 						title: '上传文件中',
 						text: '上传进度：',
-						percentage: 0
+						data: [],
+						percentage: 0,
+						scrollTop: 0
 					},
 					knowledgeData: {
 						isUploading: false,
@@ -61,7 +63,7 @@
 				// 使用 for（顺序执行） 循环替代 forEach（并行执行）
 				for (let i = 0; i < this.knowledgeData.files.length; i++) {
 					const file = this.knowledgeData.files[i];
-					// 读取本地文件内容
+					// 从本地获取文件内容
 					// file.content = await getLocalFileContent(file.url);
 					// 上传到服务空间
 					let res = await uniCloud.uploadFile({
@@ -71,6 +73,7 @@
 					})
 					// 更新URL为服务空间URL
 					file.url = res.fileID
+					// 从云存储获取文件内容
 					res = await ragCloudObj.getCloudFileContent(file.url)
 					file.content = res.data
 					// 上传到知识库
@@ -81,6 +84,7 @@
 						url: [file.url]
 					})
 					// 更新上传进度
+					this.progressData.data[i].status = res.data.message
 					this.progressData.percentage = Math.round((i + 1) / this.knowledgeData.files.length * 100)
 				}
 				
@@ -98,6 +102,10 @@
 					size: tempFile.size,
 					content: ''
 				}))
+				this.progressData.data = this.knowledgeData.files.map((file) => ({
+					name: file.name,
+					status: '【等待】上传中'
+				}))
 			},		
 		}
 	}
@@ -108,7 +116,7 @@
 	.title{
 		font-size: 30rpx;
 		color: #333;
-		margin: 50rpx 20rpx 100rpx 20rpx;
+		margin: 20rpx 20rpx 20rpx 20rpx;
 		padding: 20rpx;
 		border-bottom: 1px solid $border-color-light;
 		.desc{
@@ -120,10 +128,10 @@
 		}
 	}
 	.file{
-		padding: 30rpx 40rpx 40rpx 10rpx;
+		padding: 0 40rpx 0 10rpx;
 	}
 	.button{
-		margin-top: 150rpx;
+		margin-top: 50rpx;
 		padding: 0 150rpx;
 	}
 }

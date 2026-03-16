@@ -92,6 +92,7 @@ export default {
                     display: flex;
                     justify-content: flex-start;
                     align-items: center;
+                    margin: 0 30rpx;
                     .name{
                         width: 300rpx;
                         font-size: 28rpx;

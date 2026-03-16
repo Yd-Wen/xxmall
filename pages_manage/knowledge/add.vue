@@ -58,8 +58,14 @@
 			async onSubmit(){
 				// 先上传文件到云存储
 				// await this.$refs.filePicker.upload()
+				// 初始化上传进度
 				this.knowledgeData.isUploading = true
-				
+				this.progressData.percentage = 0
+				this.progressData.scrollTop = 0
+				this.progressData.data = this.knowledgeData.files.map((file) => ({
+					name: file.name,
+					status: '【等待】上传中'
+				}))
 				// 使用 for（顺序执行） 循环替代 forEach（并行执行）
 				for (let i = 0; i < this.knowledgeData.files.length; i++) {
 					const file = this.knowledgeData.files[i];
@@ -86,12 +92,9 @@
 					// 更新上传进度
 					this.progressData.data[i].status = res.data.message
 					this.progressData.percentage = Math.round((i + 1) / this.knowledgeData.files.length * 100)
+					// 滚动到当前上传的文件
+					this.progressData.scrollTop = (i + 1) * 30 - 150;
 				}
-				
-				// 延迟0.3s后关闭进度条
-				setTimeout(() => {
-					this.knowledgeData.isUploading = false
-				}, 300)
 			},
 			// 处理文件选择
 			onSelectFiles(e) {
@@ -101,10 +104,6 @@
 					url: tempFile.url,  // 本地文件路径
 					size: tempFile.size,
 					content: ''
-				}))
-				this.progressData.data = this.knowledgeData.files.map((file) => ({
-					name: file.name,
-					status: '【等待】上传中'
 				}))
 			},		
 		}

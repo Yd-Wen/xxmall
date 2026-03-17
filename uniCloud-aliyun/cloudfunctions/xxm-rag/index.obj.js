@@ -7,6 +7,8 @@ const URL_KNOWLEDGE_UPDATE = "https://api-xxmall.yindongwen.top/v1/knowledge/upd
 const URL_KNOWLEDGE_DELETE = "https://api-xxmall.yindongwen.top/v1/knowledge/delete"
 const URL_KNOWLEDGE_GET = "https://api-xxmall.yindongwen.top/v1/knowledge/get"
 
+const URL_CLOUD_STORAGE_DOWNLOAD = "https://mp-73e40e97-a1b0-469e-90c8-485169335ec2.cdn.bspapp.com"
+
 module.exports = {
 	_before: async function () {
 		this.userInfo = await cloudUtils.getUserInfo(this)
@@ -29,13 +31,27 @@ module.exports = {
 			}
 		})
 	},
-	async getCloudFileContent(url) {
-		return await uniCloud.request({
+	async uploadFile(file) {
+		return await uniCloud.uploadFile({
+			filePath: file.url,
+			cloudPath: `knowledge/${file.name}`,
+			cloudPathAsRealPath: true
+		});
+	},
+	async getFile(filename) {
+		let url = URL_CLOUD_STORAGE_DOWNLOAD + `/knowledge/${filename}`
+		let res = await uniCloud.request({
 			url: url,
 			method: 'GET',
 			dataType: 'text',
 			responseType: 'text'
 		});
+		new_res = { ...res }
+		new_res.data = {
+			content: res.data,
+			url: url
+		}
+		return new_res
 	},
 	async uploadKnowledge(options) {
 		return await uniCloud.request({

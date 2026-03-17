@@ -22,7 +22,7 @@
 				<button type="primary" :disabled="knowledgeData.files.length === 0">添加到知识库</button>
 			</view>
 		</uni-forms>
-		<xxm-progress :progressPopState="knowledgeData.isUploading" :progressData="progressData" @confirm="knowledgeData.isUploading = false"></xxm-progress>
+		<xxm-progress :progressPopState="knowledgeData.isUploading" :progressData="progressData" @confirm="onConfirmUpload"></xxm-progress>
 	</view>
 </template>
 
@@ -64,24 +64,31 @@
 				this.progressData.scrollTop = 0
 				this.progressData.data = this.knowledgeData.files.map((file) => ({
 					name: file.name,
-					status: '【等待】上传中'
+					status: '【等待】上传文件'
 				}))
 				// 使用 for（顺序执行） 循环替代 forEach（并行执行）
 				for (let i = 0; i < this.knowledgeData.files.length; i++) {
 					const file = this.knowledgeData.files[i];
 					// 从本地获取文件内容
 					// file.content = await getLocalFileContent(file.url);
-					// 上传到服务空间
-					let res = await uniCloud.uploadFile({
-						filePath: file.url,
-						cloudPath: `knowledge/${file.name}`,
-						cloudPathAsRealPath: true
-					})
-					// 更新URL为服务空间URL
-					file.url = res.fileID
-					// 从云存储获取文件内容
-					res = await ragCloudObj.getCloudFileContent(file.url)
-					file.content = res.data
+					// 从云存储获取文件：查重
+					let res = await ragCloudObj.getFile(file.name)
+					if (res.statusCode != 200) {
+						// 上传到服务空间
+						res = await uniCloud.uploadFile({
+							filePath: file.url,
+							cloudPath: `knowledge/${file.name}`,
+							cloudPathAsRealPath: true
+						})
+						this.updateProgressStatus(i, res.success ? '【成功】文件上传成功' : '【失败】文件上传失败')
+						// 再次读取文件：获取服务空间URL和文件内容
+						res = await ragCloudObj.getFile(file.name)
+					}else{
+						this.updateProgressStatus(i, '【跳过】文件已存在')
+					}
+					file.content = res.data.content
+					file.url = res.data.url
+					this.updateProgressStatus(i, '【等待】同步到知识库')
 					// 上传到知识库
 					res = await ragCloudObj.uploadKnowledge({
 						id: file.name,
@@ -89,23 +96,37 @@
 						content: file.content,
 						url: [file.url]
 					})
-					// 更新上传进度
-					this.progressData.data[i].status = res.data.message
-					this.progressData.percentage = Math.round((i + 1) / this.knowledgeData.files.length * 100)
-					// 滚动到当前上传的文件
-					this.progressData.scrollTop = (i + 1) * 30 - 150;
+					this.updateProgressStatus(i, res.data.message, true)
 				}
 			},
 			// 处理文件选择
 			onSelectFiles(e) {
+				// 清除之前的选择
+				this.knowledgeData.files = []
 				// 存储选择的文件信息
-				this.knowledgeData.files = e.tempFiles.map((tempFile) => ({
+					this.knowledgeData.files = e.tempFiles.map((tempFile) => ({
 					name: tempFile.name,
 					url: tempFile.url,  // 本地文件路径
 					size: tempFile.size,
-					content: ''
+					content: '',
 				}))
-			},		
+			},
+			// 更新进度条状态
+			updateProgressStatus(index, status, setPercentage=false) {
+				this.progressData.data[index].status = status
+				// 更新上传进度
+				if (setPercentage) {
+					this.progressData.percentage = Math.round((index + 1) / this.knowledgeData.files.length * 100)
+				}
+				// 滚动到当前上传的文件
+				this.progressData.scrollTop = (index + 1) * 30 - 150;
+			},
+			// 确认上传
+			onConfirmUpload(){
+				this.knowledgeData.isUploading = false
+				// 清空选择的文件
+				this.knowledgeData.files = []
+			}
 		}
 	}
 </script>

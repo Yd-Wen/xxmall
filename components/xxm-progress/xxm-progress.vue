@@ -94,7 +94,7 @@ export default {
                     align-items: center;
                     margin: 0 30rpx;
                     .name{
-                        width: 300rpx;
+                        width: 250rpx;
                         font-size: 28rpx;
                         line-height: 28rpx;
                         color: $text-font-color-1;

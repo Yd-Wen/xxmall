@@ -349,7 +349,6 @@
 					res = await goodsCloudObj.add(this.goodsData)
 					id = res.id
 					this.updateProgressStatus(0, '【成功】新增商品')
-					console.log(this.checkSync)
 					if(this.checkSync){
 						// 整理商品信息为内容
 						const content = this.formatKnowledgeContent()

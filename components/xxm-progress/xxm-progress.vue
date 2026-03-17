@@ -36,7 +36,20 @@ export default {
             default: () => {
                 return {
                     title: '上传文件中',
-                    text: '上传进度',
+                    data: [
+                        {
+                            name: '文件1',
+                            status: '上传中'
+                        },
+                        {
+                            name: '文件1',
+                            status: '同步中'
+                        },
+                        {
+                            name: '文件2',
+                            status: '上传中'
+                        },
+                    ],
                     percentage: 0,
                     scrollTop: 0
                 }

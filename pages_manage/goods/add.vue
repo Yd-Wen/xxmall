@@ -69,6 +69,7 @@
 			<uni-popup-dialog mode="input" title="添加属性" placeholder="请输入属性名称" 
 			@confirm="onAddConfirm"></uni-popup-dialog>
 		</uni-popup>
+		<xxm-progress :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmUpload"></xxm-progress>
 	</view>
 </template>
 
@@ -83,6 +84,12 @@
 				originalThumb: [],
 				addType: "parent", //parent:父类属性, child:子类标签
 				isSync: true,
+				progressData: {
+					title: '上传商品中',
+					data: [],
+					percentage: 0,
+					scrollTop: 0
+				},
 				goodsData: {
 					thumb: [],
 					name: "",
@@ -267,6 +274,10 @@
 					res = await goodsCloudObj.add(this.goodsData)
 				}
 				if(res){
+					console.log(res)
+					// 同步到知识库
+					this.formatKnowledgeContent()
+					await this.syncToKnowledge(res)
 					uni.showToast({
 						title: toastTitle,
 						mask: true
@@ -275,6 +286,39 @@
 						uni.navigateBack()
 					}, 1500)
 				}
+			},
+			// 整理商品信息为内容
+			formatKnowledgeContent(){
+				let content = `商品名称: ${this.goodsData.name}\n`
+				content += `所属分类: ${this.goodsData.category_id}\n`
+				content += `商品价格: ${this.goodsData.current_price}\n`
+				if (this.goodsData.origin_price) {
+					content += `商品原价: ${this.goodsData.origin_price}\n`
+				}
+				if (this.goodsData.sku && this.goodsData.sku.length > 0) {
+					content += `商品属性:\n`
+					this.goodsData.sku.forEach(attr => {
+						content += `- ${attr.name}: ${attr.children.map(child => child.name).join('/')}\n`
+					})
+				}
+				if (this.goodsData.desc) {
+					content += `商品描述: ${this.goodsData.desc}\n`
+				}
+				return content
+			},
+			// 同步到知识库
+			syncToKnowledge(goodsId) {
+				
+				// 提取图片URL列表
+				const imageUrls = this.goodsData.thumb.map(item => item.url)
+				
+				// 调用知识库上传接口
+				return ragCloudObj.uploadKnowledge({
+					id: goodsId,
+					category: 'goods',
+					content: content,
+					url: imageUrls
+				})
 			},
 			// 检查并删除旧图片
 			deleteOldImageIfNeeded(){

@@ -32,8 +32,7 @@
 		data() {
 				return {
 					progressData: {
-						title: '上传文件中',
-						text: '上传进度：',
+						title: '同步到知识库',
 						data: [],
 						percentage: 0,
 						scrollTop: 0
@@ -62,10 +61,21 @@
 				this.knowledgeData.isUploading = true
 				this.progressData.percentage = 0
 				this.progressData.scrollTop = 0
-				this.progressData.data = this.knowledgeData.files.map((file) => ({
-					name: file.name,
-					status: '【等待】上传文件'
-				}))
+				// this.progressData.data = this.knowledgeData.files.map((file) => ({
+				// 	name: file.name,
+				// 	status: '【等待】上传文件'
+				// }))
+				this.progressData.data = []
+				this.knowledgeData.files.forEach((file) => {
+					this.progressData.data.push({
+						name: file.name,
+						status: '【等待】上传文件'
+					})
+					this.progressData.data.push({
+						name: '',
+						status: '【等待】同步到知识库'
+					})
+				})
 				// 使用 for（顺序执行） 循环替代 forEach（并行执行）
 				for (let i = 0; i < this.knowledgeData.files.length; i++) {
 					const file = this.knowledgeData.files[i];
@@ -80,15 +90,15 @@
 							cloudPath: `knowledge/${file.name}`,
 							cloudPathAsRealPath: true
 						})
-						this.updateProgressStatus(i, res.success ? '【成功】文件上传成功' : '【失败】文件上传失败')
+						this.updateProgressStatus(i * 2, res.success ? '【成功】文件上传成功' : '【失败】文件上传失败')
 						// 再次读取文件：获取服务空间URL和文件内容
 						res = await ragCloudObj.getFile(file.name)
 					}else{
-						this.updateProgressStatus(i, '【跳过】文件已存在')
+						this.updateProgressStatus(i * 2, '【跳过】文件已存在')
 					}
 					file.content = res.data.content
 					file.url = res.data.url
-					this.updateProgressStatus(i, '【等待】同步到知识库')
+					this.updateProgressStatus(i * 2 +  1, '【等待】同步到知识库')
 					// 同步到知识库
 					res = await ragCloudObj.uploadKnowledge({
 						id: file.name,
@@ -96,7 +106,7 @@
 						content: file.content,
 						url: [file.url]
 					})
-					this.updateProgressStatus(i, res.data.message, true)
+					this.updateProgressStatus(i * 2 +  1, res.data.message, true)
 				}
 			},
 			// 处理文件选择
@@ -116,10 +126,10 @@
 				this.progressData.data[index].status = status
 				// 更新上传进度
 				if (setPercentage) {
-					this.progressData.percentage = Math.round((index + 1) / this.knowledgeData.files.length * 100)
+					this.progressData.percentage = Math.round((index + 1) / this.knowledgeData.files.length * 2 * 100)
 				}
 				// 滚动到当前上传的文件
-				this.progressData.scrollTop = (index + 1) * 30 - 150;
+				this.progressData.scrollTop = (index + 1) * 30 - 150 > 0 ? (index + 1) * 30 - 150 : this.progressData.scrollTop;
 			},
 			// 确认上传
 			onConfirmUpload(){

@@ -28,7 +28,7 @@
 			</uni-list-item>
 		</uni-list>
 		<uni-list class="list">
-			<uni-list-item thumb="/static/images/client_service.png" @click="deactivate" title="联系客服" link="navigateTo"></uni-list-item>
+			<uni-list-item thumb="/static/images/client_service.png" @click="contactService" title="联系客服" link="navigateTo"></uni-list-item>
 		</uni-list>
 		<!-- #ifndef MP -->
 		<uni-list class="list">
@@ -267,6 +267,13 @@ const uniIdCo = uniCloud.importObject("uni-id-co")
 					}
 				}
 			},
+			// 联系客服
+			contactService(){
+				uni.navigateTo({
+					url: '/pages/chatbot/chatbot'
+				})
+			},
+
 			login() {
 				uni.navigateTo({
 					url: '/uni_modules/uni-id-pages/pages/login/login-withoutpwd',

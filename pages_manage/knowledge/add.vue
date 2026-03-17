@@ -133,10 +133,11 @@
 
 <style lang="scss">
 .knowledgeView{
+	padding: 0 20rpx;
 	.title{
 		font-size: 30rpx;
 		color: #333;
-		margin: 20rpx 20rpx 20rpx 20rpx;
+		margin: 20rpx 0;
 		padding: 20rpx;
 		border-bottom: 1px solid $border-color-light;
 		.desc{

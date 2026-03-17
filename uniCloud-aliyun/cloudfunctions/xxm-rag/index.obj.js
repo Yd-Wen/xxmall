@@ -85,8 +85,11 @@ module.exports = {
 	},
 	async deleteKnowledge(options) {
 		return await uniCloud.request({
-			url: `${URL_KNOWLEDGE_DELETE}/${options.id}`,
-			method: 'DELETE'
+			url: URL_KNOWLEDGE_DELETE,
+			method: 'POST',
+			data: {
+				id: options.id
+			}
 		});
 	},
 }

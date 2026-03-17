@@ -22,7 +22,7 @@
 							<view class="icon" @click="onUpdate(row._id)">
 								<u-icon name="edit-pen" size="25" color="576b95"></u-icon>
 							</view>
-							<view class="icon" @click="onDelete(row._id)">
+							<view class="icon" @click="onDelete(row._id, row.name)">
 								<u-icon name="trash" size="25" color="#ec544f"></u-icon>
 							</view>
 						</view>
@@ -30,15 +30,24 @@
 				</view>
 			</view>
 		</view>
+		<xxm-progress :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmSync"></xxm-progress>
 	</view>
 </template>
 
 <script>
-	const goodsCloudObj = uniCloud.importObject("xxm-goods")
+	const goodsCloudObj = uniCloud.importObject("xxm-goods", {'customUI': true})
+	const ragCloudObj = uniCloud.importObject("xxm-rag", {'customUI': true})
 	export default {
 		data() {
 			return {
-				goodsData: []
+				goodsData: [],
+				isSync: false,
+				progressData: {
+					title: '上传商品中',
+					data: [],
+					percentage: 0,
+					scrollTop: 0
+				},
 			};
 		},
 		onLoad() {
@@ -48,6 +57,27 @@
 			this.getGoods()
 		},
 		methods:{
+			// 初始化上传进度
+			initProgress(name){
+				this.isSync = true
+				this.progressData.percentage = 0
+				this.progressData.scrollTop = 0
+				this.progressData.data = [
+					{
+						name: name,
+						status: '【等待】删除商品'
+					},
+					{
+						name: '',
+						status: '【等待】同步到知识库'
+					}
+				]
+			},
+			// 更新进度条状态
+			updateProgressStatus(index, status) {
+				this.progressData.data[index].status = status
+				this.progressData.percentage = Math.round((index + 1) / 2 * 100)
+			},
 			// 获取商品
 			async getGoods(){
 				let res = await goodsCloudObj.get()
@@ -60,11 +90,12 @@
 				})
 			},
 			// 删除
-			onDelete(id){
+			onDelete(id, name){
 				uni.showModal({
 					title:"是否确认删除",
 					success:res=>{
 						if(res.confirm){
+							this.initProgress(name)
 							this.removeGoods(id)
 						}
 					}
@@ -73,15 +104,25 @@
 			// 删除商品
 			async removeGoods(id){
 				let res = await goodsCloudObj.remove(id)
-				if (res) {
-					uni.showToast({
-						title:"删除成功"
-					})
-					setTimeout(()=>{
-						this.getGoods()
-					}, 1000)
+				this.updateProgressStatus(0, res.deleted ? '【成功】删除商品成功' : '【失败】删除商品失败')
+				console.log(res.deleted)
+				if (res.deleted) {
+					console.log(res.deleted)
+					console.log(id)
+					res = await ragCloudObj.deleteKnowledge({id: id})
+					this.updateProgressStatus(1, res.data.message)
 				}
-			}
+				else{
+					this.updateProgressStatus(1, '【失败】必先删除商品')
+				}
+			},
+			// 上传结束
+			onConfirmSync(){
+				this.isSync = false
+				setTimeout(()=>{
+					this.getGoods()
+				}, 500)
+			},
 		}
 	}
 </script>

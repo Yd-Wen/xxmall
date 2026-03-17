@@ -74,8 +74,8 @@
 </template>
 
 <script>
-	const skuCloudObj = uniCloud.importObject("xxm-sku")
-	const goodsCloudObj = uniCloud.importObject("xxm-goods")
+	const skuCloudObj = uniCloud.importObject("xxm-sku", {customUI:true})
+	const goodsCloudObj = uniCloud.importObject("xxm-goods", {customUI:true})
 	const ragCloudObj = uniCloud.importObject("xxm-rag", {customUI:true})
 	let goodsId
 	export default {
@@ -361,7 +361,6 @@
 							content: content,
 							url: imageUrls
 						})
-						console.log(res)
 						this.updateProgressStatus(1, res.data.message)
 					}
 				}

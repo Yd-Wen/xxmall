@@ -26,6 +26,7 @@
 
 <script>
     import { getLocalDatetimeString, timeFormat, post } from "@/utils/tools.js"
+    import {store} from '@/uni_modules/uni-id-pages/common/store.js'
 	const ragCloudObj = uniCloud.importObject("xxm-rag", {"customUI":true})
 	export default {
 		data() {
@@ -44,6 +45,8 @@
             }
         },
         async onLoad() {
+            // 获取用户头像
+            await this.getAvatar()
             // 获取历史消息
             await this.getHistoryMessages()
         },
@@ -54,6 +57,10 @@
         methods: {
             getLocalDatetimeString,
             timeFormat,
+            // 获取用户头像
+            getAvatar(){
+                this.avatar.human = store.userInfo.avatar_file ? store.userInfo.avatar_file.url : '/static/images/avatar.png'
+            },
             // 滚动到最新消息
             scrollToBottom() {
                 this.$nextTick(() => {

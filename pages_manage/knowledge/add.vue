@@ -89,7 +89,7 @@
 					file.content = res.data.content
 					file.url = res.data.url
 					this.updateProgressStatus(i, '【等待】同步到知识库')
-					// 上传到知识库
+					// 同步到知识库
 					res = await ragCloudObj.uploadKnowledge({
 						id: file.name,
 						category: "file",

@@ -43,7 +43,7 @@
 				goodsData: [],
 				isSync: false,
 				progressData: {
-					title: '上传商品中',
+					title: '删除商品中',
 					data: [],
 					percentage: 0,
 					scrollTop: 0
@@ -105,10 +105,7 @@
 			async removeGoods(id){
 				let res = await goodsCloudObj.remove(id)
 				this.updateProgressStatus(0, res.deleted ? '【成功】删除商品成功' : '【失败】删除商品失败')
-				console.log(res.deleted)
 				if (res.deleted) {
-					console.log(res.deleted)
-					console.log(id)
 					res = await ragCloudObj.deleteKnowledge({id: id})
 					this.updateProgressStatus(1, res.data.message)
 				}

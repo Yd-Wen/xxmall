@@ -67,8 +67,8 @@ module.exports = {
 	},
 	async updateKnowledge(options) {
 		return await uniCloud.request({
-			url: `${URL_KNOWLEDGE_UPDATE}/${options.id}`,
-			method: 'PUT',
+			url: URL_KNOWLEDGE_UPDATE,
+			method: 'POST',
 			data: {
 				id: options.id,
 				category: options.category || 'file',

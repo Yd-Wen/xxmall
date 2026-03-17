@@ -31,8 +31,8 @@
 				<!-- <editor class="desc" placeholder="请输入商品介绍" @statuschange="onStatusChange"></editor> -->
 			</uni-forms-item>
 			<uni-forms-item label="是否同步" class="syncToKnowledge">
-				<u-checkbox-group>
-					<u-checkbox label="同步到知识库" name="syncToKnowledge" :checked="isSync"></u-checkbox>
+				<u-checkbox-group @change="handleSyncChange">
+					<u-checkbox label="同步到知识库" name="syncToKnowledge" :checked="checkSync"></u-checkbox>
 				</u-checkbox-group>
 			</uni-forms-item>
 			<view class="button" @click="onSubmit">
@@ -69,7 +69,7 @@
 			<uni-popup-dialog mode="input" title="添加属性" placeholder="请输入属性名称" 
 			@confirm="onAddConfirm"></uni-popup-dialog>
 		</uni-popup>
-		<xxm-progress :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmUpload"></xxm-progress>
+		<xxm-progress :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmSync"></xxm-progress>
 	</view>
 </template>
 
@@ -83,7 +83,8 @@
 			return {
 				originalThumb: [],
 				addType: "parent", //parent:父类属性, child:子类标签
-				isSync: true,
+				checkSync: true,
+				isSync: false,
 				progressData: {
 					title: '上传商品中',
 					data: [],
@@ -248,46 +249,30 @@
 					if(!err) this.upload()
 				})
 			},
-			// 上传数据库
-			async upload(){
-				// 判断价格为有效正数
-				if (!Number(this.goodsData.current_price) || Number(this.goodsData.current_price) <= 0) {
-					uni.showToast({ title: '请输入大于 0 的有效价格', icon: 'none' })
-					return
-				}
-				
-				this.goodsData.thumb = this.goodsData.thumb.map(item=>{
-					return{
-						url: item.url,
-						name: item.name,
-						extname: item.extname
+			// 初始化上传进度
+			initProgress(){
+				this.isSync = true
+				this.progressData.percentage = 0
+				this.progressData.scrollTop = 0
+				this.progressData.data = [
+					{
+						name: this.goodsData.name,
+						status: '【等待】上传商品'
 					}
-				})
-				let toastTitle, res
-				if (goodsId){
-					// 检查并删除旧图片
-					this.deleteOldImageIfNeeded()
-					toastTitle = "修改成功"
-					res = await goodsCloudObj.update(this.goodsData)
-				}else{
-					toastTitle = "新增成功"
-					res = await goodsCloudObj.add(this.goodsData)
-				}
-				if(res){
-					console.log(res)
-					// 同步到知识库
-					this.formatKnowledgeContent()
-					await this.syncToKnowledge(res)
-					uni.showToast({
-						title: toastTitle,
-						mask: true
+				]
+				if(this.checkSync){
+					this.progressData.data.push({
+						name: '',
+						status: '【等待】同步到知识库'
 					})
-					setTimeout(()=>{
-						uni.navigateBack()
-					}, 1500)
 				}
 			},
-			// 整理商品信息为内容
+			// 更新进度条状态
+			updateProgressStatus(index, status) {
+				this.progressData.data[index].status = status
+				this.progressData.percentage = Math.round((index + 1) / (this.checkSync ? 2 : 1) * 100)
+			},
+			// 整理商品信息为知识库内容
 			formatKnowledgeContent(){
 				let content = `商品名称: ${this.goodsData.name}\n`
 				content += `所属分类: ${this.goodsData.category_id}\n`
@@ -304,21 +289,18 @@
 				if (this.goodsData.desc) {
 					content += `商品描述: ${this.goodsData.desc}\n`
 				}
+				content += `商品图片:\n`
+				this.goodsData.thumb.forEach(item => {
+					content += `- ${item.url}\n`
+				})
 				return content
 			},
-			// 同步到知识库
-			syncToKnowledge(goodsId) {
-				
-				// 提取图片URL列表
-				const imageUrls = this.goodsData.thumb.map(item => item.url)
-				
-				// 调用知识库上传接口
-				return ragCloudObj.uploadKnowledge({
-					id: goodsId,
-					category: 'goods',
-					content: content,
-					url: imageUrls
-				})
+			// 格式化知识库图片URL
+			formatKnowledgeUrls(){
+			if(!Array.isArray(this.goodsData.thumb)) return []
+			return this.goodsData.thumb
+				.filter(item => item && typeof item.url === 'string' && item.url.trim())
+				.map(item => item.url.trim())
 			},
 			// 检查并删除旧图片
 			deleteOldImageIfNeeded(){
@@ -327,7 +309,75 @@
 				this.goodsData.thumb_urls_delete = this.originalThumb.filter(oldItem => {
 					return !newUrls.includes(oldItem.url)
 				}).map(item => item.url)
-			}
+			},
+			// 上传数据库
+			async upload(){
+				// 判断价格为有效正数
+				if (!Number(this.goodsData.current_price) || Number(this.goodsData.current_price) <= 0) {
+					uni.showToast({ title: '请输入大于 0 的有效价格', icon: 'none' })
+					return
+				}				
+				this.goodsData.thumb = this.goodsData.thumb.map(item=>{
+					return{
+						url: item.url,
+						name: item.name,
+						extname: item.extname
+					}
+				})
+				this.initProgress()
+				let res, id
+				if (goodsId){
+					// 检查并删除旧图片
+					this.deleteOldImageIfNeeded()
+					res = await goodsCloudObj.update(this.goodsData)
+					id = this.goodsData._id
+					this.updateProgressStatus(0, res.updated ? '【成功】更新商品' : '【跳过】商品内容相同')
+					if(this.checkSync){
+						// 整理商品信息为内容
+						const content = this.formatKnowledgeContent()
+						// 提取图片URL列表
+						const imageUrls = this.formatKnowledgeUrls()
+						res = await ragCloudObj.updateKnowledge({
+							id: id,
+							category: 'goods',
+							content: content,
+							url: imageUrls
+						})
+						this.updateProgressStatus(1, res.data.message)
+					}
+				}else{
+					res = await goodsCloudObj.add(this.goodsData)
+					id = res.id
+					this.updateProgressStatus(0, '【成功】新增商品')
+					console.log(this.checkSync)
+					if(this.checkSync){
+						// 整理商品信息为内容
+						const content = this.formatKnowledgeContent()
+						// 提取图片URL列表
+						const imageUrls = this.formatKnowledgeUrls()
+						res = await ragCloudObj.uploadKnowledge({
+							id: id,
+							category: 'goods',
+							content: content,
+							url: imageUrls
+						})
+						console.log(res)
+						this.updateProgressStatus(1, res.data.message)
+					}
+				}
+			},
+			// 上传结束
+			onConfirmSync(){
+				this.isSync = false
+				setTimeout(()=>{
+					uni.navigateBack()
+				}, 500)
+			},
+			// 处理同步复选框变化
+			handleSyncChange(e){
+				// e为选中的数组，包含选中的name值
+				this.checkSync = e.includes('syncToKnowledge')
+			},
 		}
 	}
 </script>

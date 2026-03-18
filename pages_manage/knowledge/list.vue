@@ -195,7 +195,7 @@
         }
         .content{
 			flex: 1;
-			height: 100%;
+			height: 80vh;
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
@@ -203,6 +203,7 @@
 			.page{
 				flex: 1;
                 width: 100%;
+                height: calc(100% - 140rpx);
                 padding: 0 10rpx;
 				.contentList{	
 					width: 100%;
@@ -214,13 +215,12 @@
 						justify-content: space-between;
 						align-items: center;
 						margin: 20rpx 10rpx;
-                        border-bottom: 1px solid #ededed;
+                        border-bottom: 1px solid $border-color-light;
 						.left{
                             width: 100rpx;
 							height: 100rpx;
 					        border-radius: 20rpx;
 							overflow: hidden;
-                            background: #f5f5f5;
 							.img{
 								width: 100%;
 								height: 100%;

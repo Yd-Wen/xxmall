@@ -9,6 +9,16 @@ module.exports = {
 	async getById(id) {
 		return await db.collection("xxm-banner").doc(id).get()
 	},
+	async getByIds(ids) {
+		return await db.collection("xxm-banner").where({
+			_id: {
+				$in: ids
+			}
+		}).field({
+			name: true,
+			desc: true
+		}).get()
+	},
 	async get() {
 		return await db.collection("xxm-banner").get()
 

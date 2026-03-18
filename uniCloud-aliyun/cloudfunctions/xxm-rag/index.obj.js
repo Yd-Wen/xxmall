@@ -90,8 +90,8 @@ module.exports = {
 			method: 'POST',
 			data: {
 				category: options.category || 'file',
-				offset: options.offset || 1,
-				limit: options.limit || 10
+				offset: options.offset,
+				limit: options.limit
 			}
 		});
 	},

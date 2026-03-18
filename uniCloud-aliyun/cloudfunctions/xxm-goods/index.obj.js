@@ -12,6 +12,16 @@ module.exports = {
 		res.data[0].origin_price = res.data[0].origin_price ? res.data[0].origin_price / 100 : null
 		return res
 	},
+	async getByIds(ids) {
+		return await db.collection("xxm-goods").where({
+			_id: {
+				$in: ids
+			}
+		}).field({
+			name: true,
+			desc: true
+		}).get()
+	},
 	async get() {
 		let category = await db.collection("xxm-category").get()
 		let goods = await db.collection("xxm-goods").get()

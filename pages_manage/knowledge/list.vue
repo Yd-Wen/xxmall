@@ -1,7 +1,7 @@
 <template>
 	<view class="knowledgeList">
 		<view class="navList">
-            <view class="navTitle">知识库分类</view>
+            <view class="navTitle">分类</view>
             <scroll-view class="scrollView" scroll-y>
                 <view class="item" :class="index==activeCategoryIndex?'active':''" v-for="(item, index) in categoryList" :key="index" @click="onChangeTab(index)">
                 {{item.name}}
@@ -12,21 +12,24 @@
             <view class="page" v-if="knowledgeListData.length > 0">
                 <view class="contentList">
                     <scroll-view scroll-y>
-                        <view class="item" v-for="(knowledge, index) in knowledgeListData" :key="index" @click="onSelectKnowledge(knowledge)">
+                        <view class="item" v-for="(knowledge, index) in knowledgeListData" :key="index">
                             <view class="left">
                                 <image :src="knowledge.cover" mode="aspectFill" class="img"></image>
                             </view>
-                            <view class="middle">
+                            <view class="right">
                                 <view class="title">{{knowledge.title}}</view>
-                                <view class="content">{{knowledge.content}}</view>
+                                <view class="content" v-if="categoryList[activeCategoryIndex].value != 'file'">{{knowledge.content}}</view>
                                 <view class="time">
                                     <view class="createTime" v-if="knowledge.updateTime == knowledge.createTime">创建于 {{timeFormat(knowledge.createTime, 'yyyy-MM-dd hh:mm')}}</view>
                                     <view class="updateTime" v-else>上次更新 {{timeFormat(knowledge.updateTime, 'yyyy-MM-dd hh:mm')}}</view>
                                 </view>    
+                                <view class="option" @click="onOption(knowledge._id)">
+                                    <u-icon name="more-dot-fill" size="18" color="#576b95"></u-icon>
+                                </view>
                              </view>
-                            <view class="right">
-                                <view class="icon" @click="onDownLoad(knowledge._id)">
-                                    <u-icon name="down" size="25" color="#576b95"></u-icon>
+                            <!-- <view class="right">
+                                <view class="icon" @click="onDownLoad(knowledge._id)" v-if="categoryList[activeCategoryIndex].value == 'file'">
+                                    <u-icon name="download" size="25" color="#576b95"></u-icon>
                                 </view>
                                 <view class="icon" @click="onUpdate(knowledge._id)">
                                     <u-icon name="edit-pen" size="25" color="#576b95"></u-icon>
@@ -34,7 +37,7 @@
                                 <view class="icon" @click="onDelete(knowledge._id)">
                                     <u-icon name="trash" size="25" color="#ec544f"></u-icon>
                                 </view>
-                            </view>
+                            </view> -->
                         </view>
                     </scroll-view>
                 </view>
@@ -51,31 +54,20 @@
 </template>
 
 <script>
+	import {timeFormat} from '@/utils/tools.js'
 	const ragCloudObj = uniCloud.importObject("xxm-rag", {customUI:true})
+    const goodsCloudObj = uniCloud.importObject("xxm-goods")
+    const bannerCloudObj = uniCloud.importObject("xxm-banner")
 	export default {
         data() {
             return {
-                categoryList: {
-                    type: Array,
-                    default: () => []
-                },
-                activeCategoryIndex: {
-                    type: Number,
-                    default: 0
-                },
-                knowledgeListData: {
-                    type: Array,
-                    default: () => []
-                },
+                categoryList: [],
+                activeCategoryIndex: 0,
+                knowledgeListData: [],
                 pageData: {
-                    type: Object,
-                    default: () => {
-                        return {
-                            current: 1,
-                            pageSize: 2,
-                            total: 0
-                        }
-                    }
+                    current: 1,
+                    pageSize: 5,
+                    total: 0
                 },
             };
         },
@@ -83,15 +75,15 @@
             await this.getCategory()
             await this.getKnowledgeList()
         },
-        async onKnowledgePageChange(e){
-            this.pageData.current = e.current
-            await this.getKnowledgeList()
-        },
         methods:{
+            timeFormat,
+            async onKnowledgePageChange(e){
+                this.pageData.current = e.current
+                await this.getKnowledgeList()
+            },
             // 获取知识库分类
             async getCategory(){
                 let res = await ragCloudObj.getCategory()
-                console.log(res)
                 this.categoryList = res.data.category.map(item => ({
                     name: item.name,
                     value: item.value
@@ -106,37 +98,184 @@
             },
             // 获取知识库列表
             async getKnowledgeList(){
+                if (!this.categoryList[this.activeCategoryIndex]) {
+                    console.error('Category not found')
+                    return
+                }
                 let res = await ragCloudObj.queryKnowledge({
                     category: this.categoryList[this.activeCategoryIndex].value,
                     offset: (this.pageData.current - 1) * this.pageData.pageSize,
                     limit: this.pageData.pageSize
                 })
-                console.log(res)
-                this.knowledgeListData = res.data.knowledge
+                await this.queryKnowledgeContent(res.data.knowledge)
                 this.pageData.total = res.data.total
             },
+            // 根据分类查询知识库
+            async queryKnowledgeContent(knowledgeList){
+                if (this.categoryList[this.activeCategoryIndex] && this.categoryList[this.activeCategoryIndex].value == "file"){
+                    // 文件分类
+                    this.knowledgeListData = knowledgeList.map(item => ({
+                        cover: '/static/images/file_'+item.id.split('.')[1]+'.png',
+                        title: item.id,
+                        createTime: item.create_time,
+                        updateTime: item.update_time,
+                        url: item.url[0]  // 下载链接
+                    }))
+                }else if (this.categoryList[this.activeCategoryIndex] && this.categoryList[this.activeCategoryIndex].value == "goods"){
+                    // 商品分类
+                    this.knowledgeListData = knowledgeList.map(item => ({
+                        cover: item.url[0],
+                        createTime: item.create_time,
+                        updateTime: item.update_time,
+                    }))
+                    // 查询商品获取商品名称和内容
+                    let res = await goodsCloudObj.getByIds(knowledgeList.map(item => item.id))
+                    console.log(res)
+                    this.knowledgeListData = res.data.map(item => ({
+                        title: item.name,
+                        content: item.desc
+                    }))
+                }else if (this.categoryList[this.activeCategoryIndex].value == "recommend"){
+                    // 推荐分类
+                    this.knowledgeListData = knowledgeList.map(item => ({
+                        cover: item.url[0] || '/static/images/banner_default'+(item.id[-1]%3+1)+'.png',
+                        createTime: item.create_time,
+                        updateTime: item.update_time,
+                    }))
+                    // 查询商品获取商品名称和内容
+                    let res = await bannerCloudObj.getByIds(knowledgeList.map(item => item.id))
+                    console.log(res)
+                    this.knowledgeListData = res.data.map(item => ({
+                        title: item.name,
+                        content: item.desc
+                    }))
+                }
+            }
         }
     }
 </script>
 
 <style lang="scss" scoped>
 	.knowledgeList{
-		@include flex-box-set(column);
+        width: 750rpx;
+		display: flex;;
         .navList{
-            @include flex-box-set(start);
-            width: 100%;
-            height: 100rpx;
-            line-height: 100rpx;
-            font-size: 34rpx;
-            color: #333;
-            background-color: #f5f5f5;
-            border-bottom: 1px solid #ededed;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            height: 100%;
+            width: 150rpx;
+            background: $page-bg-color;
+            .navTitle{
+				text-align: center;
+				padding: 30rpx 0;
+				border-bottom: 1px solid $border-color;
+			}
+			.item{
+				text-align: center;
+				font-size: 30rpx;
+				line-height: 100rpx;
+				color: $text-font-color-2;
+				position: relative;
+				&.active{
+					color: $text-font-color-1;
+					background: #fff;
+					&::after {
+						content: "";
+						width: 6rpx;
+						height: 50rpx;
+						background-color: $xxm-theme-color;
+						position: absolute;
+						left: 0;
+						top: 50%;
+						transform: translateY(-50%);
+					}
+				}
+			}
         }
         .content{
-            @include flex-box-set(column);
-            width: 100%;
-            height: 100%;
-            padding: 30rpx;
-        }
+			flex: 1;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			align-items: center;
+			.page{
+				flex: 1;
+                width: 100%;
+                padding: 0 10rpx;
+				.contentList{	
+					width: 100%;
+					height: calc(100% - 140rpx - 80rpx);
+					margin-top: 50rpx;
+					.item{
+                        height: 150rpx;
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
+						margin: 20rpx 10rpx;
+                        border-bottom: 1px solid #ededed;
+						.left{
+                            width: 100rpx;
+							height: 100rpx;
+					        border-radius: 20rpx;
+							overflow: hidden;
+                            background: #f5f5f5;
+							.img{
+								width: 100%;
+								height: 100%;
+							}
+                        }
+                        .right{
+                            flex: 1;
+                            height: 100%;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: flex-start;
+                            padding: 0 20rpx;
+                            position: relative;
+                            .title{
+                                font-size: 32rpx;
+                                color: #333;
+                                font-weight: bold;
+                            }
+                            .content{
+                                font-size: 28rpx;
+                                color: $text-font-color-2;
+                                margin-top: 10rpx;
+                            }
+                            .time{
+                                font-size: 22rpx;
+                                color: $text-font-color-2;
+                                margin-top: 10rpx;
+                            }
+                            .option{
+                                position: absolute;
+                                right: 0;
+                                top: 0;
+                                padding: 10rpx;
+                            }
+                        }
+					}
+				}
+				.pagination{
+					height: 80rpx;
+					width: 100%;
+					margin: 20rpx 0;
+                    text-align: center;
+					.pageInfo{
+						font-size: 32rpx;
+					}
+				}
+			}
+			.empty{
+				height: 100%;
+				width: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+		}
     }	
 </style>

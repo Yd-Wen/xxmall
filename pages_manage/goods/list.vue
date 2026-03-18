@@ -20,7 +20,7 @@
 						<view class="desc">{{row.desc}}</view>
 						<view class="option">
 							<view class="icon" @click="onUpdate(row._id)">
-								<u-icon name="edit-pen" size="25" color="576b95"></u-icon>
+								<u-icon name="edit-pen" size="25" color="#576b95"></u-icon>
 							</view>
 							<view class="icon" @click="onDelete(row._id, row.name)">
 								<u-icon name="trash" size="25" color="#ec544f"></u-icon>
@@ -30,7 +30,7 @@
 				</view>
 			</view>
 		</view>
-		<xxm-progress :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmSync"></xxm-progress>
+		<xxm-progress ref="progress" :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmSync"></xxm-progress>
 	</view>
 </template>
 
@@ -60,9 +60,7 @@
 			// 初始化上传进度
 			initProgress(name){
 				this.isSync = true
-				this.progressData.percentage = 0
-				this.progressData.scrollTop = 0
-				this.progressData.data = [
+				this.$refs.progress.initProgress('删除商品中', [
 					{
 						name: name,
 						status: '【等待】删除商品'
@@ -71,12 +69,7 @@
 						name: '',
 						status: '【等待】同步到知识库'
 					}
-				]
-			},
-			// 更新进度条状态
-			updateProgressStatus(index, status) {
-				this.progressData.data[index].status = status
-				this.progressData.percentage = Math.round((index + 1) / 2 * 100)
+				])
 			},
 			// 获取商品
 			async getGoods(){
@@ -104,13 +97,13 @@
 			// 删除商品
 			async removeGoods(id){
 				let res = await goodsCloudObj.remove(id)
-				this.updateProgressStatus(0, res.deleted ? '【成功】删除商品成功' : '【失败】删除商品失败')
+				this.$refs.progress.updateProgressStatus(0, res.deleted ? '【成功】删除商品成功' : '【失败】删除商品失败')
 				if (res.deleted) {
 					res = await ragCloudObj.deleteKnowledge({id: id})
-					this.updateProgressStatus(1, res.data.message)
+					this.$refs.progress.updateProgressStatus(1, res.data.message)
 				}
 				else{
-					this.updateProgressStatus(1, '【失败】必先删除商品')
+					this.$refs.progress.updateProgressStatus(1, '【失败】必先删除商品')
 				}
 			},
 			// 上传结束

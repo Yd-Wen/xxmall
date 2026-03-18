@@ -25,7 +25,7 @@
 				<button type="primary">提交</button>
 			</view>
 		</uni-forms>
-		<xxm-progress :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmSync"></xxm-progress>
+		<xxm-progress ref="progress" :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmSync"></xxm-progress>
 	</view>
 </template>
 
@@ -104,25 +104,23 @@
 			// 初始化上传进度
 			initProgress(){
 				this.isSync = true
-				this.progressData.percentage = 0
-				this.progressData.scrollTop = 0
-				this.progressData.data = [
+				const items = [
 					{
 						name: this.bannerData.name,
 						status: '【等待】上传推荐'
 					}
 				]
 				if(this.checkSync){
-					this.progressData.data.push({
+					items.push({
 						name: '',
 						status: '【等待】同步到知识库'
 					})
 				}
+				this.$refs.progress.initProgress('上传推荐中', items)
 			},
 			// 更新进度条状态
 			updateProgressStatus(index, status) {
-				this.progressData.data[index].status = status
-				this.progressData.percentage = Math.round((index + 1) / (this.checkSync ? 2 : 1) * 100)
+				this.$refs.progress.updateProgressStatus(index, status, true)
 			},
 			// 整理商品信息为知识库内容
 			formatKnowledgeContent(){
@@ -195,14 +193,13 @@
 					}
 				})
 				this.initProgress()
-
 				let res, id
 				if (bannerId){
 					res = await bannerCloudObj.update(this.bannerData)
 					// 提交成功后，更新banner数据到vuex
 					await this.SET_BANNER(this.bannerData)
 					id = this.bannerData._id
-					this.updateProgressStatus(0, res.updated ? '【成功】更新推荐' : '【跳过】推荐内容相同')
+					this.$refs.progress.updateProgressStatus(0, res.updated ? '【成功】更新推荐' : '【跳过】推荐内容相同')
 					if(this.checkSync){
 						// 整理推荐信息为内容
 						const content = this.formatKnowledgeContent()
@@ -214,14 +211,14 @@
 							content: content,
 							url: imageUrls
 						})
-						this.updateProgressStatus(1, res.data.message)
+						this.$refs.progress.updateProgressStatus(1, res.data.message)	
 					}
 				}else{
 					res = await bannerCloudObj.add(this.bannerData)
 					// 新增成功后，将banner数据添加到vuex
 					await this.ADD_BANNER(this.bannerData)
 					id = res.id
-					this.updateProgressStatus(0, '【成功】新增推荐')
+					this.$refs.progress.updateProgressStatus(0, '【成功】新增推荐')
 					if(this.checkSync){
 						// 整理推荐信息为内容
 						const content = this.formatKnowledgeContent()
@@ -233,7 +230,7 @@
 							content: content,
 							url: imageUrls
 						})
-						this.updateProgressStatus(1, res.data.message)
+						this.$refs.progress.updateProgressStatus(1, res.data.message)
 					}
 				}
 			},

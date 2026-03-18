@@ -22,7 +22,7 @@
 				<button type="primary" :disabled="knowledgeData.files.length === 0">添加到知识库</button>
 			</view>
 		</uni-forms>
-		<xxm-progress :progressPopState="knowledgeData.isUploading" :progressData="progressData" @confirm="onConfirmUpload"></xxm-progress>
+		<xxm-progress ref="progress" :progressPopState="knowledgeData.isUploading" :progressData="progressData" @confirm="onConfirmUpload"></xxm-progress>
 	</view>
 </template>
 
@@ -73,15 +73,15 @@
 							cloudPath: `knowledge/${file.name}`,
 							cloudPathAsRealPath: true
 						})
-						this.updateProgressStatus(i * 2, res.success ? '【成功】文件上传成功' : '【失败】文件上传失败', true)
+						this.$refs.progress.updateProgressStatus(i * 2, res.success ? '【成功】文件上传成功' : '【失败】文件上传失败', scrollBottom=true)
 						// 再次读取文件：获取服务空间URL和文件内容
 						res = await ragCloudObj.getFile(file.name)
 					}else{
-						this.updateProgressStatus(i * 2, '【跳过】文件已存在', true)
+						this.$refs.progress.updateProgressStatus(i * 2, '【跳过】文件已存在', scrollBottom=true)
 					}
 					file.content = res.data.content
 					file.url = res.data.url
-					this.updateProgressStatus(i * 2 +  1, '【等待】同步到知识库')
+					// this.$refs.progress.updateProgressStatus(i * 2 +  1, '【等待】同步到知识库', setPercentage=false, scrollBottom=true)
 					// 同步到知识库
 					res = await ragCloudObj.uploadKnowledge({
 						id: file.name,
@@ -89,7 +89,7 @@
 						content: file.content,
 						url: [file.url]
 					})
-					this.updateProgressStatus(i * 2 +  1, res.data.message, true)
+					this.$refs.progress.updateProgressStatus(i * 2 +  1, res.data.message, scrollBottom=true)
 				}
 			},
 			// 处理文件选择
@@ -107,29 +107,18 @@
 			// 初始化上传进度
 			initProgress(){
 				this.knowledgeData.isUploading = true
-				this.progressData.percentage = 0
-				this.progressData.scrollTop = 0
-				this.progressData.data = []
+				const items = []
 				this.knowledgeData.files.forEach((file) => {
-					this.progressData.data.push({
+					items.push({
 						name: file.name,
 						status: '【等待】上传文件'
 					})
-					this.progressData.data.push({
+					items.push({
 						name: '',
 						status: '【等待】同步到知识库'
 					})
 				})
-			},
-			// 更新进度条状态
-			updateProgressStatus(index, status, setPercentage=false) {
-				this.progressData.data[index].status = status
-				// 更新上传进度
-				if (setPercentage) {
-					this.progressData.percentage = Math.round((index + 1) / (this.knowledgeData.files.length * 2) * 100)
-				}
-				// 滚动到当前上传的文件
-				this.progressData.scrollTop = (index + 1) * 30 - 150 > this.progressData.scrollTop ? (index + 1) * 30 - 150 : this.progressData.scrollTop;
+				this.$refs.progress.initProgress('上传和同步文件中', items)
 			},
 			// 确认上传
 			onConfirmUpload(){

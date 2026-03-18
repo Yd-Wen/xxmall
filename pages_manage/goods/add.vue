@@ -69,7 +69,7 @@
 			<uni-popup-dialog mode="input" title="添加属性" placeholder="请输入属性名称" 
 			@confirm="onAddConfirm"></uni-popup-dialog>
 		</uni-popup>
-		<xxm-progress :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmSync"></xxm-progress>
+		<xxm-progress ref="progress" :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmSync"></xxm-progress>
 	</view>
 </template>
 
@@ -252,25 +252,19 @@
 			// 初始化上传进度
 			initProgress(){
 				this.isSync = true
-				this.progressData.percentage = 0
-				this.progressData.scrollTop = 0
-				this.progressData.data = [
+				const items = [
 					{
 						name: this.goodsData.name,
 						status: '【等待】上传商品'
 					}
 				]
 				if(this.checkSync){
-					this.progressData.data.push({
+					items.push({
 						name: '',
 						status: '【等待】同步到知识库'
 					})
 				}
-			},
-			// 更新进度条状态
-			updateProgressStatus(index, status) {
-				this.progressData.data[index].status = status
-				this.progressData.percentage = Math.round((index + 1) / (this.checkSync ? 2 : 1) * 100)
+				this.$refs.progress.initProgress('上传商品中', items)
 			},
 			// 整理商品信息为知识库内容
 			formatKnowledgeContent(){
@@ -331,7 +325,7 @@
 					this.deleteOldImageIfNeeded()
 					res = await goodsCloudObj.update(this.goodsData)
 					id = this.goodsData._id
-					this.updateProgressStatus(0, res.updated ? '【成功】更新商品' : '【跳过】商品内容相同')
+					this.$refs.progress.updateProgressStatus(0, res.updated ? '【成功】更新商品' : '【跳过】商品内容相同')
 					if(this.checkSync){
 						// 整理商品信息为内容
 						const content = this.formatKnowledgeContent()
@@ -343,12 +337,13 @@
 							content: content,
 							url: imageUrls
 						})
-						this.updateProgressStatus(1, res.data.message)
+						this.$refs.progress.updateProgressStatus(1, res.data.message)
+						
 					}
 				}else{
 					res = await goodsCloudObj.add(this.goodsData)
 					id = res.id
-					this.updateProgressStatus(0, '【成功】新增商品')
+					this.$refs.progress.updateProgressStatus(0, '【成功】新增商品')
 					if(this.checkSync){
 						// 整理商品信息为内容
 						const content = this.formatKnowledgeContent()
@@ -360,7 +355,7 @@
 							content: content,
 							url: imageUrls
 						})
-						this.updateProgressStatus(1, res.data.message)
+						this.$refs.progress.updateProgressStatus(1, res.data.message)
 					}
 				}
 			},

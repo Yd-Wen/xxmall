@@ -33,7 +33,7 @@
 				</view>
 			</view>
 		</view>
-		<xxm-progress :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmSync"></xxm-progress>
+		<xxm-progress ref="progress" :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmSync"></xxm-progress>
 	</view>
 </template>
 
@@ -65,9 +65,7 @@
 			// 初始化上传进度
 			initProgress(name){
 				this.isSync = true
-				this.progressData.percentage = 0
-				this.progressData.scrollTop = 0
-				this.progressData.data = [
+				this.$refs.progress.initProgress('删除推荐中', [
 					{
 						name: name,
 						status: '【等待】删除推荐'
@@ -76,12 +74,7 @@
 						name: '',
 						status: '【等待】同步到知识库'
 					}
-				]
-			},
-			// 更新进度条状态
-			updateProgressStatus(index, status) {
-				this.progressData.data[index].status = status
-				this.progressData.percentage = Math.round((index + 1) / 2 * 100)
+				])
 			},
 			// 获取商品
 			async getBanner(){
@@ -109,13 +102,13 @@
 			// 删除banner
 			async removeBanner(id){
 				let res = await bannerCloudObj.remove(id)
-				this.updateProgressStatus(0, res.deleted ? '【成功】删除推荐成功' : '【失败】删除推荐失败')
+				this.$refs.progress.updateProgressStatus(0, res.deleted ? '【成功】删除推荐成功' : '【失败】删除推荐失败')
 				if (res.deleted) {
 					res = await ragCloudObj.deleteKnowledge({id: id})
-					this.updateProgressStatus(1, res.data.message)
+					this.$refs.progress.updateProgressStatus(1, res.data.message)
 				}
 				else{
-					this.updateProgressStatus(1, '【失败】必先删除推荐')
+					this.$refs.progress.updateProgressStatus(1, '【失败】必先删除推荐')
 				}
 				// 删除成功后，从vuex中删除banner数据
 				await this.REMOVE_BANNER(id)

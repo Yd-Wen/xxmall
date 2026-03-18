@@ -2,10 +2,10 @@
     "passwordSecret": "xxm", 
     "passwordStrength": "medium", 
     "tokenSecret": "xxm", 
-    "tokenExpiresIn": 7200, 
+    "tokenExpiresIn": 604800,
     "tokenExpiresThreshold": 3600, 
     "passwordErrorLimit": 6, 
-    "passwordErrorRetryTime": 3600, 
+    "passwordErrorRetryTime": 600, 
     "autoSetInviteCode": false,
     "forceInviteCode": false, 
     "app": { 
@@ -26,7 +26,7 @@
       }
     },
     "web": { 
-      "tokenExpiresIn": 7200,
+      "tokenExpiresIn": 604800,
       "tokenExpiresThreshold": 3600,
       "oauth": {
         "weixin-h5": { 

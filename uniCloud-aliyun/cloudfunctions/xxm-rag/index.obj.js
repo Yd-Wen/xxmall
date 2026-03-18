@@ -60,6 +60,10 @@ module.exports = {
 		}
 		return new_res
 	},
+	async getFileUrl(filename) {
+		// 生成临时下载链接
+		return URL_CLOUD_STORAGE_DOWNLOAD + `/knowledge/${filename}`;
+	},
 	async uploadKnowledge(options) {
 		return await uniCloud.request({
 			url: URL_KNOWLEDGE_UPLOAD,

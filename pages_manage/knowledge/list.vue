@@ -23,7 +23,7 @@
                                     <view class="createTime" v-if="knowledge.updateTime == knowledge.createTime">创建于 {{timeFormat(knowledge.createTime, 'yyyy-MM-dd hh:mm')}}</view>
                                     <view class="updateTime" v-else>上次更新 {{timeFormat(knowledge.updateTime, 'yyyy-MM-dd hh:mm')}}</view>
                                 </view>    
-                                <view class="option" @click="onOption(knowledge._id)">
+                                <view class="option" @click="onOption(knowledge.title)">
                                     <u-icon name="more-dot-fill" size="18" color="#576b95"></u-icon>
                                 </view>
                              </view>
@@ -178,13 +178,13 @@
                             cancelText: '下载',
                             confirmText: '删除',
                             confirmColor: '#ec544f',
-                            success: function(res) {
+                            success: async (res) => {
                                 if (res.confirm) {
                                     // 删除文件（暂不实现）
                                     console.log('删除文件:', fileName);
-                                } else if (res.cancel) {
-                                    // 下载文件（暂不实现）
-                                    console.log('下载文件:', fileName);
+                                } else if (res.cancel) {                                  
+                                    // 下载文件
+                                    await this.downloadFile(fileName)
                                 }
                             }
                         });
@@ -192,6 +192,34 @@
                     default:
                         break;
                 }
+            },
+            async downloadFile(fileName){
+                // 获取文件下载链接
+                let downloadUrl = await ragCloudObj.getFileUrl(fileName);
+                // #ifdef H5
+                // 新标签页打开链接
+                window.open(downloadUrl, '_blank')
+                // #endif
+				// #ifdef MP-WEIXIN
+				// 使用uni.downloadFile和uni.saveFile实现下载
+				uni.downloadFile({
+				    url: downloadUrl,
+				    success: function(downloadRes) {
+				        if (downloadRes.statusCode === 200) {
+				            // 保存文件
+				            uni.saveFile({
+				                tempFilePath: downloadRes.tempFilePath,
+				                success: () => {
+				                    uni.showToast({
+				                        title: '文件下载成功',
+				                        icon: 'success'
+				                    });
+				                }
+				            });
+				        } 
+				    },
+				});
+				// #endif
             }
         }
     }

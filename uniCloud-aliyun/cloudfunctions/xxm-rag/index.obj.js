@@ -5,7 +5,7 @@ const URL_HISTORY_QUERY = "https://api-xxmall.yindongwen.top/v1/history/query"
 const URL_KNOWLEDGE_UPLOAD = "https://api-xxmall.yindongwen.top/v1/knowledge/upload"
 const URL_KNOWLEDGE_UPDATE = "https://api-xxmall.yindongwen.top/v1/knowledge/update"
 const URL_KNOWLEDGE_DELETE = "https://api-xxmall.yindongwen.top/v1/knowledge/delete"
-const URL_KNOWLEDGE_GET = "https://api-xxmall.yindongwen.top/v1/knowledge/get"
+const URL_KNOWLEDGE_QUERY = "https://api-xxmall.yindongwen.top/v1/knowledge/query"
 const URL_KNOWLEDGE_CATEGORY = "https://api-xxmall.yindongwen.top/v1/knowledge/category"
 
 const URL_CLOUD_STORAGE_DOWNLOAD = "https://mp-73e40e97-a1b0-469e-90c8-485169335ec2.cdn.bspapp.com"
@@ -84,10 +84,15 @@ module.exports = {
 			}
 		});
 	},
-	async getKnowledge(options) {
+	async queryKnowledge(options) {
 		return await uniCloud.request({
-			url: URL_KNOWLEDGE_GET + "?category=" + (options.category || 'file'),
-			method: 'GET',
+			url: URL_KNOWLEDGE_QUERY,
+			method: 'POST',
+			data: {
+				category: options.category || 'file',
+				offset: options.offset || 1,
+				limit: options.limit || 10
+			}
 		});
 	},
 	async deleteKnowledge(options) {

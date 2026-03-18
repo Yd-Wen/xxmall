@@ -74,7 +74,7 @@ export default {
             }
             this.progressData.percentage = Math.round((index + 1) / this.progressData.data.length * 100)
             if (scrollBottom){
-                this.progressData.scrollTop = (index + 1) * 50 - 150 > 0 ? (index + 1) * 50 - 150: this.progressData.scrollTop
+                this.progressData.scrollTop = (index + 1) * 30 - 150 > 0 ? (index + 1) * 30 - 150: this.progressData.scrollTop
             }
         }
     }

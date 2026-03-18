@@ -167,11 +167,13 @@
 
 <style lang="scss" scoped>
     page {
-        background-color: $page-bg-color;
+        background-color: #fff;
     }
 	.knowledgeList{
         width: 750rpx;
-		display: flex;;
+		display: flex;
+        height: 100vh;
+        background-color: #fff;
         .navList{
             display: flex;
             flex-direction: column;
@@ -212,27 +214,30 @@
 			justify-content: space-between;
 			align-items: center;
             background-color: #fff;
+            width: 100%;
 			.page{
 				flex: 1;
                 width: 100%;
-                height: 100%;
+                display: flex;
+                flex-direction: column;
                 padding: 0 10rpx;
-				.contentList{	
+					.contentList{	
 					width: 100%;
-					height: calc(100% - 80rpx);
-					margin-top: 50rpx;
+					margin-top: 30rpx;
+					max-height: calc(100vh - 420rpx);
 					.item{
-                        height: 150rpx;
+                        min-height: 120rpx;
+                        height: auto;
 						display: flex;
 						justify-content: space-between;
-						align-items: center;
-						margin: 20rpx 10rpx;
-                        padding: 20rpx 0;
+						align-items: flex-start;
+						margin: 10rpx 0;
+                        padding: 15rpx;
                         border-bottom: 1px solid $border-color-light;
 						.left{
-                            width: 100rpx;
-							height: 100rpx;
-					        border-radius: 20rpx;
+                            width: 80rpx;
+							height: 80rpx;
+						    border-radius: 15rpx;
 							overflow: hidden;
 							.img{
 								width: 100%;
@@ -241,45 +246,59 @@
                         }
                         .right{
                             flex: 1;
-                            height: 100%;
+                            min-height: 80rpx;
                             display: flex;
                             flex-direction: column;
-                            justify-content: center;
+                            justify-content: flex-start;
                             align-items: flex-start;
-                            padding: 0 20rpx;
+                            padding: 0 15rpx;
                             position: relative;
                             .title{
-                                font-size: 32rpx;
+                                font-size: 30rpx;
                                 color: #333;
                                 font-weight: bold;
+                                margin-bottom: 8rpx;
                             }
                             .content{
-                                font-size: 28rpx;
+                                @include ellipse(2);
+                                font-size: 26rpx;
                                 color: $text-font-color-2;
-                                margin-top: 10rpx;
-                                @include ellipse(1);
+                                margin-bottom: 8rpx;
+                                line-height: 36rpx;
+                                // word-break: break-all;
+                                // display: -webkit-box;
+                                // -webkit-line-clamp: 2;
+                                // -webkit-box-orient: vertical;
+                                // overflow: hidden;
                             }
                             .time{
-                                font-size: 22rpx;
+                                font-size: 20rpx;
                                 color: $text-font-color-2;
-                                margin-top: 10rpx;
+                                margin-bottom: 8rpx;
                             }
                             .option{
                                 position: absolute;
                                 right: 0;
                                 top: 0;
-                                padding: 10rpx;
+                                padding: 5rpx;
                             }
                         }
 					}
 				}
 				.pagination{
-					height: 80rpx;
-					width: 100%;
-					padding: 20rpx 0;
-                    text-align: center;
+					height: 120rpx;
+					padding: 15rpx 20rpx;
+					text-align: center;
+					background-color: #fff;
+					position: fixed;
+					bottom: 50rpx;
+					left: 150rpx;
+					right: 0;
+					z-index: 100;
+					box-shadow: 0 -2rpx 10rpx rgba(0,0,0,0.05);
+					box-sizing: border-box;
 					.pageInfo{
-						font-size: 32rpx;
+						font-size: 28rpx;
 					}
 				}
 			}

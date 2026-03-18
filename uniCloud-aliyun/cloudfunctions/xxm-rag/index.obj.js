@@ -6,6 +6,7 @@ const URL_KNOWLEDGE_UPLOAD = "https://api-xxmall.yindongwen.top/v1/knowledge/upl
 const URL_KNOWLEDGE_UPDATE = "https://api-xxmall.yindongwen.top/v1/knowledge/update"
 const URL_KNOWLEDGE_DELETE = "https://api-xxmall.yindongwen.top/v1/knowledge/delete"
 const URL_KNOWLEDGE_GET = "https://api-xxmall.yindongwen.top/v1/knowledge/get"
+const URL_KNOWLEDGE_CATEGORY = "https://api-xxmall.yindongwen.top/v1/knowledge/category"
 
 const URL_CLOUD_STORAGE_DOWNLOAD = "https://mp-73e40e97-a1b0-469e-90c8-485169335ec2.cdn.bspapp.com"
 
@@ -20,6 +21,12 @@ module.exports = {
 			session_id: this.userInfo.uid,
 			url: urlType === "chat" ? (isStream ? URL_CHAT_STREAM : URL_CHAT_COMPLETION) : ""
 		}
+	},
+	async getCategory() {
+		return await uniCloud.request({
+			url: URL_KNOWLEDGE_CATEGORY,
+			method: 'GET',
+		});
 	},
 	async queryHistory(limit = 100) {
 		return await uniCloud.request({

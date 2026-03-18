@@ -149,6 +149,49 @@
                         }
                     })
                 }
+            },
+            // 处理选项操作
+            onOption(knowledgeId) {
+                const currentCategory = this.categoryList[this.activeCategoryIndex];
+                if (!currentCategory) return;
+                
+                switch (currentCategory.value) {
+                    case 'goods':
+                        // 跳转到商品列表页面
+                        uni.navigateTo({
+                            url: '/pages_manage/goods/list'
+                        });
+                        break;
+                    case 'recommend':
+                        // 跳转到推荐列表页面
+                        uni.navigateTo({
+                            url: '/pages_manage/banner/list'
+                        });
+                        break;
+                    case 'file':
+                        // 弹出对话框
+                        const knowledgeItem = this.knowledgeListData.find(item => item.title === knowledgeId || item.id === knowledgeId);
+                        const fileName = knowledgeItem ? knowledgeItem.title : knowledgeId;
+                        
+                        uni.showModal({
+                            title: `对 ${fileName} 的操作`,
+                            cancelText: '下载',
+                            confirmText: '删除',
+                            confirmColor: '#ec544f',
+                            success: function(res) {
+                                if (res.confirm) {
+                                    // 删除文件（暂不实现）
+                                    console.log('删除文件:', fileName);
+                                } else if (res.cancel) {
+                                    // 下载文件（暂不实现）
+                                    console.log('下载文件:', fileName);
+                                }
+                            }
+                        });
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }

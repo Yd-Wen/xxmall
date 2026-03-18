@@ -1,45 +1,59 @@
 <template>
-	<view class="knowledgeList">
-		<view class="navList">
-            <view class="navTitle">分类</view>
-            <scroll-view class="scrollView" scroll-y>
-                <view class="item" :class="index==activeCategoryIndex?'active':''" v-for="(item, index) in categoryList" :key="index" @click="onChangeTab(index)">
-                {{item.name}}
-                </view>
-            </scroll-view>
-        </view>
-        <view class="content">
-            <view class="page" v-if="knowledgeListData.length > 0">
-                <view class="contentList">
-                    <scroll-view scroll-y>
-                        <view class="item" v-for="(knowledge, index) in knowledgeListData" :key="index">
-                            <view class="left">
-                                <image :src="knowledge.cover" mode="aspectFill" class="img"></image>
-                            </view>
-                            <view class="right">
-                                <view class="title">{{knowledge.title}}</view>
-                                <view class="content" v-if="knowledge.content">{{knowledge.content}}</view>
-                                <view class="time">
-                                    <view class="createTime" v-if="knowledge.updateTime == knowledge.createTime">创建于 {{timeFormat(knowledge.createTime, 'yyyy-MM-dd hh:mm')}}</view>
-                                    <view class="updateTime" v-else>上次更新 {{timeFormat(knowledge.updateTime, 'yyyy-MM-dd hh:mm')}}</view>
-                                </view>    
-                                <view class="option" @click="onOption(knowledge.title)">
-                                    <u-icon name="more-dot-fill" size="18" color="#576b95"></u-icon>
+    <view>
+        <view class="knowledgeList">
+            <view class="navList">
+                <view class="navTitle">分类</view>
+                <scroll-view class="scrollView" scroll-y>
+                    <view class="item" :class="index==activeCategoryIndex?'active':''" v-for="(item, index) in categoryList" :key="index" @click="onChangeTab(index)">
+                    {{item.name}}
+                    </view>
+                </scroll-view>
+            </view>
+            <view class="content">
+                <view class="page" v-if="knowledgeListData.length > 0">
+                    <view class="contentList">
+                        <scroll-view scroll-y>
+                            <view class="item" v-for="(knowledge, index) in knowledgeListData" :key="index">
+                                <view class="left">
+                                    <image :src="knowledge.cover" mode="aspectFill" class="img"></image>
                                 </view>
-                             </view>
-                        </view>
-                    </scroll-view>
+                                <view class="right">
+                                    <view class="title">{{knowledge.title}}</view>
+                                    <view class="content" v-if="knowledge.content">{{knowledge.content}}</view>
+                                    <view class="time">
+                                        <view class="createTime" v-if="knowledge.updateTime == knowledge.createTime">创建于 {{timeFormat(knowledge.createTime, 'yyyy-MM-dd hh:mm')}}</view>
+                                        <view class="updateTime" v-else>上次更新 {{timeFormat(knowledge.updateTime, 'yyyy-MM-dd hh:mm')}}</view>
+                                    </view>    
+                                    <view class="option" @click="onOption(knowledge.title)">
+                                        <u-icon name="more-dot-fill" size="18" color="#576b95"></u-icon>
+                                    </view>
+                                </view>
+                            </view>
+                        </scroll-view>
+                    </view>
+                    <view class="pagination">
+                        <uni-pagination :show-icon="true" :total="pageData.total" :current="pageData.current" :page-size="pageData.pageSize" title="标题文字" @change="onKnowledgePageChange" />
+                        <text class="pageInfo">共{{ pageData.total }}条数据 当前页：{{ pageData.current}} 每页数据：{{ pageData.pageSize }}</text>
+                    </view>
                 </view>
-                <view class="pagination">
-                    <uni-pagination :show-icon="true" :total="pageData.total" :current="pageData.current" :page-size="pageData.pageSize" title="标题文字" @change="onKnowledgePageChange" />
-                    <text class="pageInfo">共{{ pageData.total }}条数据 当前页：{{ pageData.current}} 每页数据：{{ pageData.pageSize }}</text>
+                <view class="empty" v-if="knowledgeListData.length == 0">
+                    <u-empty mode="data" icon="/static/images/no_address.png"></u-empty>
                 </view>
-            </view>
-            <view class="empty" v-if="knowledgeListData.length == 0">
-                <u-empty mode="data" icon="/static/images/no_address.png"></u-empty>
             </view>
         </view>
-	</view>
+        <u-popup :show="filePopState" closeable round="10" @close="filePopState = false" mode="center">
+            <view class="wrapper">
+                <view class="header">
+                    <view class="title">{{currentFileName}}</view>
+                </view>
+                <view class="body">
+                    <view class="download" @click="onDownloadFile(currentFileName)">下载文件</view>
+                    <view class="update" @click="onUpdateFile">更新文件</view>
+                    <view class="delete" @click="onDeleteFile">删除文件</view>
+                </view>
+            </view>
+        </u-popup>
+    </view>
 </template>
 
 <script>
@@ -50,6 +64,8 @@
 	export default {
         data() {
             return {
+                filePopState: false,
+                currentFileName: '',
                 categoryList: [],
                 activeCategoryIndex: 0,
                 knowledgeListData: [],
@@ -170,30 +186,15 @@
                         break;
                     case 'file':
                         // 弹出对话框
-                        const knowledgeItem = this.knowledgeListData.find(item => item.title === knowledgeId || item.id === knowledgeId);
-                        const fileName = knowledgeItem ? knowledgeItem.title : knowledgeId;
-                        
-                        uni.showModal({
-                            title: `对 ${fileName} 的操作`,
-                            cancelText: '下载',
-                            confirmText: '删除',
-                            confirmColor: '#ec544f',
-                            success: async (res) => {
-                                if (res.confirm) {
-                                    // 删除文件（暂不实现）
-                                    console.log('删除文件:', fileName);
-                                } else if (res.cancel) {                                  
-                                    // 下载文件
-                                    await this.downloadFile(fileName)
-                                }
-                            }
-                        });
+                        this.currentFileName = knowledgeId
+                        this.filePopState = true
                         break;
                     default:
                         break;
                 }
             },
-            async downloadFile(fileName){
+            async onDownloadFile(fileName){
+                this.filePopState = false
                 // 获取文件下载链接
                 let downloadUrl = await ragCloudObj.getFileUrl(fileName);
                 // #ifdef H5
@@ -366,4 +367,51 @@
 			}
 		}
     }	
+    .wrapper{
+        width: 450rpx;
+        height: 350rpx;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        .title{
+            height: 100rpx;
+            width: 400rpx;
+            line-height: 100rpx;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 30rpx;
+            color: #333;
+            font-weight: bold;
+            border-bottom: 1px solid $border-color-light;
+        }
+        .body{
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            .download,
+            .update,
+            .delete{
+                flex: 1;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 28rpx;
+                border-bottom: 1px solid $border-color-light;
+            }
+            .download,
+            .update{
+                color: #436cc5;
+            }
+            .delete{
+                color: $xxm-theme-color;
+                border-bottom: none;
+            }
+        }
+    }
 </style>

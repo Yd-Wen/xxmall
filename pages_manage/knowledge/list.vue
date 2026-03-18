@@ -228,15 +228,21 @@
 					title:"是否确认删除",
 					success: async res=>{
 						if(res.confirm){
-                            let res = await ragCloudObj.deleteKnowledge({id: fileName})
-                            console.log(res)
-                            uni.showToast({
-                                title: res.data.message
-                            })
-                            setTimeout(()=>{
-                                this.getKnowledgeList()
-                            }, 500) 
-						}
+                            let res = await ragCloudObj.deleteFile(fileName)
+                            if (res.fileList[0].fileID.split('/').pop()==fileName){
+                                res = await ragCloudObj.deleteKnowledge({id: fileName})
+                                uni.showToast({
+                                    title: res.data.message
+                                })
+                                setTimeout(()=>{
+                                    this.getKnowledgeList()
+                                }, 500) 
+                            }else{
+                                uni.showToast({
+                                    title: '删除失败'
+                                })
+                            }
+  						}
 					}
 				})
             }

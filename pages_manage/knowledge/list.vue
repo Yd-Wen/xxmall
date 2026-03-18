@@ -41,15 +41,15 @@
                 </view>
             </view>
         </view>
-        <u-popup :show="filePopState" closeable round="10" @close="filePopState = false" mode="center">
+        <u-popup :show="filePopState" closeable round="10" @close="filePopState = false" mode="bottom">
             <view class="wrapper">
                 <view class="header">
                     <view class="title">{{currentFileName}}</view>
                 </view>
                 <view class="body">
                     <view class="download" @click="onDownloadFile(currentFileName)">下载文件</view>
-                    <view class="update" @click="onUpdateFile">更新文件</view>
-                    <view class="delete" @click="onDeleteFile">删除文件</view>
+                    <view class="update" @click="onUpdateFile(currentFileName)">更新文件</view>
+                    <view class="delete" @click="onDeleteFile(currentFileName)">删除文件</view>
                 </view>
             </view>
         </u-popup>
@@ -221,6 +221,24 @@
 				    },
 				});
 				// #endif
+            },
+            async onDeleteFile(fileName){
+                this.filePopState = false
+                uni.showModal({
+					title:"是否确认删除",
+					success: async res=>{
+						if(res.confirm){
+                            let res = await ragCloudObj.deleteKnowledge({id: fileName})
+                            console.log(res)
+                            uni.showToast({
+                                title: res.data.message
+                            })
+                            setTimeout(()=>{
+                                this.getKnowledgeList()
+                            }, 500) 
+						}
+					}
+				})
             }
         }
     }
@@ -229,6 +247,8 @@
 <style lang="scss" scoped>
     page {
         background-color: #fff;
+        padding-top: 0;
+        padding-bottom: 0;
     }
 	.knowledgeList{
         width: 750rpx;
@@ -368,15 +388,15 @@
 		}
     }	
     .wrapper{
-        width: 450rpx;
-        height: 350rpx;
+        width: 750rpx;
+        height: 30vh;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
         .title{
             height: 100rpx;
-            width: 400rpx;
+            width: 750rpx;
             line-height: 100rpx;
             text-align: center;
             vertical-align: middle;

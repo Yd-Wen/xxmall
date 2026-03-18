@@ -18,6 +18,7 @@ module.exports = {
 				$in: ids
 			}
 		}).field({
+			_id: true,
 			name: true,
 			desc: true
 		}).get()

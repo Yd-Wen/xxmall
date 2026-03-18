@@ -18,7 +18,7 @@
                             </view>
                             <view class="right">
                                 <view class="title">{{knowledge.title}}</view>
-                                <view class="content" v-if="categoryList[activeCategoryIndex].value != 'file'">{{knowledge.content}}</view>
+                                <view class="content" v-if="knowledge.content">{{knowledge.content}}</view>
                                 <view class="time">
                                     <view class="createTime" v-if="knowledge.updateTime == knowledge.createTime">创建于 {{timeFormat(knowledge.createTime, 'yyyy-MM-dd hh:mm')}}</view>
                                     <view class="updateTime" v-else>上次更新 {{timeFormat(knowledge.updateTime, 'yyyy-MM-dd hh:mm')}}</view>
@@ -124,31 +124,41 @@
                 }else if (this.categoryList[this.activeCategoryIndex] && this.categoryList[this.activeCategoryIndex].value == "goods"){
                     // 商品分类
                     this.knowledgeListData = knowledgeList.map(item => ({
+                        id: item.id,
                         cover: item.url[0],
                         createTime: item.create_time,
                         updateTime: item.update_time,
                     }))
                     // 查询商品获取商品名称和内容
                     let res = await goodsCloudObj.getByIds(knowledgeList.map(item => item.id))
-                    console.log(res)
-                    this.knowledgeListData = res.data.map(item => ({
-                        title: item.name,
-                        content: item.desc
-                    }))
+                    this.knowledgeListData = this.knowledgeListData.map(item => {
+                        // 根据id匹配商品接口返回的数据
+                        const goodsItem = res.data.find(goods => goods._id === item.id)
+                        return {
+                            ...item, // 保留原有字段（cover/createTime/updateTime）
+                            title: goodsItem ? goodsItem.name : '', // 追加商品名称
+                            content: goodsItem ? goodsItem.desc : '' // 追加商品描述
+                        }
+                    })
                 }else if (this.categoryList[this.activeCategoryIndex].value == "recommend"){
                     // 推荐分类
                     this.knowledgeListData = knowledgeList.map(item => ({
-                        cover: item.url[0] || '/static/images/banner_default'+(item.id[-1]%3+1)+'.png',
+                        id: item.id,
+                        cover: item.url[0] || '/static/images/banner/banner_default_'+(Number((item.create_time + '').slice(-1) || 0) % 3 + 1)+'.png',
                         createTime: item.create_time,
                         updateTime: item.update_time,
                     }))
                     // 查询商品获取商品名称和内容
                     let res = await bannerCloudObj.getByIds(knowledgeList.map(item => item.id))
-                    console.log(res)
-                    this.knowledgeListData = res.data.map(item => ({
-                        title: item.name,
-                        content: item.desc
-                    }))
+                    this.knowledgeListData = this.knowledgeListData.map(item => {
+                        // 根据id匹配商品接口返回的数据
+                        const bannerItem = res.data.find(banner => banner._id === item.id)
+                        return {
+                            ...item, // 保留原有字段（cover/createTime/updateTime）
+                            title: bannerItem ? bannerItem.name : '', // 追加商品名称
+                            content: bannerItem ? bannerItem.desc : '' // 追加商品描述
+                        }
+                    })
                 }
             }
         }
@@ -156,6 +166,9 @@
 </script>
 
 <style lang="scss" scoped>
+    page {
+        background-color: $page-bg-color;
+    }
 	.knowledgeList{
         width: 750rpx;
 		display: flex;;
@@ -163,7 +176,6 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            height: 100%;
             width: 150rpx;
             background: $page-bg-color;
             .navTitle{
@@ -195,19 +207,19 @@
         }
         .content{
 			flex: 1;
-			height: 80vh;
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
 			align-items: center;
+            background-color: #fff;
 			.page{
 				flex: 1;
                 width: 100%;
-                height: calc(100% - 140rpx);
+                height: 100%;
                 padding: 0 10rpx;
 				.contentList{	
 					width: 100%;
-					height: calc(100% - 140rpx - 80rpx);
+					height: calc(100% - 80rpx);
 					margin-top: 50rpx;
 					.item{
                         height: 150rpx;
@@ -215,6 +227,7 @@
 						justify-content: space-between;
 						align-items: center;
 						margin: 20rpx 10rpx;
+                        padding: 20rpx 0;
                         border-bottom: 1px solid $border-color-light;
 						.left{
                             width: 100rpx;
@@ -244,6 +257,7 @@
                                 font-size: 28rpx;
                                 color: $text-font-color-2;
                                 margin-top: 10rpx;
+                                @include ellipse(1);
                             }
                             .time{
                                 font-size: 22rpx;
@@ -262,7 +276,7 @@
 				.pagination{
 					height: 80rpx;
 					width: 100%;
-					margin: 20rpx 0;
+					padding: 20rpx 0;
                     text-align: center;
 					.pageInfo{
 						font-size: 32rpx;

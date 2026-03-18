@@ -25,7 +25,7 @@
 							<view class="icon" @click="onUpdate(row._id)">
 								<u-icon name="edit-pen" size="25" color="#576b95"></u-icon>
 							</view>
-							<view class="icon" @click="onDelete(row._id)">
+							<view class="icon" @click="onDelete(row._id, row.name)">
 								<u-icon name="trash" size="25" color="#ec544f"></u-icon>
 							</view>
 						</view>
@@ -33,16 +33,25 @@
 				</view>
 			</view>
 		</view>
+		<xxm-progress :progressPopState="isSync" :progressData="progressData" @confirm="onConfirmSync"></xxm-progress>
 	</view>
 </template>
 
 <script>
 	import { mapMutations } from 'vuex'
-	const bannerCloudObj = uniCloud.importObject("xxm-banner")
+	const bannerCloudObj = uniCloud.importObject("xxm-banner", {'customUI': true})
+	const ragCloudObj = uniCloud.importObject("xxm-rag", {'customUI': true})
 	export default {
 		data() {
 			return {
-				bannerData: []
+				bannerData: [],
+				isSync: false,
+				progressData: {
+					title: '删除推荐中',
+					data: [],
+					percentage: 0,
+					scrollTop: 0
+				},
 			};
 		},
 		onLoad() {
@@ -53,6 +62,27 @@
 		},
 		methods:{
 			...mapMutations(['REMOVE_BANNER']),
+			// 初始化上传进度
+			initProgress(name){
+				this.isSync = true
+				this.progressData.percentage = 0
+				this.progressData.scrollTop = 0
+				this.progressData.data = [
+					{
+						name: name,
+						status: '【等待】删除推荐'
+					},
+					{
+						name: '',
+						status: '【等待】同步到知识库'
+					}
+				]
+			},
+			// 更新进度条状态
+			updateProgressStatus(index, status) {
+				this.progressData.data[index].status = status
+				this.progressData.percentage = Math.round((index + 1) / 2 * 100)
+			},
 			// 获取商品
 			async getBanner(){
 				let res = await bannerCloudObj.getByGroup()
@@ -65,11 +95,12 @@
 				})
 			},
 			// 删除
-			onDelete(id){
+			onDelete(id, name){
 				uni.showModal({
 					title:"是否确认删除",
 					success:res=>{
 						if(res.confirm){
+							this.initProgress(name)
 							this.removeBanner(id)
 						}
 					}
@@ -78,18 +109,24 @@
 			// 删除banner
 			async removeBanner(id){
 				let res = await bannerCloudObj.remove(id)
-				if (res) {
-					uni.showToast({
-						title:"删除成功",
-						mask: true
-					})
-					setTimeout(()=>{
-						this.getBanner()
-					}, 1000)
+				this.updateProgressStatus(0, res.deleted ? '【成功】删除推荐成功' : '【失败】删除推荐失败')
+				if (res.deleted) {
+					res = await ragCloudObj.deleteKnowledge({id: id})
+					this.updateProgressStatus(1, res.data.message)
+				}
+				else{
+					this.updateProgressStatus(1, '【失败】必先删除推荐')
 				}
 				// 删除成功后，从vuex中删除banner数据
 				await this.REMOVE_BANNER(id)
-			}
+			},
+			// 上传结束
+			onConfirmSync(){
+				this.isSync = false
+				setTimeout(()=>{
+					this.getBanner()
+				}, 500)
+			},
 		}
 	}
 </script>

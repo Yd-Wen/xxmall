@@ -375,7 +375,7 @@
 			handleSyncChange(e){
 				// e为选中的数组，包含选中的name值
 				this.checkSync = e.includes('syncToKnowledge')
-			},
+			}
 		}
 	}
 </script>

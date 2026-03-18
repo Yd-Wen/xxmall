@@ -119,7 +119,7 @@
 				setTimeout(()=>{
 					this.getGoods()
 				}, 500)
-			},
+			}
 		}
 	}
 </script>

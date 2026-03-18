@@ -265,11 +265,6 @@
                                 color: $text-font-color-2;
                                 margin-bottom: 8rpx;
                                 line-height: 36rpx;
-                                // word-break: break-all;
-                                // display: -webkit-box;
-                                // -webkit-line-clamp: 2;
-                                // -webkit-box-orient: vertical;
-                                // overflow: hidden;
                             }
                             .time{
                                 font-size: 20rpx;

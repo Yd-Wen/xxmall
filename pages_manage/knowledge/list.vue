@@ -27,17 +27,6 @@
                                     <u-icon name="more-dot-fill" size="18" color="#576b95"></u-icon>
                                 </view>
                              </view>
-                            <!-- <view class="right">
-                                <view class="icon" @click="onDownLoad(knowledge._id)" v-if="categoryList[activeCategoryIndex].value == 'file'">
-                                    <u-icon name="download" size="25" color="#576b95"></u-icon>
-                                </view>
-                                <view class="icon" @click="onUpdate(knowledge._id)">
-                                    <u-icon name="edit-pen" size="25" color="#576b95"></u-icon>
-                                </view>
-                                <view class="icon" @click="onDelete(knowledge._id)">
-                                    <u-icon name="trash" size="25" color="#ec544f"></u-icon>
-                                </view>
-                            </view> -->
                         </view>
                     </scroll-view>
                 </view>

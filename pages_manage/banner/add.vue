@@ -118,10 +118,6 @@
 				}
 				this.$refs.progress.initProgress('上传推荐中', items)
 			},
-			// 更新进度条状态
-			updateProgressStatus(index, status) {
-				this.$refs.progress.updateProgressStatus(index, status, true)
-			},
 			// 整理商品信息为知识库内容
 			formatKnowledgeContent(){
 				let content = `推荐名称: ${this.bannerData.name}\n`

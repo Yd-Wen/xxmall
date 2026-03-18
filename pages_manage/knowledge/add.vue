@@ -73,15 +73,14 @@
 							cloudPath: `knowledge/${file.name}`,
 							cloudPathAsRealPath: true
 						})
-						this.$refs.progress.updateProgressStatus(i * 2, res.success ? '【成功】文件上传成功' : '【失败】文件上传失败', scrollBottom=true)
+						this.$refs.progress.updateProgressStatus(i * 2, res.success ? '【成功】文件上传成功' : '【失败】文件上传失败', true)
 						// 再次读取文件：获取服务空间URL和文件内容
 						res = await ragCloudObj.getFile(file.name)
 					}else{
-						this.$refs.progress.updateProgressStatus(i * 2, '【跳过】文件已存在', scrollBottom=true)
+						this.$refs.progress.updateProgressStatus(i * 2, '【跳过】文件已存在', true)
 					}
 					file.content = res.data.content
 					file.url = res.data.url
-					// this.$refs.progress.updateProgressStatus(i * 2 +  1, '【等待】同步到知识库', setPercentage=false, scrollBottom=true)
 					// 同步到知识库
 					res = await ragCloudObj.uploadKnowledge({
 						id: file.name,
@@ -89,7 +88,7 @@
 						content: file.content,
 						url: [file.url]
 					})
-					this.$refs.progress.updateProgressStatus(i * 2 +  1, res.data.message, scrollBottom=true)
+					this.$refs.progress.updateProgressStatus(i * 2 +  1, res.data.message, true)
 				}
 			},
 			// 处理文件选择

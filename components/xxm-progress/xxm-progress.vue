@@ -68,13 +68,11 @@ export default {
             this.progressData.scrollTop = 0
         },
         // 更新进度条状态
-        updateProgressStatus(index, status, setPercentage = true, scrollBottom=false) {
+        updateProgressStatus(index, status, scrollBottom=false) {
             if (this.progressData.data[index]) {
                 this.progressData.data[index].status = status
             }
-            if (setPercentage) {
-                this.progressData.percentage = Math.round((index + 1) / this.progressData.data.length * 100)
-            }
+            this.progressData.percentage = Math.round((index + 1) / this.progressData.data.length * 100)
             if (scrollBottom){
                 this.progressData.scrollTop = (index + 1) * 50 - 150 > 0 ? (index + 1) * 50 - 150: this.progressData.scrollTop
             }

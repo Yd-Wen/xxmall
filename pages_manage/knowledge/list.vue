@@ -378,9 +378,11 @@
                                 line-height: 36rpx;
                             }
                             .time{
+                                width: 100%;
                                 font-size: 20rpx;
                                 color: $text-font-color-2;
                                 margin-bottom: 8rpx;
+                                text-align: right;
                             }
                             .option{
                                 position: absolute;

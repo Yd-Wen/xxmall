@@ -108,7 +108,7 @@
 					this.$refs.progress.updateProgressStatus(1, res.data.message)
 				}
 				else{
-					this.$refs.progress.updateProgressStatus(1, '【失败】必先删除推荐')
+					this.$refs.progress.updateProgressStatus(1, '【失败】需先删除推荐')
 				}
 				// 删除成功后，从vuex中删除banner数据
 				await this.REMOVE_BANNER(id)

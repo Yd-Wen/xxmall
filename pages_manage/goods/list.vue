@@ -103,7 +103,7 @@
 					this.$refs.progress.updateProgressStatus(1, res.data.message)
 				}
 				else{
-					this.$refs.progress.updateProgressStatus(1, '【失败】必先删除商品')
+					this.$refs.progress.updateProgressStatus(1, '【失败】需先删除商品')
 				}
 			},
 			// 上传结束

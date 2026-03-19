@@ -53,6 +53,7 @@
                 </view>
             </view>
         </u-popup>
+        <xxm-progress ref="progress" :progressPopState="isDelete" :progressData="progressData" @confirm="onConfirmDelete"></xxm-progress>
     </view>
 </template>
 
@@ -64,6 +65,13 @@
 	export default {
         data() {
             return {
+                isDelete: false,
+				progressData: {
+					title: '删除知识库中',
+					data: [],
+					percentage: 0,
+					scrollTop: 0
+				},
                 filePopState: false,
                 currentFileName: '',
                 categoryList: [],
@@ -222,29 +230,45 @@
 				});
 				// #endif
             },
+            // 初始化删除进度
+			initProgress(name){
+				this.isDelete = true
+				this.$refs.progress.initProgress('删除知识库中', [
+					{
+						name: name,
+						status: '【等待】删除文件'
+					},
+					{
+						name: '',
+						status: '【等待】同步到知识库'
+					}
+				])
+			},
             async onDeleteFile(fileName){
                 this.filePopState = false
                 uni.showModal({
 					title:"是否确认删除",
 					success: async res=>{
 						if(res.confirm){
-                            let res = await ragCloudObj.deleteFile(fileName)
+                            this.initProgress(fileName)
+                            let res = await ragCloudObj.deleteFile(fileName)                          
                             if (res.fileList[0].fileID.split('/').pop()==fileName){
+                                this.$refs.progress.updateProgressStatus(0, '【成功】删除文件成功')
                                 res = await ragCloudObj.deleteKnowledge({id: fileName})
-                                uni.showToast({
-                                    title: res.data.message
-                                })
-                                setTimeout(()=>{
-                                    this.getKnowledgeList()
-                                }, 500) 
+                                this.$refs.progress.updateProgressStatus(1, res.data.message)
                             }else{
-                                uni.showToast({
-                                    title: '删除失败'
-                                })
+                                this.$refs.progress.updateProgressStatus(0, '【失败】删除文件失败')
+                                this.$refs.progress.updateProgressStatus(1, '【失败】需先删除文件')
                             }
   						}
 					}
 				})
+            },
+            onConfirmDelete(){
+                this.isDelete = false
+                setTimeout(()=>{
+                    this.getKnowledgeList()
+                }, 500) 
             }
         }
     }

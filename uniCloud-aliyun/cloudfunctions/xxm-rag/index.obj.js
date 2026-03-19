@@ -38,13 +38,6 @@ module.exports = {
 			}
 		})
 	},
-	async uploadFile(file) {
-		return await uniCloud.uploadFile({
-			filePath: file.url,
-			cloudPath: `knowledge/${file.name}`,
-			cloudPathAsRealPath: true
-		});
-	},
 	async getFile(filename) {
 		let url = URL_CLOUD_STORAGE_DOWNLOAD + `/knowledge/${filename}`
 		let res = await uniCloud.request({

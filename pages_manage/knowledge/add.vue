@@ -27,8 +27,6 @@
 </template>
 
 <script>
-import { updateKnowledge } from '../../uniCloud-aliyun/cloudfunctions/xxm-rag/index.obj';
-
 	const ragCloudObj = uniCloud.importObject("xxm-rag", {customUI:true})
 	export default {
 		data() {
@@ -62,6 +60,18 @@ import { updateKnowledge } from '../../uniCloud-aliyun/cloudfunctions/xxm-rag/in
 			this.fileLimit = e.id ? 1 : 9
 		},
 		methods: {
+			// 处理文件选择
+			onSelectFiles(e) {
+				// 清除之前的选择
+				this.knowledgeData.files = []
+				// 存储选择的文件信息
+				this.knowledgeData.files = e.tempFiles.map((tempFile) => ({
+					name: tempFile.name,
+					url: tempFile.url,  // 本地文件路径
+					size: tempFile.size,
+					content: '',
+				}))
+			},
 			// 提交
 			async onSubmit(){
 				// 先上传文件到云存储
@@ -131,7 +141,6 @@ import { updateKnowledge } from '../../uniCloud-aliyun/cloudfunctions/xxm-rag/in
 				}
 				this.$refs.progress.updateProgressStatus(0, '【成功】文件校验通过')
 				file.content = res.data.content
-				file.url = res.data.url
 				// 2.删除原文件
 				res = await ragCloudObj.deleteFile(this.currentId)
 				if(res.fileList[0].fileID.split('/').pop() != this.currentId){
@@ -141,14 +150,15 @@ import { updateKnowledge } from '../../uniCloud-aliyun/cloudfunctions/xxm-rag/in
 				}
 				this.$refs.progress.updateProgressStatus(1, '【成功】原文件已删除')
 				// 3.上传新文件
-				res = await ragCloudObj.uploadFile({
-					filePath: file.url,
-					cloudPath: `knowledge/${this.currentId}`,
+				res = await uniCloud.uploadFile({
+					filePath: file.url, // 本地文件路径
+					cloudPath: `knowledge/${file.name}`,
 					cloudPathAsRealPath: true
 				})
+				file.url = res.fileID  // 服务空间文件路径
 				this.$refs.progress.updateProgressStatus(2, res.success ? '【成功】文件上传成功' : '【失败】文件上传失败', true)
 				// 4.同步到知识库
-				res = await ragCloudObj.uploadKnowledge({
+				res = await ragCloudObj.updateKnowledge({
 					id: this.currentId,
 					category: "file",
 					content: file.content,

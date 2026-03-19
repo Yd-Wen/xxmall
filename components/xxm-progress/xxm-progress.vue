@@ -1,23 +1,23 @@
 <template>
     <view class="progress-panel">
         <u-popup :show="progressPopState" round="10" mode="center">
-            <view class="wrapper" v-if="progressData">
+            <view class="wrapper" v-if="localProgressData">
                 <view class="header">
-                    <view class="title">{{progressData.title}}</view>
+                    <view class="title">{{localProgressData.title}}</view>
                 </view>
                 <view class="body">
                     <view class="progress">
-                        <u-line-progress :showText="false" :percentage="progressData.percentage" activeColor="#436cc5"></u-line-progress>
+                        <u-line-progress :showText="false" :percentage="localProgressData.percentage" activeColor="#436cc5"></u-line-progress>
                     </view>
-                    <scroll-view class="scroll-view" scroll-y :scroll-top="progressData.scrollTop">
-                        <view class="data" v-for="(item, index) in progressData.data" :key="index">
+                    <scroll-view class="scroll-view" scroll-y :scroll-top="localProgressData.scrollTop">
+                        <view class="data" v-for="(item, index) in localProgressData.data" :key="index">
                             <view class="name">{{item.name}}</view>
                             <view class="status">{{item.status}}</view>
                         </view>
                     </scroll-view>
                 </view>
                 <view class="footer">
-                    <u-button color="#436cc5" icon="checkmark-circle-fill" iconColor="#fff" :disabled="progressData.percentage < 100" @click="onConfirm">确 定</u-button>
+                    <u-button color="#436cc5" icon="checkmark-circle-fill" iconColor="#fff" :disabled="localProgressData.percentage < 100" @click="onConfirm">确 定</u-button>
                 </view>
             </view>
         </u-popup>
@@ -56,25 +56,50 @@ export default {
             }
         }
     },
+    data() {
+        return {
+            localProgressData: {
+                title: '上传文件中',
+                data: [],
+                percentage: 0,
+                scrollTop: 0
+            }
+        }
+    },
+    watch: {
+        progressData: {
+            handler(newVal) {
+                this.localProgressData = { ...newVal }
+            },
+            deep: true,
+            immediate: true
+        }
+    },
     methods: {
         onConfirm(){
             this.$emit('confirm')
         },
         // 初始化进度条
         initProgress(title, items) {
-            this.progressData.title = title
-            this.progressData.data = items
-            this.progressData.percentage = 0
-            this.progressData.scrollTop = 0
+            this.localProgressData.title = title
+            this.localProgressData.data = items
+            this.localProgressData.percentage = 0
+            this.localProgressData.scrollTop = 0
         },
         // 更新进度条状态
         updateProgressStatus(index, status, scrollBottom=false) {
-            if (this.progressData.data[index]) {
-                this.progressData.data[index].status = status
+            if (this.localProgressData.data[index]) {
+                this.localProgressData.data[index].status = status
             }
-            this.progressData.percentage = Math.round((index + 1) / this.progressData.data.length * 100)
+            // 确保进度计算正确，当处理完所有项时进度为100%
+            const progress = Math.round((index + 1) / this.localProgressData.data.length * 100)
+            this.localProgressData.percentage = Math.min(progress, 100)
+            // 当处理到最后一项时，强制设置为100%
+            if (index === this.localProgressData.data.length - 1) {
+                this.localProgressData.percentage = 100
+            }
             if (scrollBottom){
-                this.progressData.scrollTop = (index + 1) * 30 - 150 > 0 ? (index + 1) * 30 - 150: this.progressData.scrollTop
+                this.localProgressData.scrollTop = (index + 1) * 30 - 150 > 0 ? (index + 1) * 30 - 150: this.localProgressData.scrollTop
             }
         }
     }

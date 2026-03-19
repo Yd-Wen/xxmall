@@ -24,7 +24,7 @@
                                         <view class="createTime" v-if="knowledge.updateTime == knowledge.createTime">创建于 {{timeFormat(knowledge.createTime, 'yyyy-MM-dd hh:mm')}}</view>
                                         <view class="updateTime" v-else>上次更新 {{timeFormat(knowledge.updateTime, 'yyyy-MM-dd hh:mm')}}</view>
                                     </view>    
-                                    <view class="option" @click="onOption(knowledge.title)">
+                                    <view class="option" @click="onOption(knowledge)">
                                         <u-icon name="more-dot-fill" size="18" color="#576b95"></u-icon>
                                     </view>
                                 </view>
@@ -41,15 +41,15 @@
                 </view>
             </view>
         </view>
-        <u-popup :show="filePopState" closeable round="10" @close="filePopState = false" mode="bottom">
+        <u-popup :show="popState" closeable round="10" @close="popState = false" mode="bottom">
             <view class="wrapper">
                 <view class="header">
-                    <view class="title">{{currentFileName}}</view>
+                    <view class="title">{{currentKnowledge.title}}</view>
                 </view>
                 <view class="body">
-                    <view class="download" @click="onDownloadFile(currentFileName)">下载文件</view>
-                    <view class="update" @click="onUpdateFile(currentFileName)">更新文件</view>
-                    <view class="delete" @click="onDeleteFile(currentFileName)">删除文件</view>
+                    <view class="download" v-if="activeCategoryIndex == 0" @click="onDownload">下载</view>
+                    <view class="update" @click="onUpdate">更新</view>
+                    <view class="delete" @click="onDelete">删除</view>
                 </view>
             </view>
         </u-popup>
@@ -60,8 +60,8 @@
 <script>
 	import {timeFormat} from '@/utils/tools.js'
 	const ragCloudObj = uniCloud.importObject("xxm-rag", {customUI:true})
-    const goodsCloudObj = uniCloud.importObject("xxm-goods")
-    const bannerCloudObj = uniCloud.importObject("xxm-banner")
+    const goodsCloudObj = uniCloud.importObject("xxm-goods", {customUI:true})
+    const bannerCloudObj = uniCloud.importObject("xxm-banner", {customUI:true})
 	export default {
         data() {
             return {
@@ -72,8 +72,8 @@
 					percentage: 0,
 					scrollTop: 0
 				},
-                filePopState: false,
-                currentFileName: '',
+                popState: false,
+                currentKnowledge: {},
                 categoryList: [],
                 activeCategoryIndex: 0,
                 knowledgeListData: [],
@@ -128,6 +128,7 @@
                 if (this.categoryList[this.activeCategoryIndex] && this.categoryList[this.activeCategoryIndex].value == "file"){
                     // 文件分类
                     this.knowledgeListData = knowledgeList.map(item => ({
+                        id: item.id,
                         cover: '/static/images/file_'+item.id.split('.')[1]+'.png',
                         title: item.id,
                         createTime: item.create_time,
@@ -175,44 +176,22 @@
                 }
             },
             // 处理选项操作
-            onOption(knowledgeId) {
-                const currentCategory = this.categoryList[this.activeCategoryIndex];
-                if (!currentCategory) return;
-                
-                switch (currentCategory.value) {
-                    case 'goods':
-                        // 跳转到商品列表页面
-                        uni.navigateTo({
-                            url: '/pages_manage/goods/list'
-                        });
-                        break;
-                    case 'recommend':
-                        // 跳转到推荐列表页面
-                        uni.navigateTo({
-                            url: '/pages_manage/banner/list'
-                        });
-                        break;
-                    case 'file':
-                        // 弹出对话框
-                        this.currentFileName = knowledgeId
-                        this.filePopState = true
-                        break;
-                    default:
-                        break;
-                }
+            onOption(knowledge) {
+                this.currentKnowledge = knowledge
+                this.popState = true
             },
-            async onDownloadFile(fileName){
-                this.filePopState = false
+            async onDownload(){
+                this.popState = false
                 // 获取文件下载链接
-                let downloadUrl = await ragCloudObj.getFileUrl(fileName);
+                // let downloadUrl = await ragCloudObj.getFileUrl(this.currentKnowledge.title);
                 // #ifdef H5
                 // 新标签页打开链接
-                window.open(downloadUrl, '_blank')
+                window.open(this.currentKnowledge.url, '_blank')
                 // #endif
 				// #ifdef MP-WEIXIN
 				// 使用uni.downloadFile和uni.saveFile实现下载
 				uni.downloadFile({
-				    url: downloadUrl,
+				    url: this.currentKnowledge.url,
 				    success: function(downloadRes) {
 				        if (downloadRes.statusCode === 200) {
 				            // 保存文件
@@ -230,13 +209,28 @@
 				});
 				// #endif
             },
+            onUpdate(){
+                this.popState = false
+                let pageName
+                // 跳转到添加页面，传递当前知识库数据的ID
+                if (this.categoryList[this.activeCategoryIndex].value == "file"){
+                    pageName = 'knowledge'
+                }else if (this.categoryList[this.activeCategoryIndex].value == "goods"){
+                    pageName = 'goods'
+                }else if (this.categoryList[this.activeCategoryIndex].value == "recommend"){
+                    pageName = 'banner'
+                }
+                uni.navigateTo({
+                    url: `/pages_manage/${pageName}/add?id=${this.currentKnowledge.id}`
+                })
+            },
             // 初始化删除进度
 			initProgress(name){
 				this.isDelete = true
 				this.$refs.progress.initProgress('删除知识库中', [
 					{
 						name: name,
-						status: '【等待】删除文件'
+						status: `【等待】删除${this.categoryList[this.activeCategoryIndex].name}`
 					},
 					{
 						name: '',
@@ -244,26 +238,51 @@
 					}
 				])
 			},
-            async onDeleteFile(fileName){
-                this.filePopState = false
+            async onDelete(){
+                this.popState = false
                 uni.showModal({
 					title:"是否确认删除",
 					success: async res=>{
 						if(res.confirm){
-                            this.initProgress(fileName)
-                            let res = await ragCloudObj.deleteFile(fileName)                          
-                            if (res.fileList[0].fileID.split('/').pop()==fileName){
-                                this.$refs.progress.updateProgressStatus(0, '【成功】删除文件成功')
-                                res = await ragCloudObj.deleteKnowledge({id: fileName})
-                                this.$refs.progress.updateProgressStatus(1, res.data.message)
-                            }else{
-                                this.$refs.progress.updateProgressStatus(0, '【失败】删除文件失败')
-                                this.$refs.progress.updateProgressStatus(1, '【失败】需先删除文件')
-                            }
+                            this.initProgress(this.currentKnowledge.title)
+                            await this.onDeleteAccCategory(this.currentKnowledge.id)
   						}
 					}
 				})
             },
+            // 根据分类删除知识库数据
+            async onDeleteAccCategory(id){
+                let res, deleted = false
+                const category = this.categoryList[this.activeCategoryIndex].value
+                switch(category){
+                    case "file":
+                        // 文件分类
+                        res = await ragCloudObj.deleteFile(id)    
+                        deleted = res.fileList[0].fileID.split('/').pop()==id
+                        break;
+                    case "goods":
+                        // 商品分类
+                        res = await goodsCloudObj.remove(id)
+                        deleted = res.deleted > 0
+                        break;
+                    case "recommend":
+                        // 推荐分类
+                        res = await bannerCloudObj.remove(id)
+                        deleted = res.deleted > 0
+                        break;
+                    default:
+                        break;
+                }
+                if (deleted){
+                    this.$refs.progress.updateProgressStatus(0, `【成功】删除${this.categoryList[this.activeCategoryIndex].name}成功`)
+                    res = await ragCloudObj.deleteKnowledge({id: id})
+                    this.$refs.progress.updateProgressStatus(1, res.data.message)
+                }else{
+                    this.$refs.progress.updateProgressStatus(0, `【失败】删除${this.categoryList[this.activeCategoryIndex].name}失败`)
+                    this.$refs.progress.updateProgressStatus(1, `【失败】需先删除${this.categoryList[this.activeCategoryIndex].name}`)
+                }
+            },
+            // 删除结束
             onConfirmDelete(){
                 this.isDelete = false
                 setTimeout(()=>{
@@ -421,7 +440,6 @@
     }	
     .wrapper{
         width: 750rpx;
-        height: 30vh;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
@@ -438,7 +456,6 @@
             border-bottom: 1px solid $border-color-light;
         }
         .body{
-            flex: 1;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -448,7 +465,7 @@
             .download,
             .update,
             .delete{
-                flex: 1;
+                height: 100rpx;
                 width: 100%;
                 display: flex;
                 justify-content: center;

@@ -12,9 +12,9 @@
                 file-mediatype="all" 
                 file-extname="txt,doc,docx,md" 
                 dir="knowledge" 
-                title="最多选择9个文件" 
+                :title="fileLimit === 1 ? `请重新上传文件：${currentId}` : `最多选择${fileLimit}个文件`" 
 				:auto-upload="false"
-                :limit="9"
+                :limit="fileLimit"
                 @select="onSelectFiles">
             </uni-file-picker>
 			</uni-forms-item>
@@ -27,31 +27,40 @@
 </template>
 
 <script>
+import { updateKnowledge } from '../../uniCloud-aliyun/cloudfunctions/xxm-rag/index.obj';
+
 	const ragCloudObj = uniCloud.importObject("xxm-rag", {customUI:true})
 	export default {
 		data() {
-				return {
-					progressData: {
-						title: '同步到知识库',
-						data: [],
-						percentage: 0,
-						scrollTop: 0
-					},
-					knowledgeData: {
-						isUploading: false,
-						files: []
-					},
-					selectedFiles: [], // 存储用户选择的文件信息
-					knowledgeRules: {
-						files: {
-							rules: [{
-								required: true,
-								errorMessage: '请选择文件',
-							}]
-						}
+			return {
+				currentId: '',
+				fileLimit: 9,
+				progressData: {
+					title: '同步到知识库',
+					data: [],
+					percentage: 0,
+					scrollTop: 0
+				},
+				knowledgeData: {
+					isUploading: false,
+					files: []
+				},
+				selectedFiles: [], // 存储用户选择的文件信息
+				knowledgeRules: {
+					files: {
+						rules: [{
+							required: true,
+							errorMessage: '请选择文件',
+						}]
 					}
-				};
-			},
+				}
+			};
+		},
+		onLoad(e){
+			this.isManage()
+			this.currentId = e?.id || null
+			this.fileLimit = e.id ? 1 : 9
+		},
 		methods: {
 			// 提交
 			async onSubmit(){
@@ -60,6 +69,15 @@
 				// 初始化上传进度
 				this.initProgress()
 				// 使用 for（顺序执行） 循环替代 forEach（并行执行）
+				if (this.fileLimit === 1 && this.currentId){
+					await this.updateKnowledge()
+				}
+				else{
+					await this.addKnowledge()
+				}
+			},
+			// 添加知识库
+			async addKnowledge(){
 				for (let i = 0; i < this.knowledgeData.files.length; i++) {
 					const file = this.knowledgeData.files[i];
 					// 从本地获取文件内容
@@ -91,32 +109,86 @@
 					this.$refs.progress.updateProgressStatus(i * 2 +  1, res.data.message, true)
 				}
 			},
-			// 处理文件选择
-			onSelectFiles(e) {
-				// 清除之前的选择
-				this.knowledgeData.files = []
-				// 存储选择的文件信息
-				this.knowledgeData.files = e.tempFiles.map((tempFile) => ({
-					name: tempFile.name,
-					url: tempFile.url,  // 本地文件路径
-					size: tempFile.size,
-					content: '',
-				}))
+			// 更新知识库
+			async updateKnowledge(){
+				let res
+				const file = this.knowledgeData.files[0]
+				// 1.校验文件名和文件内容
+				if (this.currentId != file.name){
+					this.$refs.progress.updateProgressStatus(0, '【失败】文件名不匹配')
+					this.$refs.progress.updateProgressStatus(1, '【跳过】文件名不匹配')
+					this.$refs.progress.updateProgressStatus(2, '【跳过】文件名不匹配')
+					this.$refs.progress.updateProgressStatus(3, '【跳过】文件名不匹配')
+					return
+				}
+				res = await ragCloudObj.getFile(this.currentId)
+				if (res.statusCode != 200) {
+					this.$refs.progress.updateProgressStatus(0, '【失败】文件不存在')
+					this.$refs.progress.updateProgressStatus(1, '【跳过】文件不存在')
+					this.$refs.progress.updateProgressStatus(2, '【跳过】文件不存在')
+					this.$refs.progress.updateProgressStatus(3, '【跳过】文件不存在')
+					return
+				}
+				this.$refs.progress.updateProgressStatus(0, '【成功】文件校验通过')
+				file.content = res.data.content
+				file.url = res.data.url
+				// 2.删除原文件
+				res = await ragCloudObj.deleteFile(this.currentId)
+				if(res.fileList[0].fileID.split('/').pop() != this.currentId){
+					this.$refs.progress.updateProgressStatus(1, '【失败】文件删除失败')
+					this.$refs.progress.updateProgressStatus(2, '【跳过】文件删除失败')
+					this.$refs.progress.updateProgressStatus(3, '【跳过】文件删除失败')
+				}
+				this.$refs.progress.updateProgressStatus(1, '【成功】原文件已删除')
+				// 3.上传新文件
+				res = await ragCloudObj.uploadFile({
+					filePath: file.url,
+					cloudPath: `knowledge/${this.currentId}`,
+					cloudPathAsRealPath: true
+				})
+				this.$refs.progress.updateProgressStatus(2, res.success ? '【成功】文件上传成功' : '【失败】文件上传失败', true)
+				// 4.同步到知识库
+				res = await ragCloudObj.uploadKnowledge({
+					id: this.currentId,
+					category: "file",
+					content: file.content,
+					url: [file.url]
+				})
+				this.$refs.progress.updateProgressStatus(3, res.data.message)
 			},
 			// 初始化上传进度
 			initProgress(){
 				this.knowledgeData.isUploading = true
 				const items = []
-				this.knowledgeData.files.forEach((file) => {
-					items.push({
-						name: file.name,
-						status: '【等待】上传文件'
+				if (this.fileLimit === 1 && this.currentId){
+					this.knowledgeData.files.forEach((file) => {
+						items.push({
+							name: this.currentId,
+							status: '【等待】校验文件'
+						},{
+							name: '',
+							status: '【等待】删除原文件'
+						},{
+							name: '',
+							status: '【等待】上传新文件'
+						},
+						{
+							name: '',
+							status: '【等待】同步到知识库'
+						})
 					})
-					items.push({
-						name: '',
-						status: '【等待】同步到知识库'
+				}
+				else{
+					this.knowledgeData.files.forEach((file) => {
+						items.push({
+							name: file.name,
+							status: '【等待】上传文件'
+						},{
+							name: '',
+							status: '【等待】同步到知识库'
+						})
 					})
-				})
+				}
 				this.$refs.progress.initProgress('上传和同步文件中', items)
 			},
 			// 确认上传

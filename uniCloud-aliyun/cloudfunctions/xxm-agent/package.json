@@ -1,0 +1,7 @@
+{
+  "name": "xxm-agent",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}
